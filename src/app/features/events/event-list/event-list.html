@@ -1,0 +1,152 @@
+<div class="event-list-page">
+    <div class="page-header">
+        <h1 class="page-header__title">Tableau de bord des Événements</h1>
+        <div class="page-header__actions flex gap-2">
+            <button mat-stroked-button (click)="exportCSV()" [disabled]="dataSource.data.length === 0">
+                <mat-icon>download</mat-icon>
+                Exporter
+            </button>
+            <button mat-raised-button color="primary">
+                <mat-icon>add</mat-icon>
+                Nouvel Événement
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-bar flex flex-wrap gap-4 mb-6 items-center p-4 bg-white rounded-lg border shadow-sm">
+        <mat-form-field appearance="outline" class="search-field flex-grow max-w-md">
+            <mat-label>Rechercher un événement</mat-label>
+            <input matInput (keyup)="onSearchChange($any($event.target).value)" placeholder="Titre, lieu...">
+            <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-64">
+            <mat-label>Organisation</mat-label>
+            <mat-select [value]="orgFilter" (selectionChange)="onOrgFilterChange($event.value)">
+                <mat-option value="all">Toutes les organisations</mat-option>
+                <mat-option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="filter-group flex gap-2">
+            <button mat-stroked-button [color]="statusFilter === 'all' ? 'primary' : ''"
+                (click)="onStatusFilterChange('all')">Tout</button>
+            <button mat-stroked-button [color]="statusFilter === 'upcoming' ? 'primary' : ''"
+                (click)="onStatusFilterChange('upcoming')">À venir</button>
+            <button mat-stroked-button [color]="statusFilter === 'ongoing' ? 'primary' : ''"
+                (click)="onStatusFilterChange('ongoing')">En cours</button>
+            <button mat-stroked-button [color]="statusFilter === 'completed' ? 'primary' : ''"
+                (click)="onStatusFilterChange('completed')">Terminés</button>
+        </div>
+    </div>
+
+    <div class="event-table-container">
+        <div *ngIf="loading" class="flex justify-center items-center p-8">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" *ngIf="!loading && dataSource.data.length > 0; else emptyState">
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Événement </th>
+                <td mat-cell *matCellDef="let event">
+                    <div class="event-name-cell">
+                        <span class="font-bold text-gray-900 block">{{event.title}}</span>
+                        <span class="text-xs text-gray-500">{{event.type}}</span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Org Column -->
+            <ng-container matColumnDef="organization">
+                <th mat-header-cell *matHeaderCellDef> Organisation </th>
+                <td mat-cell *matCellDef="let event">
+                    <span class="text-xs px-2 py-1 bg-gray-100 rounded text-gray-700">
+                        {{ getOrganizationName(event.organization_id) }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef> Date </th>
+                <td mat-cell *matCellDef="let event"> {{event.date | date:'short'}} </td>
+            </ng-container>
+
+            <!-- Location Column -->
+            <ng-container matColumnDef="location">
+                <th mat-header-cell *matHeaderCellDef> Lieu </th>
+                <td mat-cell *matCellDef="let event">
+                    <div class="flex items-center gap-1 text-gray-600">
+                        <mat-icon class="text-sm w-4 h-4">place</mat-icon>
+                        <span class="truncate max-w-[150px]">{{event.location}}</span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Type Column -->
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef> participants </th>
+                <td mat-cell *matCellDef="let event">
+                    <div class="flex -space-x-2">
+                        <div
+                            class="w-8 h-8 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[10px] font-bold">
+                            JD</div>
+                        <div
+                            class="w-8 h-8 rounded-full border-2 border-white bg-blue-200 flex items-center justify-center text-[10px] font-bold">
+                            AL</div>
+                        <div
+                            class="w-8 h-8 rounded-full border-2 border-white bg-gray-800 text-white flex items-center justify-center text-[10px] font-bold">
+                            +12</div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef> Statut </th>
+                <td mat-cell *matCellDef="let event">
+                    <span class="status-badge" [ngClass]="'status-badge--' + event.status">
+                        {{ event.status === 'upcoming' ? 'À venir' : event.status === 'ongoing' ? 'En cours' : 'Terminé'
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let event">
+                    <button mat-icon-button [matMenuTriggerFor]="eventMenu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #eventMenu="matMenu" xPosition="before">
+                        <button mat-menu-item [routerLink]="['/dashboard/events', event.id]">
+                            <mat-icon>visibility</mat-icon>
+                            <span>Voir Détails</span>
+                        </button>
+                        <button mat-menu-item (click)="deleteEvent(event)">
+                            <mat-icon color="warn">delete</mat-icon>
+                            <span>Supprimer</span>
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons
+            aria-label="Sélectionner la page"></mat-paginator>
+
+        <ng-template #emptyState>
+            <div class="empty-state" *ngIf="!loading">
+                <mat-icon class="empty-state__icon">event_busy</mat-icon>
+                <h2 class="empty-state__title">Aucun événement trouvé</h2>
+                <p class="empty-state__subtitle">Essayez d'ajuster vos filtres.</p>
+            </div>
+        </ng-template>
+    </div>
+</div>

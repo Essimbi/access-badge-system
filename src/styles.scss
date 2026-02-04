@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@import "material-icons/iconfont/material-icons.css";
+@import "material-symbols/index.css";
+
+/* Base styles */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Custom Snackbar Styles */
+.snackbar-success {
+    @apply bg-success text-white !important;
+}
+
+.snackbar-error {
+    @apply bg-danger text-white !important;
+}
+
+.snackbar-info {
+    @apply bg-info text-white !important;
+}
+
+.snackbar-warning {
+    @apply bg-warning text-white !important;
+}
+
+/* Custom Card Styles */
+.stat-card {
+    @apply transition-transform duration-200;
+}
+
+.stat-card:hover {
+    @apply -translate-y-1 shadow-lg;
+}
+
+/* Status Chips */
+.status-pending {
+    @apply bg-warning text-white;
+}
+
+.status-approved {
+    @apply bg-success text-white;
+}
+
+.status-rejected {
+    @apply bg-danger text-white;
+}

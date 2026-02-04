@@ -1,0 +1,131 @@
+<div class="enrollment-detail-page p-6 max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <button mat-icon-button routerLink="/dashboard/enrollments">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div>
+                <h1 class="page-header__title mb-0">Détails de l'Inscription #{{enrollment?.id}}</h1>
+                <p class="text-slate-500 text-sm">Gérer la participation et le statut de validation</p>
+            </div>
+        </div>
+        <div class="flex gap-2" *ngIf="enrollment">
+            <button mat-stroked-button color="warn" (click)="updateStatus('cancelled')"
+                *ngIf="enrollment.status !== 'cancelled'">
+                Annuler
+            </button>
+            <button mat-flat-button color="primary" (click)="updateStatus('confirmed')"
+                *ngIf="enrollment.status === 'pending'">
+                Confirmer
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center p-20">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loading && enrollment" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Participant & Event Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <mat-card class="p-8">
+                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                    <mat-icon color="primary">person</mat-icon>
+                    Informations du Participant
+                </h3>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nom
+                            Complet</label>
+                        <div class="text-lg font-medium">{{enrollment.userName}}</div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</label>
+                        <div class="text-slate-600">{{enrollment.userEmail || 'non fourni'}}</div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID
+                            Participant</label>
+                        <div class="font-mono text-slate-600">ID-{{enrollment.userId}}</div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date
+                            d'inscription</label>
+                        <div class="text-slate-600">{{enrollment.registeredAt | date:'medium'}}</div>
+                    </div>
+                </div>
+            </mat-card>
+
+            <mat-card class="p-8">
+                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                    <mat-icon color="accent">event</mat-icon>
+                    Événement Associé
+                </h3>
+                <div class="flex gap-6 items-start">
+                    <div class="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <mat-icon class="text-slate-300 text-5xl">image</mat-icon>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="text-xl font-bold text-slate-900 mb-1">{{enrollment.eventTitle}}</div>
+                        <div class="flex items-center gap-2 text-sm text-slate-500 mb-4">
+                            <mat-icon class="text-sm w-4 h-4">location_on</mat-icon>
+                            <span>Palais de la Culture, Abidjan</span>
+                        </div>
+                        <button mat-stroked-button size="small">Voir l'événement</button>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+
+        <!-- Right: Status & Actions -->
+        <div class="space-y-6">
+            <mat-card class="p-6">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-6 font-mono">Statut Actuel</h3>
+                <div class="flex flex-col items-center p-6 bg-slate-50 rounded-xl border border-slate-100 mb-6">
+                    <span class="px-4 py-2 rounded-full text-xs font-bold uppercase mb-2" [ngClass]="{
+                            'bg-green-100 text-green-700': enrollment.status === 'confirmed',
+                            'bg-orange-100 text-orange-700': enrollment.status === 'pending',
+                            'bg-red-100 text-red-700': enrollment.status === 'cancelled'
+                        }">
+                        {{ enrollment.status === 'confirmed' ? 'Confirmé' : enrollment.status === 'pending' ? 'En
+                        attente' : 'Annulé' }}
+                    </span>
+                    <div class="text-[10px] text-slate-400">Validé le {{enrollment.registeredAt | date}}</div>
+                </div>
+
+                <mat-divider class="mb-6"></mat-divider>
+
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Actions de badge</h3>
+                <div class="space-y-2">
+                    <button mat-stroked-button class="w-full text-left justify-start" color="primary">
+                        <mat-icon>print</mat-icon>
+                        Imprimer le Badge
+                    </button>
+                    <button mat-stroked-button class="w-full text-left justify-start">
+                        <mat-icon>email</mat-icon>
+                        Renvoyer l'Email
+                    </button>
+                </div>
+            </mat-card>
+
+            <mat-card class="p-6 bg-slate-900 text-white border-0">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Historique d'accès</h3>
+                <div class="space-y-4">
+                    <div class="flex gap-3 border-l-2 border-green-500 pl-4 py-1">
+                        <div>
+                            <p class="text-[10px] text-slate-400 leading-none mb-1">AUJOURD'HUI 14:20</p>
+                            <p class="text-xs font-medium">Entrée: GATE-001</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 border-l-2 border-slate-700 pl-4 py-1 opacity-50">
+                        <div>
+                            <p class="text-[10px] text-slate-400 leading-none mb-1">04 FÉV 09:15</p>
+                            <p class="text-xs">Tentative échouée (Zone VIP)</p>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+<div class="org-modal">
+    <h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Créer' }} une Organisation</h2>
+
+    <div *ngIf="loading" class="loading-container p-8 flex justify-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <mat-dialog-content class="mat-typography" *ngIf="!loading">
+        <form [formGroup]="orgForm" class="org-form pt-4">
+            <div class="org-form__grid">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Nom de l'organisation</mat-label>
+                    <input matInput formControlName="name" placeholder="Ex: Tech Sud Solutions">
+                    <mat-icon matPrefix>business</mat-icon>
+                    <mat-error *ngIf="orgForm.get('name')?.hasError('required')">Le nom est requis</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Email de contact</mat-label>
+                    <input matInput formControlName="email" type="email" placeholder="contact@domaine.com">
+                    <mat-icon matPrefix>email</mat-icon>
+                    <mat-error *ngIf="orgForm.get('email')?.hasError('required')">L'email est requis</mat-error>
+                    <mat-error *ngIf="orgForm.get('email')?.hasError('email')">Format d'email invalide</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Téléphone</mat-label>
+                    <input matInput formControlName="phone" placeholder="Ex: +33 4 00 00 00 00">
+                    <mat-icon matPrefix>phone</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Administrateur principal</mat-label>
+                    <mat-select formControlName="adminUserId">
+                        <mat-option [value]="null">Sélectionner un administrateur...</mat-option>
+                        <mat-option *ngFor="let user of potentialAdmins" [value]="user.id">
+                            {{user.firstName}} {{user.lastName}} ({{user.email}})
+                        </mat-option>
+                    </mat-select>
+                    <mat-icon matPrefix>person</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full col-span-2">
+                    <mat-label>Adresse</mat-label>
+                    <input matInput formControlName="address" placeholder="Adresse complète">
+                    <mat-icon matPrefix>location_on</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full col-span-2">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput formControlName="description" rows="3"
+                        placeholder="Brève description de l'organisation..."></textarea>
+                    <mat-icon matPrefix>description</mat-icon>
+                    <mat-error *ngIf="orgForm.get('description')?.hasError('required')">La description est
+                        requise</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>URL du Logo</mat-label>
+                    <input matInput formControlName="logoUrl" placeholder="https://exemple.com/logo.png">
+                    <mat-icon matPrefix>image</mat-icon>
+                </mat-form-field>
+
+                <div
+                    class="color-picker-container flex items-center gap-4 px-3 border rounded-md h-[56px] border-gray-300">
+                    <span class="text-sm text-gray-500">Couleur principale</span>
+                    <input type="color" formControlName="primaryColor"
+                        class="h-8 w-16 border-none bg-transparent cursor-pointer">
+                </div>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="modal-actions">
+        <button mat-button type="button" (click)="onCancel()" [disabled]="submitting">
+            Annuler
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="orgForm.invalid || submitting"
+            (click)="onSubmit()">
+            <span *ngIf="!submitting">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</span>
+            <mat-spinner diameter="20" *ngIf="submitting"></mat-spinner>
+        </button>
+    </mat-dialog-actions>
+</div>

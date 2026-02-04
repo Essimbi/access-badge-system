@@ -1,0 +1,133 @@
+.user-list-page {
+    padding: 24px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+
+    &__title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+}
+
+.user-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+}
+
+.user-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &__text {
+        font-weight: 500;
+        color: #2d3748;
+    }
+}
+
+.user-avatar-mini {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #edf2f7;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.role-chip {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--super_admin {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    &--admin {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    &--controller {
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    &--participant {
+        background: #fdf2f7;
+        color: #9d174d;
+    }
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+
+    &--active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    &--inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+}
+
+.actions-cell {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.text-danger {
+    color: #f44336 !important;
+}
+
+.empty-state {
+    padding: 64px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    &__icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        color: #cbd5e0;
+        margin-bottom: 16px;
+    }
+
+    &__title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+
+    &__subtitle {
+        color: #718096;
+        max-width: 300px;
+    }
+}

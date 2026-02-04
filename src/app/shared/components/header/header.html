@@ -1,0 +1,42 @@
+<mat-toolbar class="header">
+    <div class="header__left">
+        <button mat-icon-button class="header__menu-btn">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <span class="header__welcome">Bienvenue sur votre espace de gestion de badges</span>
+    </div>
+
+    <div class="header__right">
+        <button mat-icon-button class="header__action-btn">
+            <mat-icon>notifications_none</mat-icon>
+        </button>
+        <button mat-icon-button class="header__action-btn">
+            <mat-icon>help_outline</mat-icon>
+        </button>
+
+        <div class="header__divider"></div>
+
+        <button mat-button [matMenuTriggerFor]="userMenu" class="header__user-btn">
+            <div class="header__user-info">
+                <mat-icon class="header__user-info-icon">account_circle</mat-icon>
+                <mat-icon class="header__user-info-arrow text-xs">keyboard_arrow_down</mat-icon>
+            </div>
+        </button>
+
+        <mat-menu #userMenu="matMenu" xPosition="before" class="mt-2">
+            <button mat-menu-item routerLink="/users/profile">
+                <mat-icon>person_outline</mat-icon>
+                <span>Mon Profil</span>
+            </button>
+            <button mat-menu-item routerLink="/settings">
+                <mat-icon>settings</mat-icon>
+                <span>Paramètres</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()" class="text-danger">
+                <mat-icon class="text-danger">logout</mat-icon>
+                <span>Déconnexion</span>
+            </button>
+        </mat-menu>
+    </div>
+</mat-toolbar>

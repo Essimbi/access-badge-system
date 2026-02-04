@@ -1,0 +1,158 @@
+<div class="user-detail-page">
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="!loading && user">
+        <!-- Header / Hero Section -->
+        <div class="page-header relative overflow-hidden bg-slate-800 text-white rounded-lg mb-6">
+            <div class="p-8 flex items-center justify-between relative z-10">
+                <div class="flex items-center gap-6">
+                    <div
+                        class="user-avatar w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-bold shadow-xl border-4 border-white/20">
+                        {{ user.firstName[0] }}{{ user.lastName[0] }}
+                    </div>
+                    <div>
+                        <a routerLink="/dashboard/users"
+                            class="text-white/60 hover:text-white flex items-center gap-1 text-sm mb-1 no-underline">
+                            <mat-icon class="text-sm w-4 h-4">arrow_back</mat-icon>
+                            Retour
+                        </a>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-3xl font-bold m-0">{{ user.firstName }} {{ user.lastName }}</h1>
+                            <span class="status-badge" [class.status-badge--active]="user.is_active">
+                                {{ user.is_active ? 'Actif' : 'Inactif' }}
+                            </span>
+                        </div>
+                        <p class="text-blue-100 mt-2 flex items-center gap-2">
+                            <mat-icon class="text-sm w-4 h-4">email</mat-icon>
+                            {{ user.email }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button mat-flat-button style="background-color: rgba(255,255,255,0.2); color: white;"
+                        (click)="openEditForm()">
+                        <mat-icon>edit</mat-icon>
+                        Modifier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Sidebar Info -->
+            <div class="lg:col-span-1 space-y-6">
+                <mat-card class="p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <mat-icon color="primary">info</mat-icon>
+                        Informations
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase font-bold block mb-1">Rôle</span>
+                            <span class="role-chip" [ngClass]="'role-chip--' + user.role">
+                                {{ getRoleLabel(user.role) }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase font-bold block mb-1">Organisation ID</span>
+                            <span class="text-gray-900 font-medium">{{ user.organization_id || 'Aucune' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase font-bold block mb-1">Membre depuis</span>
+                            <span class="text-gray-900 font-medium">{{ user.createdAt | date:'longDate' }}</span>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <mat-icon color="accent">bar_chart</mat-icon>
+                        Statistiques
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-3 rounded-lg text-center">
+                            <span class="block text-2xl font-bold text-gray-900">{{ stats.totalEvents }}</span>
+                            <span class="text-[10px] text-gray-500 uppercase">Evénements</span>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg text-center">
+                            <span class="block text-2xl font-bold text-blue-600">{{ stats.presenceRate }}%</span>
+                            <span class="text-[10px] text-gray-500 uppercase">Présence</span>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+
+            <!-- Main Content Tabs -->
+            <div class="lg:col-span-2">
+                <mat-card class="overflow-hidden">
+                    <mat-tab-group>
+                        <mat-tab label="Activités">
+                            <div class="p-6">
+                                <div class="activity-timeline" *ngIf="activities.length > 0; else noActivities">
+                                    <div class="activity-item pb-4 mb-4 border-l-2 border-gray-100 pl-6 relative"
+                                        *ngFor="let activity of activities">
+                                        <div
+                                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-sm">
+                                        </div>
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ activity.message }}</p>
+                                                <p class="text-xs text-gray-500">{{ activity.type }}</p>
+                                            </div>
+                                            <span class="text-xs text-gray-400 font-mono">{{ activity.date |
+                                                date:'short' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ng-template #noActivities>
+                                    <div class="p-12 text-center text-gray-400">
+                                        <mat-icon class="text-5xl opacity-20">history</mat-icon>
+                                        <p class="mt-2 text-sm">Aucune activité récente.</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Événements">
+                            <div class="p-0">
+                                <table mat-table [dataSource]="events" class="w-full"
+                                    *ngIf="events.length > 0; else noEvents">
+                                    <ng-container matColumnDef="title">
+                                        <th mat-header-cell *matHeaderCellDef class="pl-6"> Titre </th>
+                                        <td mat-cell *matCellDef="let event" class="pl-6 font-medium"> {{event.title}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="date">
+                                        <th mat-header-cell *matHeaderCellDef> Date </th>
+                                        <td mat-cell *matCellDef="let event" class="text-gray-500"> {{event.date |
+                                            date:'short'}} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="status">
+                                        <th mat-header-cell *matHeaderCellDef class="pr-6"> Statut </th>
+                                        <td mat-cell *matCellDef="let event" class="pr-6 text-right text-xs">
+                                            <span class="px-2 py-1 rounded"
+                                                [ngClass]="event.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'">
+                                                {{ event.status === 'completed' ? 'Terminé' : 'À venir' }}
+                                            </span>
+                                        </td>
+                                    </ng-container>
+                                    <tr mat-header-row *matHeaderRowDef="['title', 'date', 'status']"
+                                        class="bg-gray-50 uppercase text-[10px]"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['title', 'date', 'status'];"></tr>
+                                </table>
+                                <ng-template #noEvents>
+                                    <div class="p-12 text-center text-gray-400">
+                                        <mat-icon class="text-5xl opacity-20">event_busy</mat-icon>
+                                        <p class="mt-2 text-sm">Aucun événement associé.</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
+                </mat-card>
+            </div>
+        </div>
+    </ng-container>
+</div>

@@ -1,0 +1,111 @@
+@use '../../../../styles' as *;
+
+.sidebar {
+    height: 100%;
+    background-color: var(--color-white);
+    border-right: 1px solid #e5e7eb; // gray-200
+    display: flex;
+    flex-direction: column;
+    width: 16rem; // w-64
+
+    &__logo {
+        padding: 1.5rem; // p-6
+        border-bottom: 1px solid #f3f4f6; // gray-100
+        display: flex;
+        align-items: center;
+        gap: 0.75rem; // gap-3
+
+        &-icon {
+            color: var(--color-primary-600);
+            transform: scale(1.25);
+        }
+
+        &-text {
+            font-size: 1.25rem; // text-xl
+            font-bold: 700;
+            background: linear-gradient(to right, var(--color-primary-700), var(--color-primary-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    }
+
+    &__nav {
+        flex-grow: 1;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+
+        &-item {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+                background-color: #f9fafb;
+            }
+
+            &--active {
+                background-color: var(--color-primary-50) !important;
+                color: var(--color-primary-700) !important;
+                border-right: 4px solid var(--color-primary-600);
+            }
+
+            mat-icon {
+                margin-right: 0.75rem;
+            }
+
+            span {
+                font-weight: 500;
+            }
+        }
+    }
+
+    &__user {
+        padding: 1rem;
+        border-top: 1px solid #f3f4f6;
+        background-color: #f9fafb; // gray-50
+
+        &-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        &-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background-color: var(--color-primary-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary-700);
+            font-weight: 700;
+        }
+
+        &-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        &-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        &-role {
+            font-size: 0.75rem;
+            color: #6b7280; // gray-500
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: capitalize;
+        }
+    }
+}

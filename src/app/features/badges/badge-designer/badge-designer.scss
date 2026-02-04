@@ -1,0 +1,39 @@
+.badge-designer-page {
+    padding: 24px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.preview-container {
+    background-image: radial-gradient(circle at 2px 2px, #e2e8f0 1px, transparent 0);
+    background-size: 24px 24px;
+}
+
+.badge-preview {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    background: white;
+}
+
+.portrait-mode {
+    width: 60mm;
+    height: 85mm;
+}
+
+.landscape-mode {
+    width: 85mm;
+    height: 60mm;
+}
+
+.qr-placeholder {
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

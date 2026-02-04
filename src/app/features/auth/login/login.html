@@ -1,0 +1,59 @@
+<div class="login-page">
+    <mat-card class="login-card">
+        <div class="login-header">
+            <div class="login-header__logo-container">
+                <div class="login-header__logo-wrapper">
+                    <mat-icon class="login-header__logo-icon">badge</mat-icon>
+                </div>
+            </div>
+            <h2 class="login-header__title">Connexion</h2>
+            <p class="login-header__subtitle">
+                Bienvenue sur le portail EventBadge
+            </p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            <mat-form-field appearance="outline" class="login-form__field">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email" placeholder="votre@email.com" autocomplete="email">
+                <mat-icon matPrefix>email</mat-icon>
+                <mat-error *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis</mat-error>
+                <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Format d'email invalide</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="login-form__field">
+                <mat-label>Mot de passe</mat-label>
+                <input matInput formControlName="password" [type]="showPassword ? 'text' : 'password'"
+                    placeholder="••••••••" autocomplete="current-password">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix (click)="showPassword = !showPassword" type="button"
+                    [attr.aria-label]="'Afficher le mot de passe'" [attr.aria-pressed]="showPassword">
+                    <mat-icon>{{showPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+                </button>
+                <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est
+                    requis</mat-error>
+                <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Le mot de passe doit faire au moins
+                    6 caractères</mat-error>
+            </mat-form-field>
+
+            <div class="login-form__options">
+                <a routerLink="/auth/forgot-password" class="login-form__forgot-password">
+                    Mot de passe oublié ?
+                </a>
+            </div>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading"
+                class="login-form__submit-btn">
+                <span *ngIf="!loading">Se Connecter</span>
+                <mat-spinner diameter="24" *ngIf="loading" color="accent" class="mx-auto"></mat-spinner>
+            </button>
+
+            <div class="login-form__footer">
+                <span>Pas encore de compte ?</span>
+                <a routerLink="/auth/register" class="login-form__footer-link">
+                    S'inscrire
+                </a>
+            </div>
+        </form>
+    </mat-card>
+</div>

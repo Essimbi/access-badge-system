@@ -1,0 +1,244 @@
+<div class="org-detail-page">
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="!loading && organization">
+        <div class="page-header relative overflow-hidden"
+            [style.background-color]="organization.primaryColor || '#1e293b'"
+            style="color: white; border-radius: 8px; margin-bottom: 24px;">
+            <div class="p-8 flex items-center justify-between relative z-10">
+                <div class="flex items-center gap-6">
+                    <div class="org-logo w-20 h-20 rounded shadow-lg bg-white p-1 flex items-center justify-center"
+                        *ngIf="organization.logoUrl">
+                        <img [src]="organization.logoUrl" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <div class="org-logo w-20 h-20 rounded shadow-lg bg-white/20 flex items-center justify-center font-bold text-2xl"
+                        *ngIf="!organization.logoUrl">
+                        {{ organization.name.charAt(0) }}
+                    </div>
+                    <div>
+                        <a routerLink="/dashboard/organizations"
+                            class="text-white/60 hover:text-white flex items-center gap-1 text-sm mb-1 no-underline">
+                            <mat-icon class="text-sm w-4 h-4">arrow_back</mat-icon>
+                            Retour
+                        </a>
+                        <h1 class="text-3xl font-bold m-0">{{ organization.name }}</h1>
+                    </div>
+                </div>
+                <button mat-flat-button style="background-color: rgba(255,255,255,0.2); color: white;"
+                    (click)="openEditForm()">
+                    <mat-icon>edit</mat-icon>
+                    Modifier
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-grid__sidebar">
+                <mat-card class="info-card">
+                    <div class="info-card__section">
+                        <span class="info-card__label">Email de contact</span>
+                        <span class="info-card__value">
+                            <mat-icon>email</mat-icon>
+                            {{ organization.email }}
+                        </span>
+                    </div>
+
+                    <div class="info-card__section">
+                        <span class="info-card__label">Téléphone</span>
+                        <span class="info-card__value">
+                            <mat-icon>phone</mat-icon>
+                            {{ organization.phone || 'Non renseigné' }}
+                        </span>
+                    </div>
+
+                    <div class="info-card__section">
+                        <span class="info-card__label">Adresse</span>
+                        <span class="info-card__value">
+                            <mat-icon>location_on</mat-icon>
+                            {{ organization.address || 'Non renseigné' }}
+                        </span>
+                    </div>
+
+                    <mat-divider class="my-4"></mat-divider>
+
+                    <div class="info-card__section">
+                        <span class="info-card__label">Administrateur</span>
+                        <span class="info-card__value">
+                            <mat-icon>account_box</mat-icon>
+                            {{ organization.adminUser ? organization.adminUser.firstName + ' ' +
+                            organization.adminUser.lastName : 'Aucun' }}
+                        </span>
+                    </div>
+
+                    <div class="info-card__section">
+                        <span class="info-card__label">Description</span>
+                        <p class="text-sm text-gray-600 mt-1">{{ organization.description }}</p>
+                    </div>
+                </mat-card>
+            </div>
+
+            <div class="detail-grid__main">
+                <div class="stats-summary" *ngIf="stats">
+                    <div class="stat-item">
+                        <span class="stat-item__value">{{ stats.totalEvents || 0 }}</span>
+                        <span class="stat-item__label">Événements</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-item__value">{{ stats.totalBadges || 0 }}</span>
+                        <span class="stat-item__label">Badges Gérés</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-item__value">{{ stats.totalUsers || 0 }}</span>
+                        <span class="stat-item__label">Membres</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-item__value">{{ stats.activeEvents || 0 }}</span>
+                        <span class="stat-item__label">Événements Actifs</span>
+                    </div>
+                </div>
+
+                <div class="stats-overview grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" *ngIf="stats">
+                    <mat-card class="p-4 flex flex-col items-center">
+                        <span class="text-xs text-gray-500 uppercase font-semibold">Total Evénements</span>
+                        <span class="text-2xl font-bold">{{ stats.totalEvents }}</span>
+                    </mat-card>
+                    <mat-card class="p-4 flex flex-col items-center">
+                        <span class="text-xs text-gray-500 uppercase font-semibold">Participants Actifs</span>
+                        <span class="text-2xl font-bold text-blue-600">{{ stats.activeParticipants }}</span>
+                    </mat-card>
+                    <mat-card class="p-4 flex flex-col items-center">
+                        <span class="text-xs text-gray-500 uppercase font-semibold">Taux de Présence</span>
+                        <span class="text-2xl font-bold text-green-600">{{ stats.attendanceRate }}%</span>
+                    </mat-card>
+                    <mat-card class="p-4 flex flex-col items-center">
+                        <span class="text-xs text-gray-500 uppercase font-semibold">Revenus (Simulé)</span>
+                        <span class="text-2xl font-bold text-purple-600">8 450 €</span>
+                    </mat-card>
+                </div>
+
+                <mat-card class="mb-6">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4">Aperçu Analytique (Simulation)</h3>
+                        <div class="h-64 bg-gray-50 rounded-lg flex items-end justify-between p-6 gap-2">
+                            <div class="flex-grow bg-blue-400 rounded-t h-[30%]" matTooltip="Janvier: 30"></div>
+                            <div class="flex-grow bg-blue-400 rounded-t h-[45%]" matTooltip="Février: 45"></div>
+                            <div class="flex-grow bg-blue-500 rounded-t h-[70%]" matTooltip="Mars: 70"></div>
+                            <div class="flex-grow bg-blue-400 rounded-t h-[25%]" matTooltip="Avril: 25"></div>
+                            <div class="flex-grow bg-blue-600 rounded-t h-[90%]" matTooltip="Mai: 90"></div>
+                            <div class="flex-grow bg-blue-500 rounded-t h-[55%]" matTooltip="Juin: 55"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-400">
+                            <span>Jan</span><span>Fév</span><span>Mar</span><span>Avr</span><span>Mai</span><span>Jun</span>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="tabs-card">
+                    <mat-tab-group>
+                        <mat-tab label="Événements Récents">
+                            <div class="event-list" *ngIf="events.length > 0; else noEvents">
+                                <div class="event-list__item" *ngFor="let event of events">
+                                    <div class="event-list__info">
+                                        <span class="event-list__title">{{ event.name }}</span>
+                                        <span class="event-list__meta">{{ event.date | date:'dd MMM yyyy' }} • {{
+                                            event.location }}</span>
+                                    </div>
+                                    <button mat-icon-button [routerLink]="['/dashboard/events', event.id]">
+                                        <mat-icon>chevron_right</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <ng-template #noEvents>
+                                <div class="p-8 text-center text-gray-400">
+                                    <mat-icon class="text-4xl">event_busy</mat-icon>
+                                    <p class="mt-2">Aucun événement trouvé pour cette organisation.</p>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                        <mat-tab label="Membres">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-800">Membres de l'organisation</h3>
+                                    <button mat-flat-button color="primary" (click)="openAddMemberDialog()">
+                                        <mat-icon>person_add</mat-icon>
+                                        Ajouter un membre
+                                    </button>
+                                </div>
+
+                                <div class="members-list" *ngIf="members.length > 0; else noMembers">
+                                    <table class="w-full text-sm text-left">
+                                        <thead class="bg-gray-50 text-gray-600 font-medium border-b">
+                                            <tr>
+                                                <th class="py-3 px-4">Utilisateur</th>
+                                                <th class="py-3 px-4">Rôle</th>
+                                                <th class="py-3 px-4 text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y">
+                                            <tr *ngFor="let member of members" class="hover:bg-gray-50">
+                                                <td class="py-3 px-4">
+                                                    <div class="font-medium text-gray-900">{{ member.firstName }} {{
+                                                        member.lastName }}</div>
+                                                    <div class="text-gray-500">{{ member.email }}</div>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        {{ member.role }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-right">
+                                                    <button mat-icon-button color="warn"
+                                                        matTooltip="Retirer de l'organisation"
+                                                        (click)="removeMember(member.id)">
+                                                        <mat-icon>person_remove</mat-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <ng-template #noMembers>
+                                    <div class="p-8 text-center text-gray-400">
+                                        <mat-icon class="text-4xl">group_off</mat-icon>
+                                        <p class="mt-2">Aucun membre trouvé pour cette organisation.</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Activités">
+                            <div class="p-6">
+                                <div class="activity-timeline" *ngIf="activities.length > 0; else noActivities">
+                                    <div class="activity-item pb-4 mb-4 border-l-2 border-gray-100 pl-6 relative"
+                                        *ngFor="let activity of activities">
+                                        <div
+                                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-500 border-2 border-white">
+                                        </div>
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ activity.message }}</p>
+                                                <p class="text-xs text-gray-500">Par {{ activity.user }}</p>
+                                            </div>
+                                            <span class="text-xs text-gray-400">{{ activity.date | date:'short'
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ng-template #noActivities>
+                                    <div class="p-8 text-center text-gray-400">
+                                        <mat-icon class="text-4xl">history</mat-icon>
+                                        <p class="mt-2">Aucune activité enregistrée.</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
+                </mat-card>
+            </div>
+        </div>
+    </ng-container>
+</div>

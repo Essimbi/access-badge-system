@@ -1,0 +1,86 @@
+<div class="settings-page">
+    <div class="page-header">
+        <h1 class="page-header__title">Configuration Système</h1>
+        <div class="page-header__actions">
+            <button mat-flat-button color="primary" (click)="saveSettings()">
+                <mat-icon>save</mat-icon>
+                Sauvegarder
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- General Settings -->
+        <mat-card class="p-8">
+            <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                <mat-icon color="primary">settings</mat-icon>
+                Paramètres Généraux
+            </h3>
+
+            <div class="space-y-4">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Nom de l'application</mat-label>
+                    <input matInput [(ngModel)]="settings.appName">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Email de support</mat-label>
+                    <input matInput [(ngModel)]="settings.supportEmail">
+                </mat-form-field>
+
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                    <div>
+                        <div class="font-medium">Inscriptions Libres</div>
+                        <div class="text-xs text-slate-500">Autoriser les nouveaux utilisateurs à s'inscrire</div>
+                    </div>
+                    <mat-slide-toggle [(ngModel)]="settings.enableRegistration" color="primary"></mat-slide-toggle>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-100">
+                    <div>
+                        <div class="font-medium text-red-700">Mode Maintenance</div>
+                        <div class="text-xs text-red-500">Rendre l'application inaccessible aux non-admins</div>
+                    </div>
+                    <mat-slide-toggle [(ngModel)]="settings.maintenanceMode" color="warn"></mat-slide-toggle>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Technical Settings -->
+        <mat-card class="p-8">
+            <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                <mat-icon color="accent">dns</mat-icon>
+                Serveur & API
+            </h3>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Hôte SMTP</mat-label>
+                        <input matInput [(ngModel)]="settings.smtpHost">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Port SMTP</mat-label>
+                        <input matInput type="number" [(ngModel)]="settings.smtpPort">
+                    </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Taille max Upload (Mo)</mat-label>
+                    <input matInput type="number" [(ngModel)]="settings.maxUploadSize">
+                </mat-form-field>
+
+                <mat-divider></mat-divider>
+
+                <div class="bg-blue-50 p-4 rounded-lg flex gap-4">
+                    <mat-icon class="text-blue-500">info</mat-icon>
+                    <div>
+                        <p class="text-xs text-blue-800 font-medium">Les modifications des paramètres SMTP seront
+                            effectives immédiatement après la sauvegarde. Assurez-vous que les informations sont
+                            correctes pour éviter les problèmes d'envoi d'emails.</p>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+.user-modal {
+    min-width: 500px;
+
+    @media (max-width: 640px) {
+        min-width: 100%;
+    }
+}
+
+.modal-actions {
+    padding: 16px 24px;
+    border-top: 1px solid #edf2f7;
+}
+
+.user-form {
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__actions {
+        display: none;
+    }
+
+    &__submit-btn {
+        min-width: 180px;
+    }
+}
+
+.w-full {
+    width: 100%;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 64px 0;
+}

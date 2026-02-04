@@ -1,0 +1,28 @@
+<div class="sidebar">
+  <div class="sidebar__logo">
+    <mat-icon class="sidebar__logo-icon">badge</mat-icon>
+    <span class="sidebar__logo-text">EventBadge</span>
+  </div>
+
+  <mat-nav-list class="sidebar__nav">
+    <ng-container *ngFor="let item of navItems">
+      <a mat-list-item *ngIf="canShow(item)" [routerLink]="item.route" routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </ng-container>
+  </mat-nav-list>
+
+  <div class="sidebar__user">
+    <div class="sidebar__user-container" *ngIf="currentUser">
+      <div class="sidebar__user-avatar">
+        {{ currentUser.firstName[0] }}{{ currentUser.lastName[0] }}
+      </div>
+      <div class="sidebar__user-info">
+        <span class="sidebar__user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+        <span class="sidebar__user-role">{{ currentUser.role }}</span>
+      </div>
+    </div>
+  </div>
+</div>

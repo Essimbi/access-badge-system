@@ -1,0 +1,29 @@
+@use '../../../styles' as *;
+
+.dashboard-layout {
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    background-color: #f9fafb; // gray-50
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    &__main {
+        flex-grow: 1;
+        overflow: auto;
+        padding: 1rem;
+
+        @media (min-width: 768px) {
+            padding: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            padding: 2rem;
+        }
+    }
+}
