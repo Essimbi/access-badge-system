@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Inject } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -31,7 +32,8 @@ import { Organization } from '../../../core/models/organization.model';
     MatIconModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatAutocompleteModule
   ],
   templateUrl: './organization-form.html',
   styleUrl: './organization-form.scss'
@@ -43,6 +45,8 @@ export class OrganizationFormComponent implements OnInit {
   loading = false;
   submitting = false;
   potentialAdmins: User[] = [];
+  filteredAdmins: User[] = [];
+  adminSearchControl = new FormControl('');
 
   constructor(
     private fb: FormBuilder,
@@ -65,9 +69,12 @@ export class OrganizationFormComponent implements OnInit {
       primaryColor: ['#3b82f6']
     });
 
-    if (this.authService.hasRole('admin')) {
-      this.orgForm.get('adminUserId')?.disable();
-    }
+    // Listen to search input changes for filtering
+    this.adminSearchControl.valueChanges.subscribe(value => {
+      if (typeof value === 'string') {
+        this.filterAdmins(value);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -111,9 +118,38 @@ export class OrganizationFormComponent implements OnInit {
 
   loadPotentialAdmins(): void {
     this.apiService.getUsers({ role: 'admin' }).subscribe({
-      next: (users) => this.potentialAdmins = users,
+      next: (users) => {
+        this.potentialAdmins = users;
+        this.filteredAdmins = users;
+
+        // If editing and an admin is already selected, pre-fill the autocomplete
+        if (this.isEditMode && this.data?.organization?.adminUserId) {
+          const selected = users.find(u => u.id === this.data.organization!.adminUserId);
+          if (selected) {
+            this.adminSearchControl.setValue(selected as any);
+          }
+        }
+      },
       error: () => console.error('Erreur chargement administrateurs')
     });
+  }
+
+  filterAdmins(query: string): void {
+    const q = query.toLowerCase();
+    this.filteredAdmins = this.potentialAdmins.filter(u =>
+      (u.firstName?.toLowerCase() || '').includes(q) ||
+      (u.lastName?.toLowerCase() || '').includes(q) ||
+      (u.email?.toLowerCase() || '').includes(q)
+    );
+  }
+
+  displayAdminFn = (user: User | null): string => {
+    return user ? `${user.firstName} ${user.lastName} (${user.email})` : '';
+  }
+
+  onAdminSelected(event: MatAutocompleteSelectedEvent): void {
+    const user = event.option.value as User;
+    this.orgForm.get('adminUserId')?.setValue(user.id);
   }
 
   onSubmit(): void {
@@ -142,3 +178,4 @@ export class OrganizationFormComponent implements OnInit {
     this.dialogRef.close(false);
   }
 }
+

@@ -60,7 +60,7 @@ export class OrganizationDetailComponent implements OnInit {
           }
         });
       } else {
-        const id = Number(this.route.snapshot.paramMap.get('id'));
+        const id = this.route.snapshot.paramMap.get('id');
         if (id) {
           this.handleId(id);
         }
@@ -68,7 +68,7 @@ export class OrganizationDetailComponent implements OnInit {
     });
   }
 
-  private handleId(id: number): void {
+  private handleId(id: string | number): void {
     this.loadOrganization(id);
     this.loadStats(id);
     this.loadEvents(id);
@@ -76,7 +76,7 @@ export class OrganizationDetailComponent implements OnInit {
     this.loadActivities(id);
   }
 
-  loadOrganization(id: number): void {
+  loadOrganization(id: string | number): void {
     this.loading = true;
     this.apiService.getOrganization(id).subscribe({
       next: (org) => {
@@ -90,28 +90,28 @@ export class OrganizationDetailComponent implements OnInit {
     });
   }
 
-  loadStats(id: number): void {
+  loadStats(id: string | number): void {
     this.apiService.getOrganizationStats(id).subscribe({
       next: (stats) => this.stats = stats,
       error: () => console.error('Erreur stats')
     });
   }
 
-  loadEvents(id: number): void {
+  loadEvents(id: string | number): void {
     this.apiService.getEvents({ organizationId: id }).subscribe({
       next: (events) => this.events = events,
       error: () => console.error('Erreur events')
     });
   }
 
-  loadMembers(id: number): void {
+  loadMembers(id: string | number): void {
     this.apiService.getOrganizationMembers(id).subscribe({
       next: (members) => this.members = members,
       error: () => this.notificationService.error('Erreur lors du chargement des membres')
     });
   }
 
-  loadActivities(id: number): void {
+  loadActivities(id: string | number): void {
     this.apiService.getOrganizationActivities(id).subscribe({
       next: (activities) => this.activities = activities,
       error: () => console.error('Erreur activités')

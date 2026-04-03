@@ -65,23 +65,14 @@ export class UserFormComponent implements OnInit {
             lastName: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
             role: ['participant', [Validators.required]],
-            organization_id: [null],
             is_active: [true]
         });
 
-        // Role-based restrictions
-        if (this.authService.hasRole('admin')) {
-            this.roles = this.roles.filter(r => r.value !== 'super_admin' && r.value !== 'admin');
-            const user = this.authService.currentUserValue;
-            if (user && user.organization_id) {
-                this.userForm.get('organization_id')?.setValue(user.organization_id);
-                this.userForm.get('organization_id')?.disable();
-            }
-        }
+
+
     }
 
     ngOnInit(): void {
-        this.loadOrganizations();
         if (this.data && this.data.user) {
             this.isEditMode = true;
             this.userId = this.data.user.id;
@@ -89,12 +80,7 @@ export class UserFormComponent implements OnInit {
         }
     }
 
-    loadOrganizations(): void {
-        this.apiService.getOrganizations().subscribe({
-            next: (orgs) => this.organizations = orgs,
-            error: () => this.notificationService.error('Erreur lors du chargement des organisations')
-        });
-    }
+
 
     patchUser(id: string | number): void {
         this.loading = true;

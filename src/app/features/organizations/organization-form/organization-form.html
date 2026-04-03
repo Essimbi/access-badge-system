@@ -31,13 +31,29 @@
 
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Administrateur principal</mat-label>
-                    <mat-select formControlName="adminUserId">
-                        <mat-option [value]="null">Sélectionner un administrateur...</mat-option>
-                        <mat-option *ngFor="let user of potentialAdmins" [value]="user.id">
-                            {{user.firstName}} {{user.lastName}} ({{user.email}})
+                    <input matInput
+                        [formControl]="adminSearchControl"
+                        [matAutocomplete]="autoAdmin"
+                        placeholder="Rechercher par nom ou email...">
+                    <mat-icon matPrefix>person_search</mat-icon>
+                    <mat-autocomplete #autoAdmin="matAutocomplete"
+                        [displayWith]="displayAdminFn"
+                        (optionSelected)="onAdminSelected($event)">
+                        <mat-option *ngFor="let user of filteredAdmins" [value]="user">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                                    {{user.firstName?.[0]}}{{user.lastName?.[0]}}
+                                </div>
+                                <div>
+                                    <div class="font-medium">{{user.firstName}} {{user.lastName}}</div>
+                                    <div class="text-xs text-gray-500">{{user.email}}</div>
+                                </div>
+                            </div>
                         </mat-option>
-                    </mat-select>
-                    <mat-icon matPrefix>person</mat-icon>
+                        <mat-option *ngIf="filteredAdmins.length === 0" disabled>
+                            Aucun administrateur trouvé
+                        </mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full col-span-2">

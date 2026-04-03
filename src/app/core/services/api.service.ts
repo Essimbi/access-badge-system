@@ -40,12 +40,23 @@ export class ApiService {
     // Organizations
     getOrganizations(params?: any): Observable<any[]> {
         if (this.authService.hasRole('super_admin')) {
-            return this.get<any[]>('/admin/organizations', params);
+            return this.get<any[]>('/admin/organizations', params).pipe(
+                map(orgs => orgs.map(org => ({
+                    ...org,
+                    adminUser: org.owner ? {
+                        id: org.owner.id,
+                        firstName: org.owner.first_name,
+                        lastName: org.owner.last_name,
+                        email: org.owner.email
+                    } : null,
+                    adminUserId: org.owner_id
+                })))
+            );
         }
         return this.get<any[]>('/organizations/my-organizations', params);
     }
 
-    getOrganization(id: number): Observable<any> {
+    getOrganization(id: string | number): Observable<any> {
         return this.get<any>(`/organizations/${id}`);
     }
 
@@ -56,15 +67,24 @@ export class ApiService {
         return this.post('/organizations', data);
     }
 
-    updateOrganization(id: number, data: any): Observable<any> {
-        return this.put(`/organizations/${id}`, data);
+    updateOrganization(id: string | number, data: any): Observable<any> {
+        const payload: any = {};
+        if (data.name !== undefined) payload.name = data.name;
+        if (data.description !== undefined) payload.description = data.description;
+        if (data.email !== undefined) payload.email = data.email;
+        if (data.phone !== undefined) payload.phone = data.phone;
+        if (data.address !== undefined) payload.address = data.address;
+        if (data.logoUrl !== undefined) payload.logo_url = data.logoUrl;
+        if (data.adminUserId !== undefined) payload.owner_id = data.adminUserId;
+        if (data.status !== undefined) payload.status = data.status;
+        return this.put(`/organizations/${id}`, payload);
     }
 
-    updateOrganizationStatus(id: number, status: string): Observable<any> {
+    updateOrganizationStatus(id: string | number, status: string): Observable<any> {
         return this.http.patch<any>(`${this.baseUrl}/admin/organizations/${id}/status`, { status });
     }
 
-    deleteOrganization(id: number): Observable<any> {
+    deleteOrganization(id: string | number): Observable<any> {
         return this.delete(`/organizations/${id}`);
     }
 

@@ -40,16 +40,8 @@
                     <mat-icon matPrefix>admin_panel_settings</mat-icon>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Organisation</mat-label>
-                    <mat-select formControlName="organization_id">
-                        <mat-option [value]="null">Aucune (Indépendant)</mat-option>
-                        <mat-option *ngFor="let org of organizations" [value]="org.id">
-                            {{org.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-icon matPrefix>business</mat-icon>
-                </mat-form-field>
+
+
 
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Statut</mat-label>

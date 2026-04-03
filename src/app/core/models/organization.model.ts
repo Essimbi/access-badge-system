@@ -1,7 +1,7 @@
 import { User } from "./user.model";
 
 export interface Organization {
-    id: number;
+    id: string | number;
     name: string;
     description: string;
     email: string;
@@ -10,7 +10,7 @@ export interface Organization {
     logoUrl?: string;
     primaryColor?: string;
     adminUser?: User;
-    adminUserId?: number;
+    adminUserId?: string | number;
     createdAt: Date;
     updatedAt: Date;
     eventCount?: number;
@@ -23,6 +23,6 @@ export interface OrganizationCreateRequest {
     email: string;
     phone?: string;
     address?: string;
-    adminUserId?: number;
+    adminUserId?: string | number;
 }
 
