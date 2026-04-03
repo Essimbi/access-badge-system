@@ -1,0 +1,483 @@
+================================================================================
+PARTICIPANT - ARCHITECTURE TECHNIQUE
+================================================================================
+
+STRUCTURE DES COMPOSANTS
+================================================================================
+
+1. ParticipantDashboardComponent
+   ├─ Fichiers:
+   │  ├─ participant-dashboard.component.ts
+   │  ├─ participant-dashboard.component.html
+   │  └─ participant-dashboard.component.scss
+   ├─ Responsabilités:
+   │  ├─ Afficher les statistiques personnelles
+   │  ├─ Afficher les événements à venir et passés
+   │  ├─ Gérer les actions sur les badges
+   │  └─ Charger les données utilisateur
+   ├─ Imports:
+   │  ├─ CommonModule
+   │  ├─ Material Modules (Card, Button, Icon, etc.)
+   │  ├─ RouterModule
+   │  ├─ ApiService
+   │  ├─ AuthService
+   │  └─ NotificationService
+   └─ Interfaces:
+      ├─ ParticipantStats
+      └─ Event
+
+2. BrowseEventsComponent
+   ├─ Fichiers:
+   │  ├─ browse-events.component.ts
+   │  ├─ browse-events.component.html
+   │  └─ browse-events.component.scss
+   ├─ Responsabilités:
+   │  ├─ Afficher la liste des événements
+   │  ├─ Gérer le filtrage et la recherche
+   │  ├─ Gérer l'inscription/annulation
+   │  └─ Gérer la pagination
+   ├─ Imports:
+   │  ├─ CommonModule
+   │  ├─ FormsModule
+   │  ├─ Material Modules (Card, Button, Icon, etc.)
+   │  ├─ MatPaginatorModule
+   │  ├─ ApiService
+   │  └─ NotificationService
+   └─ Interfaces:
+      └─ Event
+
+3. ProfileComponent
+   ├─ Fichiers:
+   │  ├─ profile.component.ts
+   │  ├─ profile.component.html
+   │  └─ profile.component.scss
+   ├─ Responsabilités:
+   │  ├─ Afficher les informations personnelles
+   │  ├─ Gérer l'édition du profil
+   │  ├─ Gérer le changement de mot de passe
+   │  ├─ Gérer les préférences
+   │  ├─ Gérer le téléchargement des données
+   │  └─ Gérer la suppression du compte
+   ├─ Imports:
+   │  ├─ CommonModule
+   │  ├─ FormsModule
+   │  ├─ ReactiveFormsModule
+   │  ├─ Material Modules (Card, Button, Icon, etc.)
+   │  ├─ ApiService
+   │  ├─ AuthService
+   │  └─ NotificationService
+   └─ Interfaces:
+      └─ Aucune (utilise les types Angular)
+
+FLUX DE DONNÉES
+================================================================================
+
+1. Chargement Initial:
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Utilisateur accède à /dashboard/participant                 │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ AuthGuard vérifie l'authentification                        │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ParticipantDashboardComponent est chargé                    │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ngOnInit() appelle loadParticipantData()                    │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ApiService.getEvents() récupère les événements              │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Les données sont traitées et affichées                      │
+   └─────────────────────────────────────────────────────────────┘
+
+2. Filtrage des Événements:
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Utilisateur modifie un filtre                               │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ onFilterChange() est appelé                                 │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ applyFilters() filtre les événements                        │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ filteredEvents est mis à jour                               │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ La vue est mise à jour automatiquement                      │
+   └─────────────────────────────────────────────────────────────┘
+
+3. Inscription à un Événement:
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Utilisateur clique sur "S'inscrire"                         │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ enrollEvent() est appelé                                    │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Vérification de la disponibilité                            │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ event.enrolled = true                                       │
+   │ event.participants++                                        │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ NotificationService affiche un message de succès            │
+   └────────────────────┬────────────────────────────────────────┘
+                        │
+                        ▼
+   ┌─────────────────────────────────────────────────────────────┐
+   │ La vue est mise à jour automatiquement                      │
+   └─────────────────────────────────────────────────────────────┘
+
+SERVICES UTILISÉS
+================================================================================
+
+1. ApiService
+   Méthodes utilisées:
+   ├─ getEvents(options?: any): Observable<Event[]>
+   │  └─ Récupère la liste des événements
+   ├─ downloadBadgePDF(badgeId: number): Observable<Blob>
+   │  └─ Télécharge un badge en PDF
+   ├─ updateProfile(data: any): Observable<any>
+   │  └─ Met à jour le profil utilisateur
+   └─ getProfile(): Observable<any>
+      └─ Récupère le profil utilisateur
+
+2. AuthService
+   Propriétés utilisées:
+   ├─ currentUser$: Observable<User | null>
+   │  └─ Observable de l'utilisateur actuel
+   └─ Méthodes utilisées:
+      ├─ hasAnyRole(roles: string[]): boolean
+      │  └─ Vérifie si l'utilisateur a l'un des rôles
+      └─ logout(): void
+         └─ Déconnecte l'utilisateur
+
+3. NotificationService
+   Méthodes utilisées:
+   ├─ success(message: string): void
+   │  └─ Affiche une notification de succès
+   ├─ error(message: string): void
+   │  └─ Affiche une notification d'erreur
+   └─ info(message: string): void
+      └─ Affiche une notification d'information
+
+COMPOSANTS DÉTAILLÉS
+================================================================================
+
+ParticipantDashboardComponent:
+
+Propriétés:
+├─ participantStats: ParticipantStats
+│  └─ Statistiques personnelles
+├─ upcomingEvents: Event[]
+│  └─ Événements à venir
+├─ pastEvents: Event[]
+│  └─ Événements passés
+└─ loading: boolean
+   └─ Indicateur de chargement
+
+Méthodes:
+├─ ngOnInit(): void
+│  └─ Initialise le composant
+├─ loadParticipantData(): void
+│  └─ Charge les données du participant
+├─ loadParticipantStats(): void
+│  └─ Charge les statistiques
+├─ downloadBadge(event: Event): void
+│  └─ Télécharge un badge en PDF
+├─ printBadge(event: Event): void
+│  └─ Imprime un badge
+├─ shareBadge(event: Event, platform: string): void
+│  └─ Partage un badge sur les réseaux sociaux
+├─ enrollEvent(event: Event): void
+│  └─ S'inscrit à un événement
+├─ cancelEnrollment(event: Event): void
+│  └─ Annule l'inscription à un événement
+├─ getRandomCategory(): string
+│  └─ Retourne une catégorie aléatoire
+├─ generateMockUpcomingEvents(): Event[]
+│  └─ Génère des événements mockés à venir
+└─ generateMockPastEvents(): Event[]
+   └─ Génère des événements mockés passés
+
+BrowseEventsComponent:
+
+Propriétés:
+├─ events: Event[]
+│  └─ Tous les événements
+├─ filteredEvents: Event[]
+│  └─ Événements filtrés
+├─ loading: boolean
+│  └─ Indicateur de chargement
+├─ searchQuery: string
+│  └─ Requête de recherche
+├─ selectedType: string
+│  └─ Type d'événement sélectionné
+├─ selectedStatus: string
+│  └─ Statut d'événement sélectionné
+├─ selectedOrganization: string
+│  └─ Organisation sélectionnée
+├─ eventTypes: string[]
+│  └─ Types d'événements disponibles
+├─ organizations: string[]
+│  └─ Organisations disponibles
+└─ statuses: any[]
+   └─ Statuts disponibles
+
+Méthodes:
+├─ ngOnInit(): void
+│  └─ Initialise le composant
+├─ loadEvents(): void
+│  └─ Charge les événements
+├─ applyFilters(): void
+│  └─ Applique les filtres
+├─ onFilterChange(): void
+│  └─ Appelé quand un filtre change
+├─ clearFilters(): void
+│  └─ Réinitialise les filtres
+├─ enrollEvent(event: Event): void
+│  └─ S'inscrit à un événement
+├─ cancelEnrollment(event: Event): void
+│  └─ Annule l'inscription
+├─ getAvailableSpots(event: Event): number
+│  └─ Retourne le nombre de places disponibles
+├─ getOccupancyPercentage(event: Event): number
+│  └─ Retourne le pourcentage d'occupation
+└─ generateMockEvents(): Event[]
+   └─ Génère des événements mockés
+
+ProfileComponent:
+
+Propriétés:
+├─ profileForm: FormGroup
+│  └─ Formulaire des informations personnelles
+├─ passwordForm: FormGroup
+│  └─ Formulaire de changement de mot de passe
+├─ preferencesForm: FormGroup
+│  └─ Formulaire des préférences
+├─ currentUser: any
+│  └─ Utilisateur actuel
+├─ loading: boolean
+│  └─ Indicateur de chargement
+├─ editingProfile: boolean
+│  └─ Mode édition du profil
+├─ editingPassword: boolean
+│  └─ Mode édition du mot de passe
+└─ editingPreferences: boolean
+   └─ Mode édition des préférences
+
+Méthodes:
+├─ ngOnInit(): void
+│  └─ Initialise le composant
+├─ loadUserProfile(): void
+│  └─ Charge le profil utilisateur
+├─ saveProfile(): void
+│  └─ Sauvegarde le profil
+├─ changePassword(): void
+│  └─ Change le mot de passe
+├─ savePreferences(): void
+│  └─ Sauvegarde les préférences
+├─ cancelEdit(form: string): void
+│  └─ Annule l'édition
+├─ downloadProfileData(): void
+│  └─ Télécharge les données personnelles
+├─ deleteAccount(): void
+│  └─ Supprime le compte
+└─ passwordMatchValidator(group: FormGroup): any
+   └─ Valide la correspondance des mots de passe
+
+INTERFACES DE DONNÉES
+================================================================================
+
+ParticipantStats:
+interface ParticipantStats {
+  totalEvents: number;        // Nombre total d'événements
+  totalHours: number;         // Heures totales de participation
+  badgesCollected: number;    // Badges collectés
+  upcomingEvents: number;     // Événements à venir
+}
+
+Event:
+interface Event {
+  id: number;                 // ID de l'événement
+  title: string;              // Titre
+  description?: string;       // Description
+  date: Date;                 // Date
+  location: string;           // Lieu
+  status: 'upcoming' | 'ongoing' | 'completed';  // Statut
+  type?: string;              // Type d'événement
+  organization?: string;      // Organisation
+  badgeCategory?: string;     // Catégorie du badge
+  badgeId?: number;           // ID du badge
+  enrolled?: boolean;         // Inscription
+  participants?: number;      // Nombre de participants
+  maxParticipants?: number;   // Capacité maximale
+}
+
+ROUTES
+================================================================================
+
+/dashboard/participant
+└─ ParticipantDashboardComponent
+   └─ Affiche le tableau de bord participant
+   └─ Rôle requis: participant
+
+/dashboard/participant/browse-events
+└─ BrowseEventsComponent
+   └─ Affiche la page de découverte d'événements
+   └─ Rôle requis: participant
+
+/dashboard/participant/profile
+└─ ProfileComponent
+   └─ Affiche la page de gestion du profil
+   └─ Rôle requis: participant
+
+STYLES & DESIGN
+================================================================================
+
+Framework CSS:
+- Tailwind CSS pour les utilitaires
+- SCSS pour les styles personnalisés
+- Material Design pour les composants
+
+Couleurs:
+- Bleu: #2563eb (actions principales)
+- Violet: #9333ea (événements)
+- Vert: #16a34a (succès)
+- Rouge: #dc2626 (erreurs)
+- Gris: #64748b (texte secondaire)
+
+Typographie:
+- Titres: Font-weight 700-900
+- Corps: Font-weight 400-500
+- Tailles: 12px à 48px
+
+Espacement:
+- Padding: 4px à 32px
+- Margin: 4px à 32px
+- Gap: 4px à 32px
+
+Animations:
+- Transitions: 200-300ms
+- Hover effects sur les cartes
+- Fade in/out sur les modales
+
+Responsivité:
+- Mobile: < 640px
+- Tablet: 640px - 1024px
+- Desktop: > 1024px
+
+GESTION D'ÉTAT
+================================================================================
+
+État Local:
+- Chaque composant gère son propre état
+- Utilisation de propriétés de classe
+- Mise à jour automatique de la vue avec Angular
+
+État Global:
+- AuthService gère l'utilisateur actuel
+- Observable currentUser$ pour les mises à jour
+
+Flux de Données:
+- Unidirectionnel (parent → enfant)
+- Événements (enfant → parent)
+- Services pour la communication entre composants
+
+PERFORMANCE
+================================================================================
+
+Optimisations:
+✓ Lazy loading des composants
+✓ OnPush change detection (si applicable)
+✓ Unsubscribe des observables
+✓ Pagination des résultats
+✓ Caching des données (si applicable)
+
+Métriques:
+- Temps de chargement initial: < 2s
+- Temps de réponse aux filtres: < 500ms
+- Taille du bundle: < 500KB
+
+SÉCURITÉ
+================================================================================
+
+Mesures de Sécurité:
+✓ AuthGuard pour protéger les routes
+✓ Vérification des rôles
+✓ Validation des formulaires
+✓ Sanitization des données
+✓ HTTPS en production
+
+Validation:
+- Validation côté client (Angular)
+- Validation côté serveur (API)
+- Validation des formulaires réactifs
+
+TESTS
+================================================================================
+
+Tests Unitaires:
+- Tests des composants
+- Tests des services
+- Tests des pipes et directives
+
+Tests d'Intégration:
+- Tests des routes
+- Tests des flux utilisateur
+- Tests des appels API
+
+Tests E2E:
+- Tests des scénarios complets
+- Tests de responsivité
+- Tests de performance
+
+DÉPLOIEMENT
+================================================================================
+
+Build:
+npm run build
+
+Production:
+- Minification du code
+- Optimisation des images
+- Compression des fichiers
+- Cache busting
+
+Serveur:
+- Nginx ou Apache
+- HTTPS obligatoire
+- CORS configuré
+- Gzip compression
+
+================================================================================

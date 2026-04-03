@@ -97,31 +97,37 @@ export const MOCK_EVENTS = [
         id: 1,
         title: 'Conférence Innovation 2026',
         description: 'Un événement musical unique au cœur de la ville.',
-        date: new Date('2026-03-15'),
+        date: new Date('2026-03-15T09:00:00'),
+        endDate: new Date('2026-03-15T18:00:00'),
         location: 'Palais de la Culture',
         status: 'upcoming',
         type: 'Conference',
-        organization_id: 1
+        organization_id: 1,
+        participantLimit: 500
     },
     {
         id: 2,
         title: 'Workshop Angular 18',
         description: 'Rencontrez les professionnels de demain.',
-        date: new Date('2026-02-20'),
+        date: new Date('2026-02-20T10:00:00'),
+        endDate: new Date('2026-02-20T16:00:00'),
         location: 'Hôtel Ivoire',
         status: 'ongoing',
         type: 'Workshop',
-        organization_id: 1
+        organization_id: 1,
+        participantLimit: 50
     },
     {
         id: 3,
         title: 'Sommet Tech Africa',
         description: 'Le rendez-vous des leaders technologiques.',
-        date: new Date('2026-01-10'),
+        date: new Date('2026-01-10T09:00:00'),
+        endDate: new Date('2026-01-12T17:00:00'),
         location: 'Abidjan, CIV',
         status: 'completed',
         type: 'Summit',
-        organization_id: 2
+        organization_id: 2,
+        participantLimit: 1000
     }
 ];
 
@@ -132,15 +138,16 @@ export const MOCK_ENROLLMENTS = [
 ];
 
 export const MOCK_GATES = [
-    { id: 1, name: 'GATE-001', location: 'Entrée Principale', type: 'Scanner Fixe', organizationName: '3CM Event Solutions', is_active: true },
-    { id: 2, name: 'GATE-002', location: 'Zone VIP', type: 'Scanner Fixe', organizationName: '3CM Event Solutions', is_active: true },
-    { id: 3, name: 'MOBILE-045', location: 'Parking A', type: 'Mobile App', organizationName: 'Global Tech Expo', is_active: false }
+    { id: 1, name: 'GATE-001', location: 'Entrée Principale', type: 'Scanner Fixe', organizationName: '3CM Event Solutions', is_active: true, organizationId: 1 },
+    { id: 2, name: 'GATE-002', location: 'Zone VIP', type: 'Scanner Fixe', organizationName: '3CM Event Solutions', is_active: true, organizationId: 1 },
+    { id: 3, name: 'MOBILE-045', location: 'Parking A', type: 'Mobile App', organizationName: 'Global Tech Expo', is_active: false, organizationId: 2 }
 ];
 
 export const MOCK_BADGE_CATEGORIES = [
-    { id: 1, name: 'VIP', color: '#ffd700', description: 'Accès toutes zones' },
-    { id: 2, name: 'Exposant', color: '#2ecc71', description: 'Accès zone stand' },
-    { id: 3, name: 'Visiteur', color: '#3498db', description: 'Accès zone publique' }
+    { id: 1, name: 'VIP', color: '#ffd700', description: 'Accès toutes zones', organizationId: 1 },
+    { id: 2, name: 'Exposant', color: '#2ecc71', description: 'Accès zone stand', organizationId: 1 },
+    { id: 3, name: 'Visiteur', color: '#3498db', description: 'Accès zone publique', organizationId: 1 },
+    { id: 4, name: 'Staff', color: '#ef4444', description: 'Accès service', organizationId: 2 }
 ];
 
 export const MOCK_BADGE_TEMPLATES = [
@@ -153,7 +160,8 @@ export const MOCK_BADGE_TEMPLATES = [
         borderRadius: 8,
         primaryColor: '#ffd700',
         htmlContent: '',
-        designMode: 'visual'
+        designMode: 'visual',
+        organizationId: 1
     },
     {
         id: 2,
@@ -164,6 +172,7 @@ export const MOCK_BADGE_TEMPLATES = [
         borderRadius: 4,
         primaryColor: '#2ecc71',
         htmlContent: '<div style="background: #2ecc71; color: white; padding: 20px;"><h1>{{firstName}}</h1><p>Exposant</p></div>',
-        designMode: 'html'
+        designMode: 'html',
+        organizationId: 1
     }
 ];

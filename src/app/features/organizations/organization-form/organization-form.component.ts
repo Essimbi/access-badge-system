@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Inject } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { User } from '../../../core/models/user.model';
 import { Organization } from '../../../core/models/organization.model';
@@ -46,6 +47,7 @@ export class OrganizationFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
+    private authService: AuthService,
     private notificationService: NotificationService,
     private router: Router,
     private route: ActivatedRoute,
@@ -62,6 +64,10 @@ export class OrganizationFormComponent implements OnInit {
       logoUrl: [''],
       primaryColor: ['#3b82f6']
     });
+
+    if (this.authService.hasRole('admin')) {
+      this.orgForm.get('adminUserId')?.disable();
+    }
   }
 
   ngOnInit(): void {

@@ -1,0 +1,235 @@
+<div class="access-logs-page p-6">
+  <div class="mb-8">
+    <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Journaux d'Accès</h1>
+    <p class="text-slate-500">Consultez l'historique complet des entrées et sorties</p>
+  </div>
+
+  <!-- Filters Card -->
+  <mat-card class="mb-6 shadow-lg">
+    <mat-card-header class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-t-lg">
+      <div class="flex items-center gap-3">
+        <mat-icon>filter_list</mat-icon>
+        <mat-card-title class="text-white m-0">Filtres</mat-card-title>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <!-- Search -->
+        <mat-form-field class="w-full">
+          <mat-label>Rechercher</mat-label>
+          <input matInput 
+            [(ngModel)]="searchQuery" 
+            (input)="onFilterChange()"
+            placeholder="Participant, événement, portail...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <!-- Access Type Filter -->
+        <mat-form-field class="w-full">
+          <mat-label>Type d'accès</mat-label>
+          <mat-select [(ngModel)]="selectedAccessType" (selectionChange)="onFilterChange()">
+            <mat-option value="">Tous</mat-option>
+            <mat-option *ngFor="let type of accessTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Status Filter -->
+        <mat-form-field class="w-full">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()">
+            <mat-option value="">Tous</mat-option>
+            <mat-option *ngFor="let status of statuses" [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Event Filter -->
+        <mat-form-field class="w-full">
+          <mat-label>Événement</mat-label>
+          <mat-select [(ngModel)]="selectedEvent" (selectionChange)="onFilterChange()">
+            <mat-option value="">Tous</mat-option>
+            <mat-option *ngFor="let event of events" [value]="event.title">
+              {{ event.title }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Start Date -->
+        <mat-form-field class="w-full">
+          <mat-label>Date de début</mat-label>
+          <input matInput 
+            [matDatepicker]="startPicker" 
+            [(ngModel)]="startDate"
+            (dateChange)="onFilterChange()">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- End Date -->
+        <mat-form-field class="w-full">
+          <mat-label>Date de fin</mat-label>
+          <input matInput 
+            [matDatepicker]="endPicker" 
+            [(ngModel)]="endDate"
+            (dateChange)="onFilterChange()">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Filter Actions -->
+      <div class="flex gap-2">
+        <button mat-raised-button color="primary" (click)="exportLogs()">
+          <mat-icon>download</mat-icon>
+          Exporter CSV
+        </button>
+        <button mat-stroked-button (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Réinitialiser
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Logs Table -->
+  <mat-card class="shadow-lg">
+    <mat-card-header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-2xl">history</mat-icon>
+          <div>
+            <mat-card-title class="text-white m-0">Historique des Accès</mat-card-title>
+            <mat-card-subtitle class="text-blue-100">{{ dataSource.data.length }} enregistrements</mat-card-subtitle>
+          </div>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content class="p-0">
+      <div *ngIf="loading" class="flex justify-center items-center py-12">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loading && dataSource.data.length === 0" class="text-center py-12">
+        <mat-icon class="text-6xl text-slate-300 mb-4">inbox</mat-icon>
+        <p class="text-slate-500 text-lg">Aucun log d'accès trouvé</p>
+      </div>
+
+      <div *ngIf="!loading && dataSource.data.length > 0" class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-slate-50 font-bold text-slate-900">
+              Heure
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-sm font-semibold">
+              {{ element.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+            </td>
+          </ng-container>
+
+          <!-- Participant Column -->
+          <ng-container matColumnDef="participantName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-slate-50 font-bold text-slate-900">
+              Participant
+            </th>
+            <td mat-cell *matCellDef="let element" class="font-semibold text-slate-900">
+              {{ element.participantName }}
+            </td>
+          </ng-container>
+
+          <!-- Event Column -->
+          <ng-container matColumnDef="eventName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-slate-50 font-bold text-slate-900">
+              Événement
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-sm text-slate-600">
+              {{ element.eventName }}
+            </td>
+          </ng-container>
+
+          <!-- Category Column -->
+          <ng-container matColumnDef="badgeCategory">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">
+              Catégorie
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip class="text-xs font-semibold">{{ element.badgeCategory }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Access Type Column -->
+          <ng-container matColumnDef="accessType">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">
+              Type
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-2">
+                <mat-icon class="text-sm" [ngClass]="element.accessType === 'entry' ? 'text-green-600' : 'text-orange-600'">
+                  {{ getAccessTypeIcon(element.accessType) }}
+                </mat-icon>
+                <span class="text-sm font-semibold">
+                  {{ element.accessType === 'entry' ? 'Entrée' : 'Sortie' }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Gate Column -->
+          <ng-container matColumnDef="gateName">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">
+              Portail
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-sm text-slate-600">
+              {{ element.gateName }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">
+              Statut
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-2">
+                <mat-icon class="text-sm" [color]="getStatusColor(element.status)">
+                  {{ getStatusIcon(element.status) }}
+                </mat-icon>
+                <span class="text-sm font-semibold" [ngClass]="element.status === 'success' ? 'text-green-700' : 'text-red-700'">
+                  {{ element.status === 'success' ? 'Succès' : 'Erreur' }}
+                </span>
+              </div>
+              <p *ngIf="element.errorMessage" class="text-xs text-red-600 mt-1">
+                {{ element.errorMessage }}
+              </p>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">
+              Actions
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button (click)="viewDetails(element)" matTooltip="Voir les détails">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="border-b hover:bg-slate-50 transition"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        *ngIf="dataSource.data.length > 0"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        showFirstLastButtons
+        class="bg-slate-50">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

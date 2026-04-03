@@ -1,0 +1,404 @@
+================================================================================
+PARTICIPANT - GUIDE D'UTILISATION COMPLET
+================================================================================
+
+CONNEXION
+================================================================================
+
+1. Accédez à la page de connexion:
+   http://localhost:4200/auth/login
+
+2. Entrez vos identifiants:
+   Email: participant@example.com
+   Mot de passe: password123
+
+3. Cliquez sur le bouton "Se connecter"
+
+4. Vous serez redirigé vers le tableau de bord participant
+
+5. Si vous avez oublié votre mot de passe:
+   - Cliquez sur "Mot de passe oublié?"
+   - Entrez votre email
+   - Suivez les instructions reçues par email
+
+TABLEAU DE BORD PARTICIPANT (MON ESPACE)
+================================================================================
+
+Accès:
+- URL: http://localhost:4200/dashboard/participant
+- Barre latérale: Cliquez sur "Mon Espace"
+- Tableau de bord: Cliquez sur la carte "Mon Espace"
+
+Sections Affichées:
+
+1. Statistiques Personnelles (Haut de la page)
+   - Nombre total d'événements: Affiche le total des événements
+   - Heures totales: Affiche les heures de participation
+   - Badges collectés: Affiche le nombre de badges
+   - Événements à venir: Affiche le nombre d'événements futurs
+
+2. Onglet "Événements à Venir"
+   - Affiche les événements futurs
+   - Pour chaque événement:
+     * Titre de l'événement
+     * Date et lieu
+     * Catégorie du badge
+     * Bouton "Annuler l'inscription"
+     * Menu d'actions sur le badge
+
+3. Onglet "Événements Passés"
+   - Affiche les événements complétés
+   - Pour chaque événement:
+     * Titre de l'événement
+     * Date et lieu
+     * Catégorie du badge
+     * Bouton "Télécharger le badge"
+     * Menu d'actions sur le badge
+
+Actions sur les Badges:
+
+Télécharger en PDF:
+1. Cliquez sur le bouton "Télécharger" ou l'icône de téléchargement
+2. Le fichier PDF est généré et téléchargé automatiquement
+3. Le fichier est nommé: badge-[titre]-[année].pdf
+4. Une notification de succès s'affiche
+
+Imprimer:
+1. Cliquez sur le bouton "Imprimer" ou l'icône d'impression
+2. La boîte de dialogue d'impression s'ouvre
+3. Configurez vos paramètres d'impression
+4. Cliquez sur "Imprimer"
+5. Une notification de succès s'affiche
+
+Partager:
+1. Cliquez sur le bouton "Partager" ou l'icône de partage
+2. Un menu s'ouvre avec les options:
+   - Email: Ouvre votre client email
+   - Facebook: Partage sur Facebook
+   - Twitter: Partage sur Twitter
+   - LinkedIn: Partage sur LinkedIn
+3. Complétez le partage selon la plateforme
+4. Une notification de succès s'affiche
+
+Annuler l'Inscription:
+1. Cliquez sur le bouton "Annuler l'inscription"
+2. Une notification de confirmation s'affiche
+3. L'événement est retiré de votre liste
+4. Vous pouvez vous réinscrire depuis "Parcourir les Événements"
+
+PARCOURIR LES ÉVÉNEMENTS
+================================================================================
+
+Accès:
+- URL: http://localhost:4200/dashboard/participant/browse-events
+- Barre latérale: Cliquez sur "Parcourir les Événements"
+- Tableau de bord: Cliquez sur la carte "Parcourir les Événements"
+
+Affichage des Événements:
+- Les événements sont affichés en grille
+- Chaque carte affiche:
+  * Titre de l'événement
+  * Description
+  * Date et lieu
+  * Type d'événement
+  * Organisation
+  * Nombre de participants / Capacité
+  * Pourcentage d'occupation
+  * Statut d'inscription
+
+Filtrage par Recherche:
+1. Entrez un texte dans le champ "Rechercher"
+2. La recherche s'effectue sur:
+   - Titre de l'événement
+   - Lieu
+   - Organisation
+3. Les résultats se mettent à jour en temps réel
+4. Pour réinitialiser: Effacez le texte
+
+Filtrage par Type:
+1. Cliquez sur le menu déroulant "Type"
+2. Sélectionnez un type:
+   - Conference
+   - Workshop
+   - Summit
+   - Hackathon
+   - Meetup
+3. Les résultats se mettent à jour
+4. Pour réinitialiser: Sélectionnez "Tous"
+
+Filtrage par Statut:
+1. Cliquez sur le menu déroulant "Statut"
+2. Sélectionnez un statut:
+   - À venir (upcoming)
+   - En cours (ongoing)
+   - Terminé (completed)
+3. Les résultats se mettent à jour
+4. Pour réinitialiser: Sélectionnez "Tous"
+
+Filtrage par Organisation:
+1. Cliquez sur le menu déroulant "Organisation"
+2. Sélectionnez une organisation
+3. Les résultats se mettent à jour
+4. Pour réinitialiser: Sélectionnez "Tous"
+
+Réinitialiser les Filtres:
+1. Cliquez sur le bouton "Réinitialiser les filtres"
+2. Tous les filtres sont réinitialisés
+3. Tous les événements s'affichent
+
+Pagination:
+1. Les résultats sont paginés (par défaut: 10 par page)
+2. Utilisez les boutons de pagination en bas:
+   - Flèche gauche: Page précédente
+   - Numéros de page: Aller à une page spécifique
+   - Flèche droite: Page suivante
+3. Vous pouvez aussi changer le nombre d'éléments par page
+
+S'Inscrire à un Événement:
+1. Trouvez l'événement souhaité
+2. Vérifiez qu'il y a des places disponibles
+3. Cliquez sur le bouton "S'inscrire"
+4. Une notification de confirmation s'affiche
+5. Le bouton change en "Annuler l'inscription"
+6. L'événement apparaît dans "Mon Espace"
+
+Annuler l'Inscription:
+1. Trouvez l'événement auquel vous êtes inscrit
+2. Cliquez sur le bouton "Annuler l'inscription"
+3. Une notification de confirmation s'affiche
+4. Le bouton change en "S'inscrire"
+5. L'événement disparaît de "Mon Espace"
+
+Événement Complet:
+- Si un événement est complet:
+  * Le bouton "S'inscrire" est désactivé
+  * Un message "Événement complet" s'affiche
+  * Vous ne pouvez pas vous inscrire
+  * Attendez qu'une place se libère
+
+MON PROFIL
+================================================================================
+
+Accès:
+- URL: http://localhost:4200/dashboard/participant/profile
+- Barre latérale: Cliquez sur "Mon Profil"
+- Tableau de bord: Cliquez sur la carte "Mon Profil"
+
+Onglet "Informations Personnelles":
+
+Affichage:
+1. Vos informations sont affichées en lecture seule
+2. Informations visibles:
+   - Prénom
+   - Nom
+   - Email
+   - Téléphone
+   - Organisation
+
+Édition:
+1. Cliquez sur le bouton "Modifier"
+2. Les champs deviennent éditables
+3. Modifiez les informations souhaitées
+4. Cliquez sur "Enregistrer"
+5. Une notification de succès s'affiche
+6. Les informations sont mises à jour
+
+Annulation:
+1. Cliquez sur le bouton "Annuler"
+2. Les modifications sont annulées
+3. Les informations reviennent à l'état précédent
+
+Onglet "Sécurité":
+
+Changement de Mot de Passe:
+1. Cliquez sur le bouton "Modifier"
+2. Entrez votre mot de passe actuel
+3. Entrez votre nouveau mot de passe (min. 8 caractères)
+4. Confirmez le nouveau mot de passe
+5. Cliquez sur "Enregistrer"
+6. Une notification de succès s'affiche
+7. Votre mot de passe est mis à jour
+
+Validation:
+- Mot de passe actuel: Requis
+- Nouveau mot de passe: Requis, min. 8 caractères
+- Confirmation: Doit correspondre au nouveau mot de passe
+- Les mots de passe sont masqués
+
+Annulation:
+1. Cliquez sur le bouton "Annuler"
+2. Le formulaire est réinitialisé
+3. Aucune modification n'est effectuée
+
+Onglet "Préférences":
+
+Notifications par Email:
+1. Activez/désactivez le toggle
+2. Les modifications sont sauvegardées automatiquement
+3. Une notification de succès s'affiche
+
+Notifications Push:
+1. Activez/désactivez le toggle
+2. Les modifications sont sauvegardées automatiquement
+3. Une notification de succès s'affiche
+
+Rappels d'Événements:
+1. Activez/désactivez le toggle
+2. Les modifications sont sauvegardées automatiquement
+3. Une notification de succès s'affiche
+
+Abonnement à la Newsletter:
+1. Activez/désactivez le toggle
+2. Les modifications sont sauvegardées automatiquement
+3. Une notification de succès s'affiche
+
+Thème:
+1. Sélectionnez le thème souhaité:
+   - Clair: Interface claire
+   - Sombre: Interface sombre
+2. Le thème est appliqué immédiatement
+3. Les modifications sont sauvegardées
+
+Onglet "Gestion des Données":
+
+Télécharger les Données Personnelles:
+1. Cliquez sur le bouton "Télécharger mes données"
+2. Un fichier JSON est généré et téléchargé
+3. Le fichier contient:
+   - Vos informations personnelles
+   - Vos préférences
+   - La date de téléchargement
+4. Le fichier est nommé: profile-[email]-[date].json
+5. Une notification de succès s'affiche
+
+Supprimer le Compte:
+1. Cliquez sur le bouton "Supprimer mon compte"
+2. Une boîte de dialogue de confirmation s'affiche
+3. Lisez l'avertissement attentivement
+4. Cliquez sur "Confirmer la suppression"
+5. Votre compte est supprimé définitivement
+6. Vous êtes déconnecté automatiquement
+7. Vous êtes redirigé vers la page de connexion
+
+NAVIGATION
+================================================================================
+
+Barre Latérale:
+- Affiche les liens de navigation
+- Liens participant:
+  * Tableau de bord
+  * Mon Espace
+  * Parcourir les Événements
+  * Mon Profil
+- Cliquez sur un lien pour naviguer
+
+En-tête:
+- Affiche votre nom
+- Menu utilisateur (cliquez sur votre nom)
+- Bouton de déconnexion
+
+Tableau de Bord:
+- Affiche les cartes d'action rapide
+- Cliquez sur une carte pour naviguer
+
+Boutons de Navigation:
+- Utilisez les boutons "Retour" pour revenir à la page précédente
+- Utilisez les liens "Voir plus" pour accéder à plus de détails
+
+CONSEILS D'UTILISATION
+================================================================================
+
+1. Gestion des Événements:
+   - Consultez régulièrement "Parcourir les Événements"
+   - Inscrivez-vous aux événements qui vous intéressent
+   - Vérifiez les places disponibles avant de vous inscrire
+
+2. Gestion des Badges:
+   - Téléchargez vos badges après chaque événement
+   - Partagez vos badges sur les réseaux sociaux
+   - Imprimez vos badges pour les afficher
+
+3. Gestion du Profil:
+   - Mettez à jour vos informations régulièrement
+   - Changez votre mot de passe régulièrement
+   - Configurez vos préférences selon vos besoins
+
+4. Notifications:
+   - Activez les notifications pour rester informé
+   - Configurez les rappels d'événements
+   - Abonnez-vous à la newsletter pour les mises à jour
+
+5. Sécurité:
+   - Utilisez un mot de passe fort
+   - Ne partagez pas vos identifiants
+   - Déconnectez-vous après chaque utilisation
+
+DÉPANNAGE
+================================================================================
+
+Problème: Je ne peux pas me connecter
+Solution:
+1. Vérifiez votre email et mot de passe
+2. Vérifiez que vous avez le rôle "participant"
+3. Vérifiez que votre compte n'est pas désactivé
+4. Essayez de réinitialiser votre mot de passe
+5. Contactez l'administrateur
+
+Problème: Les événements ne s'affichent pas
+Solution:
+1. Vérifiez que vous êtes connecté
+2. Vérifiez que les filtres ne sont pas trop restrictifs
+3. Cliquez sur "Réinitialiser les filtres"
+4. Rafraîchissez la page
+5. Vérifiez la console pour les erreurs
+
+Problème: Je ne peux pas m'inscrire à un événement
+Solution:
+1. Vérifiez que l'événement a des places disponibles
+2. Vérifiez que vous n'êtes pas déjà inscrit
+3. Vérifiez que l'événement n'est pas terminé
+4. Essayez de rafraîchir la page
+5. Contactez l'administrateur
+
+Problème: Je ne peux pas télécharger mon badge
+Solution:
+1. Vérifiez que vous avez un badge
+2. Vérifiez que votre navigateur autorise les téléchargements
+3. Vérifiez que vous avez de l'espace disque disponible
+4. Essayez un autre navigateur
+5. Contactez l'administrateur
+
+Problème: Mes modifications de profil ne sont pas sauvegardées
+Solution:
+1. Vérifiez que vous avez cliqué sur "Enregistrer"
+2. Vérifiez que tous les champs requis sont remplis
+3. Vérifiez que vous avez une connexion Internet
+4. Essayez de rafraîchir la page
+5. Contactez l'administrateur
+
+RACCOURCIS CLAVIER
+================================================================================
+
+Ctrl+K (Cmd+K sur Mac): Ouvrir la palette de commandes
+Ctrl+Shift+P (Cmd+Shift+P sur Mac): Ouvrir les paramètres
+F12: Ouvrir les outils de développement
+Ctrl+R (Cmd+R sur Mac): Rafraîchir la page
+Ctrl+Shift+R (Cmd+Shift+R sur Mac): Rafraîchir sans cache
+Tab: Naviguer entre les éléments
+Entrée: Activer un élément
+Échap: Fermer un menu/modal
+
+SUPPORT
+================================================================================
+
+Pour toute question ou problème:
+1. Consultez cette documentation
+2. Vérifiez les logs de la console (F12)
+3. Consultez les alertes du système
+4. Contactez l'équipe de support
+
+Email de support: support@example.com
+Téléphone: +1 (555) 123-4567
+Chat en direct: Disponible 24/7
+
+================================================================================

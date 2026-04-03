@@ -52,7 +52,7 @@ export class UserDetailComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        const id = Number(this.route.snapshot.paramMap.get('id'));
+        const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.loadUser(id);
             this.loadUserActivities(id);
@@ -60,7 +60,7 @@ export class UserDetailComponent implements OnInit {
         }
     }
 
-    loadUser(id: number): void {
+    loadUser(id: string | number): void {
         this.apiService.getUserById(id).subscribe({
             next: (user: User) => {
                 this.user = user;
@@ -73,7 +73,7 @@ export class UserDetailComponent implements OnInit {
         });
     }
 
-    loadUserActivities(id: number): void {
+    loadUserActivities(id: string | number): void {
         // Simulated activities
         this.activities = [
             { id: 1, type: 'login', message: 'Connexion au système', date: new Date(Date.now() - 3600000) },
@@ -82,7 +82,7 @@ export class UserDetailComponent implements OnInit {
         ];
     }
 
-    loadUserEvents(id: number): void {
+    loadUserEvents(id: string | number): void {
         // Simulated events
         this.events = [
             { id: 1, title: 'Conférence IA 2026', date: new Date(), status: 'upcoming' },

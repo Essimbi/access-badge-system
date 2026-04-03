@@ -1,0 +1,57 @@
+.profile-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  mat-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    mat-card-header {
+      margin: 0;
+      padding: 0;
+    }
+
+    mat-card-content {
+      padding: 24px;
+    }
+  }
+
+  mat-tab-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  button {
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  mat-slide-toggle {
+    margin-left: auto;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 12px !important;
+
+    mat-form-field {
+      margin-bottom: 12px;
+    }
+  }
+}

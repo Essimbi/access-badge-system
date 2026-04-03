@@ -1,0 +1,128 @@
+.realtime-monitor {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  mat-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-header {
+      margin: 0;
+      padding: 0;
+    }
+
+    mat-card-content {
+      padding: 24px;
+    }
+  }
+
+  .event-monitor-card,
+  .gate-status-card {
+    position: relative;
+  }
+
+  mat-progress-bar {
+    border-radius: 4px;
+    height: 8px;
+  }
+
+  mat-chip {
+    font-size: 0.75rem;
+    height: 24px;
+    padding: 0 8px;
+    font-weight: 600;
+
+    &.status-ongoing {
+      background-color: #10b981;
+      color: white;
+    }
+
+    &.status-upcoming {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    &.status-completed {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    &.status-active {
+      background-color: #10b981;
+      color: white;
+    }
+
+    &.status-inactive {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    &.status-error {
+      background-color: #ef4444;
+      color: white;
+    }
+  }
+
+  button {
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .realtime-monitor {
+    padding: 12px !important;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}

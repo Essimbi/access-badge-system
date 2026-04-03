@@ -77,6 +77,14 @@ export const routes: Routes = [
                         loadComponent: () => import('./features/events/event-list/event-list.component').then(m => m.EventListComponent)
                     },
                     {
+                        path: 'new',
+                        loadComponent: () => import('./features/events/event-form/event-form.component').then(m => m.EventFormComponent)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./features/events/event-form/event-form.component').then(m => m.EventFormComponent)
+                    },
+                    {
                         path: ':id',
                         loadComponent: () => import('./features/events/event-detail/event-detail.component').then(m => m.EventDetailComponent)
                     }
@@ -116,8 +124,29 @@ export const routes: Routes = [
             },
             {
                 path: 'access-control',
-                data: { roles: ['super_admin', 'admin'] },
-                loadComponent: () => import('./features/access-control/gate-list/gate-list.component').then(m => m.GateListComponent)
+                data: { roles: ['super_admin', 'admin', 'controller'] },
+                children: [
+                    {
+                        path: '',
+                        data: { roles: ['super_admin', 'admin'] },
+                        loadComponent: () => import('./features/access-control/gate-list/gate-list.component').then(m => m.GateListComponent)
+                    },
+                    {
+                        path: 'scanner',
+                        data: { roles: ['controller', 'admin', 'super_admin'] },
+                        loadComponent: () => import('./features/access-control/controller-dashboard/controller-dashboard.component').then(m => m.ControllerDashboardComponent)
+                    },
+                    {
+                        path: 'logs',
+                        data: { roles: ['controller', 'admin', 'super_admin'] },
+                        loadComponent: () => import('./features/access-control/access-logs/access-logs.component').then(m => m.AccessLogsComponent)
+                    },
+                    {
+                        path: 'monitor',
+                        data: { roles: ['admin', 'super_admin'] },
+                        loadComponent: () => import('./features/access-control/realtime-monitor/realtime-monitor.component').then(m => m.RealtimeMonitorComponent)
+                    }
+                ]
             },
             {
                 path: 'statistics',
@@ -135,6 +164,24 @@ export const routes: Routes = [
                     {
                         path: 'settings',
                         loadComponent: () => import('./features/system/settings/settings.component').then(m => m.SettingsComponent)
+                    }
+                ]
+            },
+            {
+                path: 'participant',
+                data: { roles: ['participant'] },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./features/participant/participant-dashboard/participant-dashboard.component').then(m => m.ParticipantDashboardComponent)
+                    },
+                    {
+                        path: 'browse-events',
+                        loadComponent: () => import('./features/participant/browse-events/browse-events.component').then(m => m.BrowseEventsComponent)
+                    },
+                    {
+                        path: 'profile',
+                        loadComponent: () => import('./features/participant/profile/profile.component').then(m => m.ProfileComponent)
                     }
                 ]
             }

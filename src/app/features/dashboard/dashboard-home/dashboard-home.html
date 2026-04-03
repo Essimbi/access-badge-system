@@ -1,129 +1,212 @@
 <div class="dashboard-home">
-    <div class="dashboard-home__header">
-        <div>
-            <h1 class="dashboard-home__title">Tableau de Bord</h1>
-            <p class="dashboard-home__subtitle">Gérez vos badges et événements en un clic.</p>
+    <!-- Controller Dashboard -->
+    <div *ngIf="isController" class="controller-welcome">
+        <div class="controller-welcome__header">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900">Bienvenue, {{ currentUser?.firstName }}!</h1>
+                <p class="text-slate-500 mt-2">Vous êtes en mode Contrôle d'Accès</p>
+            </div>
         </div>
-        <div class="dashboard-home__actions">
-            <button class="dashboard-home__add-btn" routerLink="/dashboard/events">
-                <mat-icon>add</mat-icon>
-                Nouvel Événement
-            </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <mat-card class="quick-action-card" routerLink="/dashboard/access-control/scanner">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-blue-600 mb-4">qr_code_scanner</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Scanner QR</h3>
+                    <p class="text-slate-600 text-sm">Scannez les badges des participants</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="quick-action-card" routerLink="/dashboard/access-control/logs">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-purple-600 mb-4">history</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Logs d'Accès</h3>
+                    <p class="text-slate-600 text-sm">Consultez l'historique des scans</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="quick-action-card" routerLink="/dashboard/access-control/monitor">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-green-600 mb-4">monitor</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Monitoring</h3>
+                    <p class="text-slate-600 text-sm">Suivi en temps réel</p>
+                </mat-card-content>
+            </mat-card>
         </div>
     </div>
 
-    <div class="dashboard-home__stats-grid">
-        <!-- Stat Card 1 -->
-        <mat-card class="stat-card">
-            <div class="stat-card__inner">
-                <div class="stat-card__header">
-                    <div class="stat-card__icon-wrapper stat-card__icon-wrapper--blue">
-                        <mat-icon>event</mat-icon>
-                    </div>
-                    <span class="stat-card__trend stat-card__trend--up">+12%</span>
-                </div>
-                <div class="stat-card__body">
-                    <h3 class="stat-card__label">Événements</h3>
-                    <p class="stat-card__value">{{ stats.totalEvents }}</p>
-                </div>
+    <!-- Participant Dashboard -->
+    <div *ngIf="isParticipant" class="participant-welcome">
+        <div class="participant-welcome__header">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900">Bienvenue, {{ currentUser?.firstName }}!</h1>
+                <p class="text-slate-500 mt-2">Découvrez les événements et gérez vos badges</p>
             </div>
-        </mat-card>
+        </div>
 
-        <!-- Stat Card 2 -->
-        <mat-card class="stat-card">
-            <div class="stat-card__inner">
-                <div class="stat-card__header">
-                    <div class="stat-card__icon-wrapper stat-card__icon-wrapper--purple">
-                        <mat-icon>badge</mat-icon>
-                    </div>
-                    <span class="stat-card__trend stat-card__trend--up">+5%</span>
-                </div>
-                <div class="stat-card__body">
-                    <h3 class="stat-card__label">Badges Actifs</h3>
-                    <p class="stat-card__value">{{ stats.activeBadges }}</p>
-                </div>
-            </div>
-        </mat-card>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <mat-card class="quick-action-card" routerLink="/dashboard/participant">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-blue-600 mb-4">home</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Mon Espace</h3>
+                    <p class="text-slate-600 text-sm">Mes événements et badges</p>
+                </mat-card-content>
+            </mat-card>
 
-        <!-- Stat Card 3 -->
-        <mat-card class="stat-card">
-            <div class="stat-card__inner">
-                <div class="stat-card__header">
-                    <div class="stat-card__icon-wrapper stat-card__icon-wrapper--orange">
-                        <mat-icon>business</mat-icon>
-                    </div>
-                    <span class="stat-card__trend stat-card__trend--stable">Stable</span>
-                </div>
-                <div class="stat-card__body">
-                    <h3 class="stat-card__label">Organisations</h3>
-                    <p class="stat-card__value">{{ stats.organizations }}</p>
-                </div>
-            </div>
-        </mat-card>
+            <mat-card class="quick-action-card" routerLink="/dashboard/participant/browse-events">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-purple-600 mb-4">event</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Parcourir les Événements</h3>
+                    <p class="text-slate-600 text-sm">Découvrez les événements disponibles</p>
+                </mat-card-content>
+            </mat-card>
 
-        <!-- Stat Card 4 -->
-        <mat-card class="stat-card">
-            <div class="stat-card__inner">
-                <div class="stat-card__header">
-                    <div class="stat-card__icon-wrapper stat-card__icon-wrapper--red">
-                        <mat-icon>notification_important</mat-icon>
-                    </div>
-                    <span class="stat-card__trend stat-card__trend--urgent">Urgent</span>
-                </div>
-                <div class="stat-card__body">
-                    <h3 class="stat-card__label">Demandes</h3>
-                    <p class="stat-card__value">{{ stats.newRequests }}</p>
-                </div>
-            </div>
-        </mat-card>
+            <mat-card class="quick-action-card" routerLink="/dashboard/participant/profile">
+                <mat-card-content class="p-6 text-center cursor-pointer hover:shadow-lg transition">
+                    <mat-icon class="text-6xl text-green-600 mb-4">person</mat-icon>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Mon Profil</h3>
+                    <p class="text-slate-600 text-sm">Gérez vos informations</p>
+                </mat-card-content>
+            </mat-card>
+        </div>
     </div>
 
-    <div class="dashboard-home__content-grid">
-        <div class="dashboard-home__main">
-            <mat-card class="section-card">
-                <h3 class="section-card__title">Événements Récents</h3>
-                <div class="event-list">
-                    <div *ngFor="let event of recentEvents" class="event-list__item"
-                        [routerLink]="['/dashboard/events', event.id]">
-                        <div class="event-list__info">
-                            <div class="event-list__thumb">{{ event.title.substring(0, 2).toUpperCase() }}</div>
-                            <div>
-                                <h4 class="event-list__name">{{ event.title }}</h4>
-                                <p class="event-list__meta">{{ event.date | date:'longDate' }} • {{ event.location }}
-                                </p>
+    <!-- Admin/Super Admin Dashboard -->
+    <div *ngIf="!isController && !isParticipant">
+        <div class="dashboard-home__header">
+            <div>
+                <h1 class="dashboard-home__title">Tableau de Bord</h1>
+                <p class="dashboard-home__subtitle">Gérez vos badges et événements en un clic.</p>
+            </div>
+            <div class="dashboard-home__actions">
+                <button class="dashboard-home__add-btn" routerLink="/dashboard/events">
+                    <mat-icon>add</mat-icon>
+                    Nouvel Événement
+                </button>
+            </div>
+        </div>
+
+        <div class="dashboard-home__stats-grid">
+            <!-- Stat Card 1 -->
+            <mat-card class="stat-card">
+                <div class="stat-card__inner">
+                    <div class="stat-card__header">
+                        <div class="stat-card__icon-wrapper stat-card__icon-wrapper--blue">
+                            <mat-icon>event</mat-icon>
+                        </div>
+                        <span class="stat-card__trend stat-card__trend--up">+12%</span>
+                    </div>
+                    <div class="stat-card__body">
+                        <h3 class="stat-card__label">Événements</h3>
+                        <p class="stat-card__value">{{ stats.totalEvents }}</p>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Stat Card 2 -->
+            <mat-card class="stat-card">
+                <div class="stat-card__inner">
+                    <div class="stat-card__header">
+                        <div class="stat-card__icon-wrapper stat-card__icon-wrapper--purple">
+                            <mat-icon>badge</mat-icon>
+                        </div>
+                        <span class="stat-card__trend stat-card__trend--up">+5%</span>
+                    </div>
+                    <div class="stat-card__body">
+                        <h3 class="stat-card__label">Badges Actifs</h3>
+                        <p class="stat-card__value">{{ stats.activeBadges }}</p>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Stat Card 3 -->
+            <mat-card class="stat-card">
+                <div class="stat-card__inner">
+                    <div class="stat-card__header">
+                        <div class="stat-card__icon-wrapper stat-card__icon-wrapper--orange">
+                            <mat-icon>business</mat-icon>
+                        </div>
+                        <span class="stat-card__trend stat-card__trend--stable">Stable</span>
+                    </div>
+                    <div class="stat-card__body">
+                        <h3 class="stat-card__label">Organisations</h3>
+                        <p class="stat-card__value">{{ stats.organizations }}</p>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Stat Card 4 -->
+            <mat-card class="stat-card">
+                <div class="stat-card__inner">
+                    <div class="stat-card__header">
+                        <div class="stat-card__icon-wrapper stat-card__icon-wrapper--red">
+                            <mat-icon>notification_important</mat-icon>
+                        </div>
+                        <span class="stat-card__trend stat-card__trend--urgent">Urgent</span>
+                    </div>
+                    <div class="stat-card__body">
+                        <h3 class="stat-card__label">Demandes</h3>
+                        <p class="stat-card__value">{{ stats.newRequests }}</p>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+
+        <div class="dashboard-home__content-grid">
+            <div class="dashboard-home__main">
+                <mat-card class="section-card">
+                    <h3 class="section-card__title">Événements Récents</h3>
+                    <div class="event-list">
+                        <div *ngFor="let event of recentEvents" class="event-list__item"
+                            [routerLink]="['/dashboard/events', event.id]">
+                            <div class="event-list__info">
+                                <div class="event-list__thumb">{{ event.title.substring(0, 2).toUpperCase() }}</div>
+                                <div>
+                                    <h4 class="event-list__name">{{ event.title }}</h4>
+                                    <p class="event-list__meta">{{ event.date | date:'longDate' }} • {{ event.location
+                                        }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="status-badge" [ngClass]="'status-badge--' + event.status">
+                                    {{ event.status === 'upcoming' ? 'À venir' : event.status === 'ongoing' ? 'En cours'
+                                    :
+                                    'Terminé' }}
+                                </span>
+                                <button mat-icon-button
+                                    class="text-gray-400"><mat-icon>chevron_right</mat-icon></button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="status-badge" [ngClass]="'status-badge--' + event.status">
-                                {{ event.status === 'upcoming' ? 'À venir' : event.status === 'ongoing' ? 'En cours' :
-                                'Terminé' }}
-                            </span>
-                            <button mat-icon-button class="text-gray-400"><mat-icon>chevron_right</mat-icon></button>
+                        <div *ngIf="recentEvents.length === 0" class="p-8 text-center text-slate-400">
+                            Aucun événement récent
                         </div>
                     </div>
-                    <div *ngIf="recentEvents.length === 0" class="p-8 text-center text-slate-400">
-                        Aucun événement récent
-                    </div>
-                </div>
-            </mat-card>
-        </div>
+                </mat-card>
+            </div>
 
-        <div>
-            <mat-card class="section-card">
-                <h3 class="section-card__title">Activités</h3>
-                <div class="activity-timeline">
-                    <div *ngFor="let i of [1,2,3,4]" class="activity-timeline__item">
-                        <div class="activity-timeline__indicator">
-                            <div class="activity-timeline__dot"></div>
-                            <div *ngIf="i < 4" class="activity-timeline__line"></div>
-                        </div>
-                        <div>
-                            <p class="activity-timeline__text"><strong>Jean Dupont</strong> a validé 45 badges.</p>
-                            <p class="activity-timeline__time">Il y a 10 minutes</p>
+            <div>
+                <mat-card class="section-card">
+                    <h3 class="section-card__title">Activités</h3>
+                    <div class="activity-timeline">
+                        <div *ngFor="let activity of activities; let i = index; let last = last"
+                            class="activity-timeline__item">
+                            <div class="activity-timeline__indicator">
+                                <div class="activity-timeline__dot"></div>
+                                <div *ngIf="!last" class="activity-timeline__line"></div>
+                            </div>
+                            <div>
+                                <p class="activity-timeline__text"><strong>{{ activity.user }}</strong>: {{
+                                    activity.message }}</p>
+                                <p class="activity-timeline__time">{{ activity.date | date:'shortTime' }}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </mat-card>
+                    <div *ngIf="activities.length === 0" class="p-8 text-center text-slate-400">
+                        Aucune activité récente
+                    </div>
+                </mat-card>
+            </div>
         </div>
     </div>
 </div>

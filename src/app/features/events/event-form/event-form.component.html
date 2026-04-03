@@ -1,0 +1,86 @@
+<div class="event-form-page p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-900 m-0">{{ isEdit ? 'Modifier l\'événement' : 'Nouvel événement' }}
+      </h1>
+      <p class="text-slate-500 text-sm mt-1">Renseignez les informations de l'événement</p>
+    </div>
+
+    <button mat-stroked-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Retour
+    </button>
+  </div>
+
+  <mat-card class="p-6 border shadow-sm">
+    <div *ngIf="loading" class="flex justify-center p-12">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <form *ngIf="!loading" [formGroup]="form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field class="w-full md:col-span-2">
+        <mat-label>Titre</mat-label>
+        <input matInput formControlName="title" placeholder="Ex: Conférence Innovation 2026" />
+      </mat-form-field>
+
+      <mat-form-field class="w-full md:col-span-2">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="4"></textarea>
+      </mat-form-field>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:col-span-2">
+        <mat-form-field class="w-full">
+          <mat-label>Date de début</mat-label>
+          <input matInput type="datetime-local" formControlName="date" />
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Date de fin</mat-label>
+          <input matInput type="datetime-local" formControlName="endDate" />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="w-full">
+        <mat-label>Lieu</mat-label>
+        <input matInput formControlName="location" placeholder="Ex: Palais de la Culture" />
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Limite de participants</mat-label>
+        <input matInput type="number" formControlName="participantLimit" placeholder="Ex: 500" min="1" />
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="w-full md:col-span-2" *ngIf="isSuperAdmin">
+        <mat-label>Organisation</mat-label>
+        <mat-select formControlName="organization_id">
+          <mat-option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="md:col-span-2 flex gap-2 mt-2">
+        <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="saving">
+          <mat-icon>save</mat-icon>
+          {{ isEdit ? 'Mettre à jour' : 'Créer' }}
+        </button>
+        <button mat-stroked-button type="button" (click)="cancel()" [disabled]="saving">
+          <mat-icon>cancel</mat-icon>
+          Annuler
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

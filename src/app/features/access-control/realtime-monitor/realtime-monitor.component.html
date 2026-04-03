@@ -1,0 +1,176 @@
+<div class="realtime-monitor p-6">
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h1 class="text-4xl font-extrabold text-slate-900">Monitoring en Temps Réel</h1>
+        <p class="text-slate-500 mt-2">Suivi des événements et des portails d'accès</p>
+      </div>
+      <div class="flex gap-2">
+        <button mat-raised-button color="primary" (click)="manualRefresh()" [disabled]="loading">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+        <button mat-stroked-button (click)="toggleAutoRefresh()" [color]="autoRefreshEnabled ? 'primary' : ''">
+          <mat-icon>{{ autoRefreshEnabled ? 'pause' : 'play_arrow' }}</mat-icon>
+          {{ autoRefreshEnabled ? 'Pause' : 'Lecture' }}
+        </button>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-sm text-slate-600">
+      <mat-icon class="text-lg" [ngClass]="autoRefreshEnabled ? 'text-green-600 animate-pulse' : 'text-slate-400'">
+        {{ autoRefreshEnabled ? 'fiber_manual_record' : 'fiber_manual_record' }}
+      </mat-icon>
+      <span>{{ autoRefreshEnabled ? 'Actualisation automatique activée' : 'Actualisation manuelle' }}</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Events Monitoring -->
+  <div *ngIf="!loading" class="mb-8">
+    <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+      <mat-icon class="text-blue-600">event</mat-icon>
+      Événements
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <mat-card *ngFor="let event of eventMonitors" class="event-monitor-card shadow-lg">
+        <mat-card-header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg">
+          <div class="flex items-start justify-between w-full">
+            <div>
+              <mat-card-title class="text-white m-0">{{ event.name }}</mat-card-title>
+              <mat-card-subtitle class="text-blue-100 text-sm">{{ event.location }}</mat-card-subtitle>
+            </div>
+            <mat-chip class="text-xs" [ngClass]="'status-' + event.status">
+              {{ getEventStatusLabel(event.status) }}
+            </mat-chip>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="p-6">
+          <!-- Attendance Progress -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-slate-700">Présence</span>
+              <span class="text-sm font-bold text-blue-600">{{ getAttendancePercentage(event) }}%</span>
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="getAttendancePercentage(event)"
+              class="rounded-full">
+            </mat-progress-bar>
+            <p class="text-xs text-slate-500 mt-2">
+              {{ event.currentAttendees }} / {{ event.totalParticipants }} participants
+            </p>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-green-50 rounded-lg p-3 border border-green-200">
+              <div class="flex items-center gap-2 mb-1">
+                <mat-icon class="text-green-600 text-lg">login</mat-icon>
+                <span class="text-xs font-semibold text-green-700">Entrées</span>
+              </div>
+              <p class="text-2xl font-black text-green-900">{{ event.entries }}</p>
+            </div>
+
+            <div class="bg-orange-50 rounded-lg p-3 border border-orange-200">
+              <div class="flex items-center gap-2 mb-1">
+                <mat-icon class="text-orange-600 text-lg">logout</mat-icon>
+                <span class="text-xs font-semibold text-orange-700">Sorties</span>
+              </div>
+              <p class="text-2xl font-black text-orange-900">{{ event.exits }}</p>
+            </div>
+          </div>
+
+          <!-- Last Scan -->
+          <div *ngIf="event.lastScan" class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <p class="text-xs font-semibold text-slate-600 mb-2">Dernier scan</p>
+            <div class="flex items-center gap-2">
+              <mat-icon class="text-sm" [ngClass]="event.lastScan.type === 'entry' ? 'text-green-600' : 'text-orange-600'">
+                {{ event.lastScan.type === 'entry' ? 'login' : 'logout' }}
+              </mat-icon>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-slate-900">{{ event.lastScan.participantName }}</p>
+                <p class="text-xs text-slate-500">{{ event.lastScan.timestamp | date:'HH:mm:ss' }}</p>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div *ngIf="eventMonitors.length === 0" class="text-center py-12 bg-slate-50 rounded-lg border border-slate-200">
+      <mat-icon class="text-6xl text-slate-300 mb-4">event_busy</mat-icon>
+      <p class="text-slate-500 text-lg">Aucun événement en cours</p>
+    </div>
+  </div>
+
+  <!-- Gates Monitoring -->
+  <div *ngIf="!loading" class="mb-8">
+    <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+      <mat-icon class="text-purple-600">qr_code_scanner</mat-icon>
+      Portails d'Accès
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <mat-card *ngFor="let gate of gateStatuses" class="gate-status-card shadow-lg">
+        <mat-card-header class="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 rounded-t-lg">
+          <div class="flex items-start justify-between w-full">
+            <div>
+              <mat-card-title class="text-white m-0">{{ gate.name }}</mat-card-title>
+              <mat-card-subtitle class="text-purple-100 text-sm">{{ gate.location }}</mat-card-subtitle>
+            </div>
+            <div class="flex items-center gap-2">
+              <mat-icon class="text-lg" [ngClass]="gate.status === 'active' ? 'text-green-300' : gate.status === 'inactive' ? 'text-yellow-300' : 'text-red-300'">
+                {{ gate.status === 'active' ? 'check_circle' : gate.status === 'inactive' ? 'pause_circle' : 'error' }}
+              </mat-icon>
+              <mat-chip class="text-xs" [ngClass]="'status-' + gate.status">
+                {{ getGateStatusLabel(gate.status) }}
+              </mat-chip>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="p-6">
+          <!-- Scans Today -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-slate-700">Scans aujourd'hui</span>
+              <span class="text-2xl font-black text-purple-600">{{ gate.scansToday }}</span>
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="Math.min((gate.scansToday / 200) * 100, 100)"
+              class="rounded-full">
+            </mat-progress-bar>
+          </div>
+
+          <!-- Last Activity -->
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <p class="text-xs font-semibold text-slate-600 mb-2">Dernière activité</p>
+            <p class="text-sm text-slate-900">
+              {{ gate.lastActivity ? (gate.lastActivity | date:'HH:mm:ss') : 'Aucune' }}
+            </p>
+          </div>
+
+          <!-- Status Indicator -->
+          <div class="mt-4 flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full" [ngClass]="gate.status === 'active' ? 'bg-green-500 animate-pulse' : gate.status === 'inactive' ? 'bg-yellow-500' : 'bg-red-500'"></div>
+            <span class="text-xs font-semibold" [ngClass]="gate.status === 'active' ? 'text-green-700' : gate.status === 'inactive' ? 'text-yellow-700' : 'text-red-700'">
+              {{ gate.status === 'active' ? 'Opérationnel' : gate.status === 'inactive' ? 'Hors ligne' : 'Erreur détectée' }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div *ngIf="gateStatuses.length === 0" class="text-center py-12 bg-slate-50 rounded-lg border border-slate-200">
+      <mat-icon class="text-6xl text-slate-300 mb-4">qr_code_scanner</mat-icon>
+      <p class="text-slate-500 text-lg">Aucun portail configuré</p>
+    </div>
+  </div>
+</div>

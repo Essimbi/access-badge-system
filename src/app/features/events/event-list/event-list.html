@@ -6,7 +6,7 @@
                 <mat-icon>download</mat-icon>
                 Exporter
             </button>
-            <button mat-raised-button color="primary">
+            <button mat-raised-button color="primary" routerLink="/dashboard/events/new">
                 <mat-icon>add</mat-icon>
                 Nouvel Événement
             </button>
@@ -125,6 +125,10 @@
                         <button mat-menu-item [routerLink]="['/dashboard/events', event.id]">
                             <mat-icon>visibility</mat-icon>
                             <span>Voir Détails</span>
+                        </button>
+                        <button mat-menu-item [routerLink]="['/dashboard/events/edit', event.id]">
+                            <mat-icon>edit</mat-icon>
+                            <span>Modifier</span>
                         </button>
                         <button mat-menu-item (click)="deleteEvent(event)">
                             <mat-icon color="warn">delete</mat-icon>

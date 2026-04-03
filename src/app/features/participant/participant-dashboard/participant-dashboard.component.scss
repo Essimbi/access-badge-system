@@ -1,0 +1,90 @@
+.participant-dashboard {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  .stat-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-icon {
+      opacity: 0.3;
+    }
+  }
+
+  .event-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-header {
+      margin: 0;
+      padding: 0;
+    }
+
+    mat-card-content {
+      padding: 24px;
+    }
+  }
+
+  mat-tab-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  mat-chip {
+    font-size: 0.75rem;
+    height: 24px;
+    padding: 0 8px;
+    font-weight: 600;
+  }
+
+  button {
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  mat-progress-bar {
+    border-radius: 4px;
+    height: 8px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .participant-dashboard {
+    padding: 12px !important;
+
+    .stat-card {
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .event-card {
+      mat-card-content {
+        padding: 16px;
+      }
+    }
+  }
+}

@@ -1,0 +1,301 @@
+<div class="controller-dashboard p-6">
+  <div class="mb-8">
+    <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Contrôle d'Accès</h1>
+    <p class="text-slate-500">Gérez les entrées et sorties des participants en temps réel</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <mat-card class="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+      <mat-card-content class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-blue-600 uppercase tracking-wide">Entrées</p>
+            <h2 class="text-3xl font-black text-blue-900">{{ todayStats.entries }}</h2>
+            <p class="text-xs text-blue-600 mt-1">Aujourd'hui</p>
+          </div>
+          <mat-icon class="text-5xl text-blue-300">login</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+      <mat-card-content class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-orange-600 uppercase tracking-wide">Sorties</p>
+            <h2 class="text-3xl font-black text-orange-900">{{ todayStats.exits }}</h2>
+            <p class="text-xs text-orange-600 mt-1">Aujourd'hui</p>
+          </div>
+          <mat-icon class="text-5xl text-orange-300">logout</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+      <mat-card-content class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-green-600 uppercase tracking-wide">Présents</p>
+            <h2 class="text-3xl font-black text-green-900">{{ todayStats.currentAttendees }}</h2>
+            <p class="text-xs text-green-600 mt-1">Actuellement</p>
+          </div>
+          <mat-icon class="text-5xl text-green-300">people</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+      <mat-card-content class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-purple-600 uppercase tracking-wide">Total Scans</p>
+            <h2 class="text-3xl font-black text-purple-900">{{ todayStats.totalScans }}</h2>
+            <p class="text-xs text-purple-600 mt-1">Aujourd'hui</p>
+          </div>
+          <mat-icon class="text-5xl text-purple-300">qr_code_scanner</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Scanner Section -->
+    <div class="lg:col-span-2">
+      <mat-card class="shadow-lg">
+        <mat-card-header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center gap-3">
+              <mat-icon class="text-2xl">qr_code_scanner</mat-icon>
+              <div>
+                <mat-card-title class="text-white m-0">Scanner de Badge</mat-card-title>
+                <mat-card-subtitle class="text-blue-100">Scannez les codes QR des badges</mat-card-subtitle>
+              </div>
+            </div>
+            <button mat-icon-button (click)="toggleScanner()" [color]="scannerActive ? 'accent' : ''">
+              <mat-icon>{{ scannerActive ? 'videocam' : 'videocam_off' }}</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="p-6">
+          <!-- Access Type Toggle -->
+          <div class="mb-6">
+            <label class="block text-sm font-semibold text-slate-700 mb-3">Type d'accès</label>
+            <mat-button-toggle-group [(ngModel)]="accessType" class="w-full">
+              <mat-button-toggle value="entry" class="flex-1">
+                <mat-icon class="mr-2">login</mat-icon>
+                Entrée
+              </mat-button-toggle>
+              <mat-button-toggle value="exit" class="flex-1">
+                <mat-icon class="mr-2">logout</mat-icon>
+                Sortie
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <!-- Scanner -->
+          <div class="scanner-container bg-slate-900 rounded-lg overflow-hidden mb-6" *ngIf="scannerActive">
+            <zxing-scanner
+              [formats]="qrFormats"
+              (scanSuccess)="onScanSuccess($event)"
+              (scanError)="onScanError($event)"
+              class="w-full h-96">
+            </zxing-scanner>
+          </div>
+
+          <!-- Last Scan Result -->
+          <div *ngIf="lastScan" class="scan-result mb-6 p-4 rounded-lg border-2" 
+               [ngClass]="lastScan.status === 'success' 
+                 ? 'bg-green-50 border-green-300' 
+                 : 'bg-red-50 border-red-300'">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-3">
+                <mat-icon [color]="lastScan.status === 'success' ? 'primary' : 'warn'" class="text-2xl">
+                  {{ getStatusIcon(lastScan.status) }}
+                </mat-icon>
+                <div>
+                  <h3 class="font-bold text-lg" [ngClass]="lastScan.status === 'success' ? 'text-green-900' : 'text-red-900'">
+                    {{ lastScan.participantName }}
+                  </h3>
+                  <p class="text-sm" [ngClass]="lastScan.status === 'success' ? 'text-green-700' : 'text-red-700'">
+                    {{ lastScan.eventName }}
+                  </p>
+                  <div class="flex gap-2 mt-2">
+                    <mat-chip class="text-xs">{{ lastScan.badgeCategory }}</mat-chip>
+                    <mat-chip class="text-xs">
+                      {{ lastScan.accessType === 'entry' ? 'Entrée' : 'Sortie' }}
+                    </mat-chip>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-2">
+                    {{ lastScan.timestamp | date:'HH:mm:ss' }}
+                  </p>
+                </div>
+              </div>
+              <button mat-icon-button (click)="clearLastScan()" class="text-slate-400">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="loading" class="flex justify-center items-center py-8">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+
+          <!-- Instructions -->
+          <div *ngIf="!lastScan && !loading" class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+            <mat-icon class="text-blue-500 text-4xl mb-2">info</mat-icon>
+            <p class="text-sm text-blue-700">
+              Positionnez le badge face à la caméra pour scanner le code QR
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Sidebar: Events & Quick Actions -->
+    <div class="space-y-6">
+      <!-- Assigned Events -->
+      <mat-card class="shadow-lg">
+        <mat-card-header class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-4 rounded-t-lg">
+          <div class="flex items-center gap-2">
+            <mat-icon>event</mat-icon>
+            <mat-card-title class="text-white m-0">Événements Assignés</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content class="p-4">
+          <div *ngIf="assignedEvents.length === 0" class="text-center py-6 text-slate-500">
+            <mat-icon class="text-4xl mb-2 text-slate-300">event_busy</mat-icon>
+            <p class="text-sm">Aucun événement assigné</p>
+          </div>
+          <mat-list *ngIf="assignedEvents.length > 0">
+            <mat-list-item *ngFor="let event of assignedEvents" class="mb-2">
+              <mat-icon matListItemIcon class="text-indigo-600">event</mat-icon>
+              <div matListItemTitle class="font-semibold text-slate-900">{{ event.title }}</div>
+              <div matListItemLine class="text-xs text-slate-500">
+                {{ event.location }}
+              </div>
+              <mat-chip class="text-xs" [ngClass]="event.status === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'">
+                {{ event.status === 'ongoing' ? 'En cours' : 'À venir' }}
+              </mat-chip>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Quick Actions -->
+      <mat-card class="shadow-lg">
+        <mat-card-header class="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-4 rounded-t-lg">
+          <div class="flex items-center gap-2">
+            <mat-icon>bolt</mat-icon>
+            <mat-card-title class="text-white m-0">Actions Rapides</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content class="p-4 space-y-2">
+          <button mat-raised-button color="primary" class="w-full" (click)="exportScans()">
+            <mat-icon>download</mat-icon>
+            Exporter Scans
+          </button>
+          <button mat-stroked-button class="w-full">
+            <mat-icon>refresh</mat-icon>
+            Actualiser
+          </button>
+          <button mat-stroked-button class="w-full">
+            <mat-icon>help</mat-icon>
+            Aide
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Recent Scans Table -->
+  <mat-card class="mt-8 shadow-lg">
+    <mat-card-header class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-t-lg">
+      <div class="flex items-center gap-3">
+        <mat-icon class="text-2xl">history</mat-icon>
+        <div>
+          <mat-card-title class="text-white m-0">Historique des Scans</mat-card-title>
+          <mat-card-subtitle class="text-slate-300">Derniers scans du jour</mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="p-0">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Heure</th>
+            <td mat-cell *matCellDef="let element" class="text-sm">
+              {{ element.timestamp | date:'HH:mm:ss' }}
+            </td>
+          </ng-container>
+
+          <!-- Participant Column -->
+          <ng-container matColumnDef="participantName">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Participant</th>
+            <td mat-cell *matCellDef="let element" class="font-semibold text-slate-900">
+              {{ element.participantName }}
+            </td>
+          </ng-container>
+
+          <!-- Event Column -->
+          <ng-container matColumnDef="eventName">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Événement</th>
+            <td mat-cell *matCellDef="let element" class="text-sm text-slate-600">
+              {{ element.eventName }}
+            </td>
+          </ng-container>
+
+          <!-- Category Column -->
+          <ng-container matColumnDef="badgeCategory">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Catégorie</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip class="text-xs">{{ element.badgeCategory }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Access Type Column -->
+          <ng-container matColumnDef="accessType">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Type</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-1">
+                <mat-icon class="text-sm" [ngClass]="element.accessType === 'entry' ? 'text-green-600' : 'text-orange-600'">
+                  {{ element.accessType === 'entry' ? 'login' : 'logout' }}
+                </mat-icon>
+                <span class="text-sm font-semibold">
+                  {{ element.accessType === 'entry' ? 'Entrée' : 'Sortie' }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="bg-slate-50 font-bold text-slate-900">Statut</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-1">
+                <mat-icon class="text-sm" [ngClass]="element.status === 'success' ? 'text-green-600' : 'text-red-600'">
+                  {{ getStatusIcon(element.status) }}
+                </mat-icon>
+                <span class="text-sm font-semibold" [ngClass]="element.status === 'success' ? 'text-green-700' : 'text-red-700'">
+                  {{ element.status === 'success' ? 'Succès' : 'Erreur' }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="border-b hover:bg-slate-50 transition"></tr>
+        </table>
+      </div>
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons
+        class="bg-slate-50">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

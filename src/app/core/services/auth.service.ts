@@ -12,6 +12,8 @@ export interface User {
     firstName: string;
     lastName: string;
     organization_id?: number;
+    phone?: string;
+    organization?: string;
 }
 
 export interface LoginResponse {
@@ -39,66 +41,16 @@ export class AuthService {
     }
 
     login(email: string, password: string): Observable<LoginResponse> {
-        const mockUsers: { [key: string]: User } = {
-            'superadmin@test.com': {
-                userId: 1,
-                email: 'superadmin@test.com',
-                role: 'super_admin',
-                firstName: 'Super',
-                lastName: 'Admin'
-            },
-            'admin@test.com': {
-                userId: 2,
-                email: 'admin@test.com',
-                role: 'admin',
-                firstName: 'Alice',
-                lastName: 'Admin',
-                organization_id: 1
-            },
-            'control@test.com': {
-                userId: 3,
-                email: 'control@test.com',
-                role: 'controller',
-                firstName: 'Benoit',
-                lastName: 'Controleur',
-                organization_id: 1
-            },
-            'user@test.com': {
-                userId: 4,
-                email: 'user@test.com',
-                role: 'participant',
-                firstName: 'Jean',
-                lastName: 'Particulier'
-            }
-        };
-
-        return new Observable<LoginResponse>(observer => {
-            setTimeout(() => {
-                const user = mockUsers[email];
-                if (user && password === 'password123') {
-                    // Generate a dummy token that jwt-decode can handle (header.payload.signature)
-                    // The payload needs an 'exp' field for isAuthenticated check
-                    const exp = Math.floor(Date.now() / 1000) + (60 * 60 * 24); // 24h
-                    const payload = btoa(JSON.stringify({ exp, ...user }));
-                    const dummyToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${payload}.signature`;
-
-                    const response: LoginResponse = {
-                        token: dummyToken,
-                        refreshToken: 'mock-refresh-token',
-                        user: user
-                    };
+        return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+            .pipe(
+                tap(response => {
                     this.setSession(response);
-                    observer.next(response);
-                    observer.complete();
-                } else {
-                    observer.error({ error: { message: 'Identifiants invalides (Simulation)' } });
-                }
-            }, 500);
-        });
+                })
+            );
     }
 
     register(userData: any): Observable<any> {
-        return of({ message: 'Compte créé avec succès (Simulation)' }).pipe(delay(500));
+        return this.http.post(`${environment.apiUrl}/auth/register`, userData);
     }
 
     logout(): void {

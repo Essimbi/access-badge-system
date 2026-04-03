@@ -1,0 +1,272 @@
+================================================================================
+PARTICIPANT - GUIDE DE DÉMARRAGE RAPIDE
+================================================================================
+
+INSTALLATION
+================================================================================
+
+1. Prérequis:
+   - Node.js 18+ installé
+   - npm ou yarn installé
+   - Angular CLI 21+ installé
+
+2. Installation des dépendances:
+   npm install
+
+3. Démarrage du serveur de développement:
+   npm start
+   ou
+   ng serve
+
+4. Accès à l'application:
+   http://localhost:4200
+
+CONNEXION
+================================================================================
+
+1. Allez à la page de connexion:
+   http://localhost:4200/auth/login
+
+2. Entrez les identifiants:
+   Email: participant@example.com
+   Mot de passe: password123
+
+3. Cliquez sur "Se connecter"
+
+4. Vous serez redirigé vers le tableau de bord participant
+
+FONCTIONNALITÉS PRINCIPALES
+================================================================================
+
+1. MON ESPACE
+   - Accès: /dashboard/participant
+   - Affiche vos statistiques personnelles
+   - Liste vos événements à venir et passés
+   - Gère vos badges
+
+2. PARCOURIR LES ÉVÉNEMENTS
+   - Accès: /dashboard/participant/browse-events
+   - Découvrez les événements disponibles
+   - Filtrez par type, statut, organisation
+   - Inscrivez-vous aux événements
+
+3. MON PROFIL
+   - Accès: /dashboard/participant/profile
+   - Gérez vos informations personnelles
+   - Changez votre mot de passe
+   - Configurez vos préférences
+   - Téléchargez vos données
+
+COMMANDES UTILES
+================================================================================
+
+Démarrer l'application:
+npm start
+
+Compiler l'application:
+npm run build
+
+Exécuter les tests:
+npm test
+
+Linter le code:
+npm run lint
+
+Générer un composant:
+ng generate component features/participant/new-component
+
+Générer un service:
+ng generate service core/services/new-service
+
+STRUCTURE DU PROJET
+================================================================================
+
+src/
+├── app/
+│   ├── core/
+│   │   ├── guards/
+│   │   ├── interceptors/
+│   │   ├── models/
+│   │   ├── mocks/
+│   │   └── services/
+│   ├── features/
+│   │   ├── participant/
+│   │   │   ├── participant-dashboard/
+│   │   │   ├── browse-events/
+│   │   │   ├── profile/
+│   │   │   └── participant.routes.ts
+│   │   └── [autres features]
+│   ├── layouts/
+│   ├── shared/
+│   │   └── components/
+│   ├── app.routes.ts
+│   ├── app.config.ts
+│   └── app.ts
+├── environments/
+├── styles.scss
+└── main.ts
+
+FICHIERS IMPORTANTS
+================================================================================
+
+1. src/app/features/participant/participant-dashboard/
+   └─ Composant principal du tableau de bord participant
+
+2. src/app/features/participant/browse-events/
+   └─ Composant de découverte d'événements
+
+3. src/app/features/participant/profile/
+   └─ Composant de gestion du profil
+
+4. src/app/app.routes.ts
+   └─ Routes de l'application (incluant les routes participant)
+
+5. src/app/shared/components/sidebar/
+   └─ Navigation (incluant les liens participant)
+
+DOCUMENTATION
+================================================================================
+
+1. README_PARTICIPANT.txt
+   └─ Vue d'ensemble générale
+
+2. PARTICIPANT_FEATURES.txt
+   └─ Détail des fonctionnalités
+
+3. PARTICIPANT_USAGE_GUIDE.txt
+   └─ Guide d'utilisation complet
+
+4. PARTICIPANT_ARCHITECTURE.txt
+   └─ Architecture technique
+
+DÉPANNAGE
+================================================================================
+
+Problème: La page ne charge pas
+Solution:
+1. Vérifiez que le serveur est en cours d'exécution
+2. Vérifiez l'URL (http://localhost:4200)
+3. Vérifiez la console pour les erreurs
+4. Rafraîchissez la page (Ctrl+R ou Cmd+R)
+
+Problème: Les données ne s'affichent pas
+Solution:
+1. Vérifiez que vous êtes connecté
+2. Vérifiez que le rôle est "participant"
+3. Vérifiez les logs de la console
+4. Vérifiez que l'API est accessible
+
+Problème: Les filtres ne fonctionnent pas
+Solution:
+1. Vérifiez que les données sont chargées
+2. Essayez de réinitialiser les filtres
+3. Rafraîchissez la page
+4. Vérifiez la console pour les erreurs
+
+Problème: L'inscription ne fonctionne pas
+Solution:
+1. Vérifiez que l'événement a des places disponibles
+2. Vérifiez que vous n'êtes pas déjà inscrit
+3. Vérifiez les logs de la console
+4. Essayez de rafraîchir la page
+
+NAVIGATEURS SUPPORTÉS
+================================================================================
+
+✓ Chrome 90+
+✓ Firefox 88+
+✓ Safari 14+
+✓ Edge 90+
+✓ Opera 76+
+
+ENVIRONNEMENTS
+================================================================================
+
+Développement:
+- URL: http://localhost:4200
+- API: http://localhost:3000
+- Mode: ng serve
+
+Production:
+- URL: https://app.example.com
+- API: https://api.example.com
+- Mode: ng build --prod
+
+VARIABLES D'ENVIRONNEMENT
+================================================================================
+
+src/environments/environment.ts (développement):
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000'
+};
+
+src/environments/environment.prod.ts (production):
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.example.com'
+};
+
+PORTS
+================================================================================
+
+Application Angular: 4200
+API Backend: 3000
+Base de données: 5432 (PostgreSQL)
+
+UTILISATEURS DE TEST
+================================================================================
+
+Participant 1:
+- Email: participant@example.com
+- Mot de passe: password123
+- Rôle: participant
+
+Participant 2:
+- Email: user@example.com
+- Mot de passe: password123
+- Rôle: participant
+
+RACCOURCIS CLAVIER
+================================================================================
+
+Ctrl+K (Cmd+K sur Mac): Ouvrir la palette de commandes
+Ctrl+Shift+P (Cmd+Shift+P sur Mac): Ouvrir les paramètres
+F12: Ouvrir les outils de développement
+Ctrl+R (Cmd+R sur Mac): Rafraîchir la page
+Ctrl+Shift+R (Cmd+Shift+R sur Mac): Rafraîchir sans cache
+
+RESSOURCES UTILES
+================================================================================
+
+Documentation Angular:
+https://angular.io/docs
+
+Documentation Material:
+https://material.angular.io
+
+Documentation TypeScript:
+https://www.typescriptlang.org/docs
+
+Tailwind CSS:
+https://tailwindcss.com/docs
+
+SUPPORT
+================================================================================
+
+Pour toute question ou problème:
+1. Consultez la documentation appropriée
+2. Vérifiez les logs de la console
+3. Consultez les alertes du système
+4. Contactez l'équipe de développement
+
+PROCHAINES ÉTAPES
+================================================================================
+
+1. Explorez les fonctionnalités du profil participant
+2. Testez l'inscription aux événements
+3. Consultez votre profil et vos préférences
+4. Téléchargez et partagez vos badges
+5. Consultez la documentation complète pour plus de détails
+
+================================================================================

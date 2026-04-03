@@ -149,7 +149,7 @@ export class UserListComponent implements OnInit {
         return org ? org.name : 'Inconnue';
     }
 
-    deleteUser(id: number): void {
+    deleteUser(id: string | number): void {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             width: '400px',
             data: {

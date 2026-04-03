@@ -23,6 +23,9 @@ export class DashboardHomeComponent implements OnInit {
     newRequests: 0
   };
   recentEvents: any[] = [];
+  activities: any[] = [];
+  isController = false;
+  isParticipant = false;
 
   constructor(
     private authService: AuthService,
@@ -32,10 +35,19 @@ export class DashboardHomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
-    });
+      this.isController = user?.role === 'controller';
+      this.isParticipant = user?.role === 'participant';
 
-    this.loadStats();
-    this.loadRecentEvents();
+      // Si c'est un contrôleur ou participant, charger les stats spécifiques
+      if (this.isController) {
+        this.loadControllerStats();
+      } else if (this.isParticipant) {
+        this.loadParticipantStats();
+      } else {
+        this.loadStats();
+        this.loadRecentEvents();
+      }
+    });
   }
 
   loadRecentEvents(): void {
@@ -51,6 +63,26 @@ export class DashboardHomeComponent implements OnInit {
       activeBadges: 450,
       organizations: 5,
       newRequests: 8
+    };
+  }
+
+  loadControllerStats(): void {
+    // Stats pour le contrôleur
+    this.stats = {
+      totalEvents: 3,
+      activeBadges: 0,
+      organizations: 1,
+      newRequests: 0
+    };
+  }
+
+  loadParticipantStats(): void {
+    // Stats pour le participant
+    this.stats = {
+      totalEvents: 5,
+      activeBadges: 3,
+      organizations: 0,
+      newRequests: 2
     };
   }
 }

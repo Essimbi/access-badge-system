@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
     selector: 'app-statistics-dashboard',
@@ -44,7 +45,19 @@ export class StatisticsDashboardComponent implements OnInit {
         { month: 'Dec', value: 88 }
     ];
 
-    constructor() { }
+    constructor(private apiService: ApiService) { }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        this.apiService.getDashboardStats().subscribe({
+            next: (data) => {
+                this.stats = {
+                    totalRevenue: '124 500 €', // Static for now, as API only provides platform stats
+                    activeUsers: data.totalUsers !== undefined ? data.totalUsers : 842,
+                    orgsGrowth: `+${data.activeOrganizations || 12}%`,
+                    eventsThisMonth: data.totalEvents !== undefined ? data.totalEvents : 28
+                };
+            },
+            error: (err) => console.error('Dashboard Stats Error:', err)
+        });
+    }
 }

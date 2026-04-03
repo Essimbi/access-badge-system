@@ -71,9 +71,6 @@ export class OrganizationListComponent implements OnInit {
       error: (err) => {
         this.notificationService.error('Erreur lors du chargement des organisations');
         this.loading = false;
-        // Mock data for development if API fails
-        this.organizations = this.getMockOrganizations();
-        this.updateDataSource();
       }
     });
   }
@@ -149,10 +146,10 @@ export class OrganizationListComponent implements OnInit {
 
   toggleStatus(org: Organization): void {
     const newStatus = !org.is_active;
-    this.apiService.updateOrganization(org.id, { is_active: newStatus }).subscribe({
+    this.apiService.updateOrganizationStatus(org.id, newStatus ? 'active' : 'suspended').subscribe({
       next: () => {
         org.is_active = newStatus;
-        this.notificationService.success(`Organisation ${newStatus ? 'activée' : 'désactivée'} (Simulation)`);
+        this.notificationService.success(`Organisation ${newStatus ? 'activée' : 'désactivée'}`);
       },
       error: () => this.notificationService.error('Erreur lors du changement de statut')
     });

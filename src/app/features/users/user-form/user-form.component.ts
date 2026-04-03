@@ -40,7 +40,7 @@ export class UserFormComponent implements OnInit {
     loading = false;
     submitting = false;
     isEditMode = false;
-    userId: number | null = null;
+    userId: string | number | null = null;
     organizations: Organization[] = [];
 
     roles = [
@@ -71,7 +71,7 @@ export class UserFormComponent implements OnInit {
 
         // Role-based restrictions
         if (this.authService.hasRole('admin')) {
-            this.roles = this.roles.filter(r => r.value !== 'super_admin');
+            this.roles = this.roles.filter(r => r.value !== 'super_admin' && r.value !== 'admin');
             const user = this.authService.currentUserValue;
             if (user && user.organization_id) {
                 this.userForm.get('organization_id')?.setValue(user.organization_id);
@@ -96,7 +96,7 @@ export class UserFormComponent implements OnInit {
         });
     }
 
-    patchUser(id: number): void {
+    patchUser(id: string | number): void {
         this.loading = true;
         this.apiService.getUsers().subscribe({
             next: (users) => {
