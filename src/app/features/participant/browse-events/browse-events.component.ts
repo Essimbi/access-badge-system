@@ -89,33 +89,39 @@ export class BrowseEventsComponent implements OnInit {
     this.loading = true;
     this.apiService.getEvents().subscribe({
       next: (events) => {
-        this.events = events.map((e: any) => ({
-          id: e.id,
-          title: e.title,
-          description: e.description || 'Événement intéressant',
-          date: new Date(e.date),
-          location: e.location,
-          status: e.status,
-          type: e.type,
-          organization: e.organization || '3CM Event Solutions',
-          enrolled: Math.random() > 0.5,
-          participants: Math.floor(Math.random() * 200) + 10,
-          maxParticipants: 500
-        }));
+        this.apiService.getMyBadges().subscribe({
+          next: (badges) => {
+            const enrolledEventIds = badges.map((b: any) => b.event_id);
+            this.events = events.map((e: any) => ({
+              id: e.id,
+              title: e.title,
+              description: e.description || 'Description non disponible',
+              date: new Date(e.date),
+              location: e.location,
+              status: e.status,
+              type: e.type || 'Conference',
+              organization: e.organization || 'Organisation Inconnue',
+              enrolled: enrolledEventIds.includes(e.id),
+              participants: parseInt(e.participantCount, 10) || 0,
+              maxParticipants: parseInt(e.maxParticipants, 10) || 500
+            }));
 
-        // Extraire les organisations uniques
-        this.organizations = [...new Set(this.events.map(e => e.organization))];
-
-        this.applyFilters();
-        this.loading = false;
+            this.organizations = [...new Set(this.events.map(e => e.organization))];
+            this.applyFilters();
+            this.loading = false;
+          },
+          error: () => this.handleError()
+        });
       },
-      error: () => {
-        this.events = this.generateMockEvents();
-        this.organizations = [...new Set(this.events.map(e => e.organization))];
-        this.applyFilters();
-        this.loading = false;
-      }
+      error: () => this.handleError()
     });
+  }
+
+  private handleError(): void {
+    this.events = this.generateMockEvents();
+    this.organizations = [...new Set(this.events.map(e => e.organization))];
+    this.applyFilters();
+    this.loading = false;
   }
 
   applyFilters(): void {
@@ -168,20 +174,30 @@ export class BrowseEventsComponent implements OnInit {
     }
 
     this.notificationService.info('Inscription en cours...');
-    setTimeout(() => {
-      event.enrolled = true;
-      event.participants++;
-      this.notificationService.success('Inscription confirmée');
-    }, 1000);
+    this.apiService.enrollEventBadge(event.id).subscribe({
+      next: () => {
+        event.enrolled = true;
+        event.participants++;
+        this.notificationService.success('Inscription confirmée');
+      },
+      error: (err) => {
+        this.notificationService.error(err.error?.error || 'Erreur lors de l\'inscription');
+      }
+    });
   }
 
   cancelEnrollment(event: Event): void {
     this.notificationService.info('Annulation en cours...');
-    setTimeout(() => {
-      event.enrolled = false;
-      event.participants--;
-      this.notificationService.success('Inscription annulée');
-    }, 1000);
+    this.apiService.unenrollEventBadge(event.id).subscribe({
+      next: () => {
+        event.enrolled = false;
+        event.participants--;
+        this.notificationService.success('Inscription annulée');
+      },
+      error: (err) => {
+        this.notificationService.error(err.error?.error || 'Erreur lors de l\'annulation');
+      }
+    });
   }
 
   getAvailableSpots(event: Event): number {

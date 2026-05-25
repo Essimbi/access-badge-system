@@ -9,6 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -27,7 +29,9 @@ import { NotificationService } from '../../../core/services/notification.service
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './event-form.component.html',
   styleUrl: './event-form.component.scss'
@@ -37,7 +41,7 @@ export class EventFormComponent implements OnInit {
   loading = false;
   saving = false;
   isEdit = false;
-  eventId: number | null = null;
+  eventId: string | number | null = null;
 
   organizations: any[] = [];
   isSuperAdmin = false;
@@ -77,7 +81,7 @@ export class EventFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit = true;
-      this.eventId = Number(id);
+      this.eventId = id;
     }
 
     this.loadOrganizations();
@@ -104,7 +108,7 @@ export class EventFormComponent implements OnInit {
     });
   }
 
-  private loadEvent(id: number): void {
+  private loadEvent(id: string | number): void {
     this.loading = true;
     this.apiService.getEvent(id).subscribe({
       next: (event) => {
@@ -114,19 +118,16 @@ export class EventFormComponent implements OnInit {
           return;
         }
 
-        const date = event.date ? new Date(event.date) : null;
-        const dateLocal = date ? this.toDatetimeLocalValue(date) : '';
-
         this.form.patchValue({
           title: event.title,
           description: event.description,
-          date: dateLocal,
-          endDate: event.endDate ? this.toDatetimeLocalValue(new Date(event.endDate)) : '',
+          date: event.start_date ? new Date(event.start_date) : null,
+          endDate: event.end_date ? new Date(event.end_date) : null,
           location: event.location,
           status: event.status,
           type: event.type,
-          participantLimit: event.participantLimit,
-          organization_id: event.organization_id
+          participantLimit: event.max_participants || null,
+          organization_id: event.org_id
         });
 
         // If admin, lock org to own org
@@ -157,7 +158,7 @@ export class EventFormComponent implements OnInit {
       ...raw,
       date: raw.date ? new Date(raw.date) : new Date(),
       endDate: raw.endDate ? new Date(raw.endDate) : null,
-      participantLimit: raw.participantLimit ? Number(raw.participantLimit) : null
+      maxParticipants: raw.participantLimit ? Number(raw.participantLimit) : 500
     };
 
     // Admin safety: force org
@@ -187,15 +188,5 @@ export class EventFormComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/dashboard/events']);
-  }
-
-  private toDatetimeLocalValue(date: Date): string {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const yyyy = date.getFullYear();
-    const mm = pad(date.getMonth() + 1);
-    const dd = pad(date.getDate());
-    const hh = pad(date.getHours());
-    const mi = pad(date.getMinutes());
-    return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
   }
 }

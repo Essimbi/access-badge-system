@@ -1,189 +1,242 @@
-<div class="badge-designer-page">
-    <div class="page-header flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-            <button mat-icon-button routerLink="/dashboard/badges" matTooltip="Retour à la liste">
+<div class="designer-layout">
+
+    <!-- ═══════════════════════════════════════════════
+         SIDEBAR — Property Inspector
+    ════════════════════════════════════════════════ -->
+    <aside class="property-sidebar">
+
+        <!-- Header -->
+        <div class="sidebar-header">
+            <button mat-icon-button routerLink="/dashboard/badges" class="back-btn" matTooltip="Retour à la liste">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-            <div>
-                <h1 class="page-header__title mb-0">{{ templateId ? 'Modifier le Modèle' : 'Nouveau Modèle de Badge' }}
-                </h1>
-                <p class="text-slate-500 text-xs">{{ templateId ? 'ID: ' + templateId : 'Créez un nouveau design' }}</p>
+            <div class="header-text">
+                <h1>{{ templateId ? (badgeSettings.templateName || 'Modifier le Badge') : 'Nouveau Badge' }}</h1>
+                <span class="status-pill" [ngClass]="{'saved': templateId, 'draft': !templateId}">
+                    {{ templateId ? 'Enregistré' : 'Brouillon' }}
+                </span>
             </div>
         </div>
-        <div class="page-header__actions flex gap-2">
-            <mat-button-toggle-group [(ngModel)]="designMode" class="mr-4">
-                <mat-button-toggle value="visual">Éditeur Visuel</mat-button-toggle>
-                <mat-button-toggle value="html">Code HTML</mat-button-toggle>
-            </mat-button-toggle-group>
 
-            <button mat-flat-button color="primary" (click)="saveTemplate()" [disabled]="loading">
-                <mat-icon>{{ templateId ? 'check' : 'save' }}</mat-icon>
-                {{ templateId ? 'Mettre à jour' : 'Enregistrer' }}
-            </button>
-        </div>
-    </div>
+        <!-- Scrollable Body -->
+        <div class="sidebar-scrollable">
 
-    <div class="designer-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Settings Sidebar -->
-        <div class="lg:col-span-4 space-y-6">
-            <mat-card class="p-6">
-                <!-- Template Info -->
-                <div class="space-y-4 mb-6 text-sm text-slate-500">
-                    <mat-form-field appearance="outline" class="w-full">
+            <!-- ─── Section: Configuration ─── -->
+            <section class="prop-section">
+                <div class="section-header">
+                    <h2 class="section-title">Configuration</h2>
+                </div>
+                <div class="prop-group">
+                    <mat-form-field appearance="outline" class="full-width compact-field">
                         <mat-label>Nom du modèle</mat-label>
-                        <input matInput [(ngModel)]="badgeSettings.templateName">
+                        <mat-icon matPrefix style="margin-right:8px;opacity:0.5;font-size:18px">badge</mat-icon>
+                        <input matInput [(ngModel)]="badgeSettings.templateName" placeholder="Ex: Badge VIP 2025">
                     </mat-form-field>
 
-                    <div class="flex items-end gap-2">
-                        <mat-form-field appearance="outline" class="flex-grow">
-                            <mat-label>Catégorie</mat-label>
-                            <mat-select [(ngModel)]="badgeSettings.categoryId">
-                                <mat-option [value]="null">Aucune catégorie</mat-option>
-                                <mat-option *ngFor="let cat of categories" [value]="cat.id">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-3 h-3 rounded-full" [style.background-color]="cat.color"></div>
-                                        {{cat.name}}
-                                    </div>
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <button mat-icon-button color="primary" class="mb-5" (click)="openCategoryManager()"
-                            matTooltip="Gérer les catégories">
-                            <mat-icon>settings</mat-icon>
+                    <mat-form-field *ngIf="isSuperAdmin" appearance="outline" class="full-width compact-field">
+                        <mat-label>Organisation propriétaire</mat-label>
+                        <mat-icon matPrefix style="margin-right:8px;opacity:0.5;font-size:18px">business</mat-icon>
+                        <mat-select [(ngModel)]="badgeSettings.organizationId" (selectionChange)="onOrganizationChange()">
+                            <mat-option [value]="null">
+                                <span style="color:#94a3b8;font-style:italic">Modèle Global (3CM)</span>
+                            </mat-option>
+                            <mat-option *ngFor="let org of organizations" [value]="org.id">
+                                {{ org.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field *ngIf="badgeSettings.organizationId || !isSuperAdmin" appearance="outline" class="full-width compact-field">
+                        <mat-label>Événement associé</mat-label>
+                        <mat-icon matPrefix style="margin-right:8px;opacity:0.5;font-size:18px">event</mat-icon>
+                        <mat-select [(ngModel)]="badgeSettings.eventId">
+                            <mat-option [value]="null">
+                                <span style="color:#94a3b8;font-style:italic">Tous les événements</span>
+                            </mat-option>
+                            <mat-option *ngFor="let event of events" [value]="event.id">
+                                {{ event.title }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </section>
+
+            <!-- ─── Section: Mise en page ─── -->
+            <section class="prop-section">
+                <div class="section-header">
+                    <h2 class="section-title">Mise en page</h2>
+                </div>
+                <div class="prop-group grid-2">
+                    <mat-form-field appearance="outline" class="compact-field">
+                        <mat-label>Catégorie</mat-label>
+                        <mat-select [(ngModel)]="badgeSettings.categoryId">
+                            <mat-option [value]="null">Aucune</mat-option>
+                            <mat-option *ngFor="let cat of categories" [value]="cat.id">
+                                {{ cat.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="compact-field">
+                        <mat-label>Orientation</mat-label>
+                        <mat-select [(ngModel)]="badgeSettings.layout" (selectionChange)="onOrientationChange()">
+                            <mat-option value="portrait">
+                                <mat-icon style="vertical-align:middle;font-size:16px;margin-right:4px">crop_portrait</mat-icon>
+                                Portrait
+                            </mat-option>
+                            <mat-option value="landscape">
+                                <mat-icon style="vertical-align:middle;font-size:16px;margin-right:4px">crop_landscape</mat-icon>
+                                Paysage
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <!-- Dimensions personnalisées -->
+                <div class="dimensions-section">
+                    <div class="dimensions-header">
+                        <h3 class="dimensions-title">Dimensions (mm)</h3>
+                        <button mat-icon-button 
+                                (click)="toggleAspectRatioLock()" 
+                                [matTooltip]="badgeSettings.lockAspectRatio ? 'Déverrouiller les proportions' : 'Verrouiller les proportions'"
+                                class="aspect-lock-btn">
+                            <mat-icon [style.color]="badgeSettings.lockAspectRatio ? '#2563eb' : '#64748b'">
+                                {{ badgeSettings.lockAspectRatio ? 'lock' : 'lock_open' }}
+                            </mat-icon>
                         </button>
                     </div>
-                </div>
-
-                <mat-divider></mat-divider>
-
-                <!-- Visual Mode Settings -->
-                <div *ngIf="designMode === 'visual'" class="mt-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Layout</mat-label>
-                            <mat-select [(ngModel)]="badgeSettings.layout">
-                                <mat-option value="portrait">Portrait</mat-option>
-                                <mat-option value="landscape">Paysage</mat-option>
-                            </mat-select>
+                    <div class="dimensions-inputs">
+                        <mat-form-field appearance="outline" class="dimension-field">
+                            <mat-label>Largeur</mat-label>
+                            <input matInput 
+                                   type="number" 
+                                   [(ngModel)]="badgeSettings.widthMM"
+                                   (ngModelChange)="onDimensionChange('width', $event)"
+                                   min="20" 
+                                   max="200">
+                            <span matSuffix>mm</span>
                         </mat-form-field>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Couleur Thème</mat-label>
-                            <input matInput type="color" [(ngModel)]="badgeSettings.primaryColor">
+                        <span class="dimension-separator">×</span>
+                        <mat-form-field appearance="outline" class="dimension-field">
+                            <mat-label>Hauteur</mat-label>
+                            <input matInput 
+                                   type="number" 
+                                   [(ngModel)]="badgeSettings.heightMM"
+                                   (ngModelChange)="onDimensionChange('height', $event)"
+                                   min="20" 
+                                   max="200">
+                            <span matSuffix>mm</span>
                         </mat-form-field>
                     </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Arrondi
-                            ({{badgeSettings.borderRadius}}px)</label>
-                        <mat-slider min="0" max="40" step="1" discrete>
-                            <input matSliderThumb [(ngModel)]="badgeSettings.borderRadius">
-                        </mat-slider>
-                    </div>
-
-                    <div class="pt-4 flex flex-col gap-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm">Afficher Logo</span>
-                            <button mat-icon-button (click)="badgeSettings.showLogo = !badgeSettings.showLogo">
-                                <mat-icon [color]="badgeSettings.showLogo ? 'primary' : ''">{{ badgeSettings.showLogo ?
-                                    'toggle_on' : 'toggle_off' }}</mat-icon>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm">Afficher Avatar</span>
-                            <button mat-icon-button (click)="badgeSettings.showAvatar = !badgeSettings.showAvatar">
-                                <mat-icon [color]="badgeSettings.showAvatar ? 'primary' : ''">{{
-                                    badgeSettings.showAvatar ? 'toggle_on' : 'toggle_off' }}</mat-icon>
-                            </button>
-                        </div>
+                    <div class="dimensions-info">
+                        <span class="pixel-info">
+                            {{ getBadgeDimensions().width | number:'1.0-0' }} × {{ getBadgeDimensions().height | number:'1.0-0' }} px
+                        </span>
                     </div>
                 </div>
+            </section>
 
-                <div *ngIf="loading"
-                    class="absolute inset-0 bg-white/80 z-10 flex items-center justify-center rounded-xl">
-                    <mat-spinner diameter="30"></mat-spinner>
-                </div>
-
-                <div *ngIf="designMode === 'html'" class="mt-6 space-y-4">
-                    <div class="bg-indigo-50 p-4 rounded-lg mb-4 text-xs text-indigo-700 leading-relaxed">
-                        <mat-icon class="text-indigo-500 text-sm w-4 h-4 mr-1">code</mat-icon>
-                        <strong>Variables disponibles :</strong><br>
-                        <code>{{ '{{' }}firstName{{ '}}' }}</code>, <code>{{ '{{' }}lastName{{ '}}' }}</code>,
-                        <code>{{ '{{' }}role{{ '}}' }}</code>, <code>{{ '{{' }}organization{{ '}}' }}</code>
-                    </div>
-
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Code HTML du badge</mat-label>
-                        <textarea matInput rows="15" class="font-mono text-xs" [(ngModel)]="badgeSettings.htmlContent"
-                            (ngModelChange)="onHtmlChange()"
-                            placeholder="<div style='border: 1px solid black;'>...</div>">
-                        </textarea>
-                    </mat-form-field>
-                </div>
-            </mat-card>
         </div>
 
-        <!-- Preview Area -->
-        <div
-            class="lg:col-span-8 flex flex-col items-center justify-center bg-slate-100 rounded-xl border-dashed border-2 border-slate-300 min-h-[600px] p-12">
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <button mat-flat-button color="primary" class="save-btn full-width"
+                (click)="saveTemplate()" [disabled]="loading">
+                <mat-icon *ngIf="!loading">{{ templateId ? 'check_circle' : 'save' }}</mat-icon>
+                <mat-spinner *ngIf="loading" diameter="18" style="display:inline-block"></mat-spinner>
+                {{ loading ? 'Sauvegarde...' : (templateId ? 'Mettre à jour' : 'Enregistrer le design') }}
+            </button>
+        </div>
+    </aside>
 
-            <!-- Visual Mode Badge -->
-            <div *ngIf="designMode === 'visual'"
-                class="badge-preview shadow-2xl relative bg-white overflow-hidden transition-all duration-300"
-                [ngClass]="badgeSettings.layout === 'landscape' ? 'flex-row' : 'flex-col'"
-                [style.width.mm]="badgeSettings.layout === 'landscape' ? 85 : 60"
-                [style.height.mm]="badgeSettings.layout === 'landscape' ? 60 : 85"
-                [style.border-radius.px]="badgeSettings.borderRadius">
 
-                <div class="badge-header flex items-center justify-center p-4 text-white"
-                    [style.background-color]="badgeSettings.primaryColor"
-                    [style.height.%]="badgeSettings.layout === 'landscape' ? 100 : 25"
-                    [style.width.%]="badgeSettings.layout === 'landscape' ? 35 : 100">
-                    <div class="text-center" *ngIf="badgeSettings.showLogo">
-                        <mat-icon
-                            [ngClass]="badgeSettings.layout === 'landscape' ? 'text-2xl w-8 h-8' : 'text-3xl w-12 h-12 mb-1'">waves</mat-icon>
-                        <div class="text-[8px] font-bold uppercase tracking-widest">{{ previewUser.organization }}</div>
-                    </div>
-                </div>
+    <!-- ═══════════════════════════════════════════════
+         MAIN CANVAS WORKSPACE
+    ════════════════════════════════════════════════ -->
+    <main class="canvas-workspace">
 
-                <div class="badge-body p-6 flex flex-col items-center text-center justify-center"
-                    [style.width.%]="badgeSettings.layout === 'landscape' ? 65 : 100">
-                    <div *ngIf="badgeSettings.showAvatar"
-                        class="avatar-box rounded-full bg-slate-200 border-4 border-white mb-4 shadow-lg flex items-center justify-center"
-                        [ngClass]="badgeSettings.layout === 'landscape' ? 'w-24 h-24' : 'w-20 h-20 -mt-16'">
-                        <mat-icon class="text-slate-400 text-4xl w-10 h-10">person</mat-icon>
-                    </div>
-
-                    <h2 class="text-xl font-bold text-slate-800 mb-0">{{ previewUser.firstName }} {{
-                        previewUser.lastName }}</h2>
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-6">{{ previewUser.role
-                        }}</span>
-
-                    <div *ngIf="badgeSettings.showQRCode"
-                        class="qr-placeholder w-24 h-24 bg-slate-50 border border-slate-200 rounded-lg p-2 flex items-center justify-center">
-                        <mat-icon class="text-slate-300 text-5xl w-14 h-14">qr_code_2</mat-icon>
-                    </div>
+        <!-- Toolbar -->
+        <div class="workspace-toolbar">
+            <div class="toolbar-left">
+                <div class="toolbar-badge-info">
+                    <span class="badge-name-chip">
+                        {{ badgeSettings.templateName || 'Sans titre' }}
+                    </span>
+                    <span class="layout-chip">
+                        <mat-icon style="font-size:12px;width:12px;height:12px;vertical-align:middle;margin-right:3px">
+                            {{ badgeSettings.layout === 'portrait' ? 'crop_portrait' : 'crop_landscape' }}
+                        </mat-icon>
+                        {{ badgeSettings.layout === 'portrait' ? '60 × 85 mm' : '85 × 60 mm' }}
+                    </span>
                 </div>
             </div>
-
-            <!-- HTML Mode Badge -->
-            <div *ngIf="designMode === 'html'" class="flex flex-col items-center">
-                <div *ngIf="!badgeSettings.htmlContent" class="text-slate-400 text-sm flex flex-col items-center gap-4">
-                    <mat-icon class="text-6xl w-16 h-16 opacity-20">html</mat-icon>
-                    Saisissez du code HTML pour voir l'aperçu
-                </div>
-                <!-- Sanitize preview -->
-                <div *ngIf="safeHtmlPreview" class="badge-preview-html shadow-2xl bg-white overflow-hidden p-6 rounded"
-                    [ngClass]="badgeSettings.layout === 'landscape' ? 'landscape-mode' : 'portrait-mode'"
-                    [innerHTML]="safeHtmlPreview">
-                </div>
-            </div>
-
-            <div class="mt-8 flex gap-4">
-                <button mat-stroked-button color="primary" (click)="exportPreview()">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    Générer un PDF de test
+            <div class="toolbar-right">
+                <span class="zoom-label">1:1</span>
+                <div class="toolbar-divider"></div>
+                <button mat-icon-button matTooltip="Actualiser" (click)="onHtmlChange()">
+                    <mat-icon style="font-size:20px;color:#64748b">refresh</mat-icon>
+                </button>
+                <button mat-stroked-button color="primary" (click)="openPreviewModal()" style="border-radius: 8px; margin-left: 8px;">
+                    <mat-icon style="margin-right: 4px;">visibility</mat-icon>
+                    Aperçu du rendu
                 </button>
             </div>
         </div>
-    </div>
+
+        <!-- Editor Area -->
+        <div class="editor-area" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0f172a;">
+            
+            <div class="editor-wrapper" style="flex: 1; display: flex; flex-direction: column; border-radius: 0; border: none; box-shadow: none;">
+                <div class="editor-toolbar" style="background: #1e293b; color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="editor-lang" style="font-weight: 600; letter-spacing: 0.05em; font-size: 11px;">Éditeur HTML / CSS</span>
+                        <span style="font-size:10px;color:#94a3b8;font-family:'Fira Code',monospace;margin-left: 10px;">
+                            {{ (badgeSettings.htmlContent.length || 0) }} caractères
+                        </span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button mat-icon-button (click)="cleanupHtml()" matTooltip="Nettoyer le HTML" style="color: #94a3b8;">
+                            <mat-icon>cleaning_services</mat-icon>
+                        </button>
+                        <button mat-icon-button [matMenuTriggerFor]="varMenuTop" matTooltip="Variables disponibles" style="color: #94a3b8;">
+                            <mat-icon>data_object</mat-icon>
+                        </button>
+                        
+                        <mat-menu #varMenuTop="matMenu" xPosition="before">
+                            <div style="padding:16px 20px;min-width:280px">
+                                <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin:0 0 12px">
+                                    Variables dynamiques
+                                </p>
+                                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                                    <code class="var-tag" *ngFor="let v of ['firstName','lastName','participant_name','role','organization','event_title','category','photo','qr_code']"
+                                        (click)="$event.stopPropagation()" style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; color: #2563eb;">
+                                        {{ '{{' + v + '}}' }}
+                                    </code>
+                                </div>
+                            </div>
+                        </mat-menu>
+                    </div>
+                </div>
+                
+                <textarea
+                    spellcheck="false"
+                    class="code-editor"
+                    [(ngModel)]="badgeSettings.htmlContent"
+                    (ngModelChange)="onHtmlChange()"
+                    style="flex: 1; width: 100%; height: 100%; background: #0f172a; color: #e2e8f0; font-family: 'Fira Code', monospace; padding: 30px; border: none; outline: none; resize: none; font-size: 14px; line-height: 1.6;"
+                    placeholder="<!-- Écrivez votre HTML ici... -->&#10;<div style='width:100%;height:100%;...'>&#10;  variable firstName entre doubles accolades&#10;</div>">
+                </textarea>
+            </div>
+            
+            <!-- Empty state indication (only visible if content is totally empty, overlaid on text area) -->
+            <div *ngIf="!badgeSettings.htmlContent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; color: #475569; pointer-events: none;">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;">code</mat-icon>
+                <p style="font-size: 16px; font-weight: 500;">Éditeur de Badge Actif</p>
+            </div>
+
+        </div>
+
+    </main>
+
 </div>

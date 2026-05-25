@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService, User } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -28,7 +29,8 @@ import { Organization } from '../../../core/models/organization.model';
     MatDividerModule,
     MatProgressSpinnerModule,
     MatTabsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTooltipModule
   ],
   templateUrl: './organization-detail.html',
   styleUrl: './organization-detail.scss'
@@ -46,12 +48,15 @@ export class OrganizationDetailComponent implements OnInit {
     private notificationService: NotificationService,
     private authService: AuthService, // Added to constructor
     private route: ActivatedRoute,
+    private router: Router,
     private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
-    this.route.url.subscribe(url => {
-      const isMyOrg = url.some(segment => segment.path === 'my');
+    // Combine checking for 'my' path and getting the 'id' parameter
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      const isMyOrg = this.router.url.includes('/organizations/my');
 
       if (isMyOrg) {
         this.authService.currentUser$.subscribe((user: User | null) => {
@@ -59,11 +64,8 @@ export class OrganizationDetailComponent implements OnInit {
             this.handleId(user.organization_id);
           }
         });
-      } else {
-        const id = this.route.snapshot.paramMap.get('id');
-        if (id) {
-          this.handleId(id);
-        }
+      } else if (id) {
+        this.handleId(id);
       }
     });
   }
@@ -95,6 +97,18 @@ export class OrganizationDetailComponent implements OnInit {
       next: (stats) => this.stats = stats,
       error: () => console.error('Erreur stats')
     });
+  }
+
+  getMonthName(monthNum: string): string {
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    return months[parseInt(monthNum, 10) - 1] || monthNum;
+  }
+
+  getBarHeight(count: number): string {
+    if (!this.stats || !this.stats.monthlyData || this.stats.monthlyData.length === 0) return '10%';
+    const maxCount = Math.max(...this.stats.monthlyData.map((d: any) => d.count), 1);
+    const height = Math.round((count / maxCount) * 100);
+    return `${Math.max(height, 10)}%`;
   }
 
   loadEvents(id: string | number): void {
@@ -130,14 +144,13 @@ export class OrganizationDetailComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Simulating the update
-        this.apiService.updateUser(userId, { organization_id: null }).subscribe({
+      if (result && this.organization) {
+        this.apiService.removeOrganizationMember(this.organization.id, userId).subscribe({
           next: () => {
-            this.notificationService.success('Membre retiré de l\'organisation (Simulation)');
+            this.notificationService.success('Membre retiré de l\'organisation');
             this.members = this.members.filter(m => m.id !== userId);
           },
-          error: () => this.notificationService.error('Erreur lors de la suppression')
+          error: (err) => this.notificationService.error(err.error?.error || 'Erreur lors de la suppression')
         });
       }
     });
@@ -156,7 +169,7 @@ export class OrganizationDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.notificationService.success('Membre ajouté avec succès (Simulation)');
+        this.notificationService.success('Membre ajouté avec succès');
         this.loadMembers(this.organization!.id);
       }
     });

@@ -112,15 +112,23 @@
           </div>
         </div>
 
-        <!-- Occupancy -->
+        <!-- Taux de remplissage -->
         <div class="mb-4">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-semibold text-slate-700">Occupancy</span>
-            <span class="text-sm font-bold text-blue-600">{{ getOccupancyPercentage(event) }}%</span>
+            <span class="text-sm font-semibold text-slate-700">Taux de remplissage</span>
+            <span class="text-sm font-bold" 
+              [ngClass]="{
+                'text-green-600': getOccupancyPercentage(event) < 50,
+                'text-orange-600': getOccupancyPercentage(event) >= 50 && getOccupancyPercentage(event) < 80,
+                'text-red-600': getOccupancyPercentage(event) >= 80
+              }">
+              {{ getOccupancyPercentage(event) }}%
+            </span>
           </div>
           <mat-progress-bar 
             mode="determinate" 
             [value]="getOccupancyPercentage(event)"
+            [color]="getOccupancyPercentage(event) >= 80 ? 'warn' : 'primary'"
             class="rounded-full">
           </mat-progress-bar>
           <p class="text-xs text-slate-500 mt-2">
@@ -128,12 +136,26 @@
           </p>
         </div>
 
-        <!-- Available Spots -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+        <!-- Places disponibles -->
+        <div class="border rounded-lg p-3 mb-4"
+          [ngClass]="{
+            'bg-blue-50 border-blue-200': getAvailableSpots(event) > 0,
+            'bg-red-50 border-red-200': getAvailableSpots(event) <= 0
+          }">
           <div class="flex items-center gap-2">
-            <mat-icon class="text-blue-600 text-sm">info</mat-icon>
-            <span class="text-sm font-semibold text-blue-700">
-              {{ getAvailableSpots(event) }} places disponibles
+            <mat-icon class="text-sm"
+              [ngClass]="{
+                'text-blue-600': getAvailableSpots(event) > 0,
+                'text-red-600': getAvailableSpots(event) <= 0
+              }">
+              {{ getAvailableSpots(event) > 0 ? 'info' : 'block' }}
+            </mat-icon>
+            <span class="text-sm font-semibold"
+              [ngClass]="{
+                'text-blue-700': getAvailableSpots(event) > 0,
+                'text-red-700': getAvailableSpots(event) <= 0
+              }">
+              {{ getAvailableSpots(event) > 0 ? getAvailableSpots(event) + ' places disponibles' : 'COMPLET' }}
             </span>
           </div>
         </div>

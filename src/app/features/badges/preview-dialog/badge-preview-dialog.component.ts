@@ -4,6 +4,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { BadgePreviewService } from '../../../core/services/badge-preview.service';
 
 @Component({
     selector: 'app-badge-preview-dialog',
@@ -70,32 +71,22 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     </div>
   `,
     styles: [`
-    .badge-preview {
-        display: flex;
+    .badge-preview-dialog { border-radius: 24px; overflow: hidden; width: 100%; max-width: 600px; }
+    .preview-container { 
+        width: 100%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        container-type: inline-size;
         background: white;
+        border-radius: 20px;
+        padding: 40px;
     }
-    .portrait-mode {
-        flex-direction: column;
-        width: 60mm;
-        height: 85mm;
-    }
-    .landscape-mode {
-        flex-direction: row;
-        width: 85mm;
-        height: 60mm;
-    }
-    .portrait-mode-html {
-        width: 60mm;
-        height: 85mm;
-    }
-    .landscape-mode-html {
-        width: 85mm;
-        height: 60mm;
-    }
-    .badge-preview-dialog {
-        border-radius: 12px;
-        overflow: hidden;
-    }
+
+    /* Responsive scaling for dialog */
+    @container (max-width: 500px) { .portrait-mode, .portrait-mode-html { transform: scale(0.8); } .landscape-mode, .landscape-mode-html { transform: scale(0.7); } }
+    @container (max-width: 400px) { .portrait-mode, .portrait-mode-html { transform: scale(0.6); } .landscape-mode, .landscape-mode-html { transform: scale(0.5); } }
+    @container (max-width: 300px) { .portrait-mode, .portrait-mode-html { transform: scale(0.4); } .landscape-mode, .landscape-mode-html { transform: scale(0.3); } }
   `]
 })
 export class BadgePreviewDialogComponent implements OnInit {
@@ -110,17 +101,37 @@ export class BadgePreviewDialogComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<BadgePreviewDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: { template: any },
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+        private badgePreviewService: BadgePreviewService
     ) { }
 
     ngOnInit(): void {
         if (this.data.template.designMode === 'html' && this.data.template.htmlContent) {
-            let interpolated = this.data.template.htmlContent
-                .replace(/{{firstName}}/g, this.previewUser.firstName)
-                .replace(/{{lastName}}/g, this.previewUser.lastName)
-                .replace(/{{role}}/g, this.previewUser.role)
-                .replace(/{{organization}}/g, this.previewUser.organization);
-            this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(interpolated);
+            try {
+                // Utiliser le service de preview unifié avec les données personnalisées
+                this.safeHtml = this.badgePreviewService.generatePreview(this.data.template, {
+                    firstName: this.previewUser.firstName,
+                    lastName: this.previewUser.lastName,
+                    role: this.previewUser.role,
+                    organization: this.previewUser.organization
+                });
+            } catch (error) {
+                console.error('Error generating preview in dialog:', error);
+                // Fallback: utiliser le HTML brut
+                this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(
+                    this.data.template.htmlContent
+                        .replace(/{{firstName}}/g, this.previewUser.firstName)
+                        .replace(/{{lastName}}/g, this.previewUser.lastName)
+                        .replace(/{{participant_name}}/g, `${this.previewUser.firstName} ${this.previewUser.lastName}`)
+                        .replace(/{{role}}/g, this.previewUser.role)
+                        .replace(/{{organization}}/g, this.previewUser.organization)
+                        .replace(/{{event_title}}/g, 'Conférence Tech 2026')
+                        .replace(/{{category}}/g, 'VIP')
+                        .replace(/{{photo}}/g, '<img src="https://ui-avatars.com/api/?name=Jean+Dupont&background=0D8ABC&color=fff&size=128" style="width: 100%; height: 100%; object-fit: cover;">')
+                        .replace(/{{{qr_code}}}/g, '<div style="background: #eee; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #999;">[QR CODE]</div>')
+                        .replace(/{{qr_code}}/g, '<div style="background: #eee; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #999;">[QR CODE]</div>')
+                );
+            }
         }
     }
 }

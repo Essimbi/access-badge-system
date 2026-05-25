@@ -9,3 +9,6 @@ export * from './notification.service';
 
 // Alert Service
 export * from './alert.service';
+
+// Badge Preview Service
+export * from './badge-preview.service';

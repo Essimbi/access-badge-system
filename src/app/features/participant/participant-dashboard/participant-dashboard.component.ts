@@ -79,35 +79,33 @@ export class ParticipantDashboardComponent implements OnInit {
   loadParticipantData(): void {
     this.loading = true;
 
-    // Charger les événements à venir
-    this.apiService.getEvents().subscribe({
-      next: (events) => {
-        this.upcomingEvents = events
-          .filter((e: any) => e.status === 'upcoming' || e.status === 'ongoing')
-          .map((e: any) => ({
-            id: e.id,
-            title: e.title,
-            date: new Date(e.date),
-            location: e.location,
-            status: e.status,
-            badgeCategory: this.getRandomCategory(),
-            badgeId: Math.floor(Math.random() * 1000),
-            enrolled: true
-          }));
+    // Charger les événements depuis les badges
+    this.apiService.getMyBadges().subscribe({
+      next: (badges) => {
+        const mappedEvents = badges.map((b: any) => {
+          let dynamicStatus = b.event.status || 'upcoming';
+          const startDate = new Date(b.event.start_date);
+          const endDate = new Date(b.event.end_date);
+          const now = new Date();
 
-        // Charger les événements passés
-        this.pastEvents = events
-          .filter((e: any) => e.status === 'completed')
-          .map((e: any) => ({
-            id: e.id,
-            title: e.title,
-            date: new Date(e.date),
-            location: e.location,
-            status: e.status,
-            badgeCategory: this.getRandomCategory(),
-            badgeId: Math.floor(Math.random() * 1000),
+          if (now < startDate) dynamicStatus = 'upcoming';
+          else if (now >= startDate && now <= endDate) dynamicStatus = 'ongoing';
+          else if (now > endDate) dynamicStatus = 'completed';
+
+          return {
+            id: b.event.id,
+            title: b.event.title,
+            date: startDate,
+            location: b.event.location || 'N/A',
+            status: dynamicStatus,
+            badgeCategory: b.category,
+            badgeId: b.id,
             enrolled: true
-          }));
+          };
+        });
+
+        this.upcomingEvents = mappedEvents.filter((e: any) => e.status === 'upcoming' || e.status === 'ongoing');
+        this.pastEvents = mappedEvents.filter((e: any) => e.status === 'completed');
 
         this.loadParticipantStats();
         this.loading = false;
@@ -183,18 +181,27 @@ export class ParticipantDashboardComponent implements OnInit {
 
   enrollEvent(event: Event): void {
     this.notificationService.info('Inscription en cours...');
-    setTimeout(() => {
-      event.enrolled = true;
-      this.notificationService.success('Inscription confirmée');
-    }, 1000);
+    this.apiService.enrollEventBadge(event.id).subscribe({
+      next: () => {
+        event.enrolled = true;
+        this.notificationService.success('Inscription confirmée');
+      },
+      error: (err) => this.notificationService.error(err.error?.error || 'Erreur lors de l\'inscription')
+    });
   }
 
   cancelEnrollment(event: Event): void {
     this.notificationService.info('Annulation en cours...');
-    setTimeout(() => {
-      event.enrolled = false;
-      this.notificationService.success('Inscription annulée');
-    }, 1000);
+    this.apiService.unenrollEventBadge(event.id).subscribe({
+      next: () => {
+        event.enrolled = false;
+        this.upcomingEvents = this.upcomingEvents.filter((e: any) => e.id !== event.id);
+        this.pastEvents = this.pastEvents.filter((e: any) => e.id !== event.id);
+        this.loadParticipantStats();
+        this.notificationService.success('Inscription annulée');
+      },
+      error: (err) => this.notificationService.error(err.error?.error || 'Erreur lors de l\'annulation')
+    });
   }
 
   getRandomCategory(): string {

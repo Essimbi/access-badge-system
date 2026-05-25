@@ -195,7 +195,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                           <mat-icon>print</mat-icon>
                           <span>Imprimer badge</span>
                         </button>
-                        <button mat-menu-item>
+                        <button mat-menu-item (click)="sendEmail(p)">
                           <mat-icon>email</mat-icon>
                           <span>Envoyer par mail</span>
                         </button>
@@ -251,13 +251,13 @@ export class EventDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const id = +params['id'];
+      const id = params['id'];
       this.loadEvent(id);
       this.loadParticipants(id);
     });
   }
 
-  loadEvent(id: number): void {
+  loadEvent(id: string | number): void {
     this.loading = true;
     this.apiService.getEvent(id).subscribe({
       next: (event) => {
@@ -272,15 +272,15 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  loadOrganization(orgId: number): void {
+  loadOrganization(orgId: string | number): void {
     this.apiService.getOrganizations().subscribe(orgs => {
       const org = orgs.find(o => o.id === orgId);
       this.organizationName = org ? org.name : 'Inconnue';
     });
   }
 
-  loadParticipants(id: number): void {
-    this.apiService.getEventEnrollments(id).subscribe(data => {
+  loadParticipants(id: string | number): void {
+    this.apiService.getEventEnrollments(Number(id) || id as any).subscribe(data => {
       this.participants = data;
       this.dataSource.data = data;
       if (this.paginator) this.dataSource.paginator = this.paginator;
@@ -302,8 +302,7 @@ export class EventDetailComponent implements OnInit {
   }
 
   get printedCount(): number {
-    // Simulated count
-    return Math.floor(this.checkedInCount * 0.8);
+    return this.participants.filter(p => p.isPrinted).length;
   }
 
   get pendingCount(): number {
@@ -312,18 +311,36 @@ export class EventDetailComponent implements OnInit {
 
   printBadge(participant: any): void {
     this.notificationService.success(`Impression du badge pour ${participant.userName}...`);
-    this.apiService.downloadParticipantBadge(participant.id).subscribe();
+    this.apiService.downloadParticipantBadge(participant.id).subscribe({
+      next: () => {
+        this.loadParticipants(this.event.id); // Refresh to update printed status
+      }
+    });
+  }
+
+  sendEmail(participant: any): void {
+    this.notificationService.success(`Envoi du badge à ${participant.userEmail}...`);
+    this.apiService.sendBadgeEmail(participant.id).subscribe({
+      next: (res) => {
+        this.notificationService.success(res.message);
+      },
+      error: () => {
+        this.notificationService.error('Erreur lors de l\'envoi du mail');
+      }
+    });
   }
 
   printAllBadges(): void {
     this.printing = true;
+    this.notificationService.success('Génération du PDF groupé en cours...');
     this.apiService.printBadges(this.event.id).subscribe({
-      next: (res) => {
-        this.notificationService.success(res.message || 'Impression en masse lancée');
+      next: () => {
+        this.notificationService.success('PDF groupé téléchargé avec succès');
         this.printing = false;
+        this.loadParticipants(this.event.id); // Refresh all
       },
       error: () => {
-        this.notificationService.error('Erreur lors du lancement de l\'impression');
+        this.notificationService.error('Erreur lors de la génération du PDF groupé');
         this.printing = false;
       }
     });

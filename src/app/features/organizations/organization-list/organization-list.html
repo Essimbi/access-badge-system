@@ -39,7 +39,8 @@
                 <td mat-cell *matCellDef="let org">
                     <div class="org-name-cell">
                         <div class="org-name-cell__icon">
-                            <mat-icon>business</mat-icon>
+                            <img *ngIf="org.logoUrl" [src]="org.logoUrl" alt="Logo">
+                            <mat-icon *ngIf="!org.logoUrl" class="text-gray-400">business</mat-icon>
                         </div>
                         <span class="org-name-cell__text">{{org.name}}</span>
                     </div>

@@ -100,10 +100,10 @@ export class AddMemberDialogComponent implements OnInit {
         this.submitting = true;
         const userId = this.addMemberForm.value.userId;
 
-        // Simulate updating the user to link to this org
-        this.apiService.updateUser(userId, { organization_id: this.data.orgId }).subscribe({
-            next: (updatedUser) => {
-                this.dialogRef.close(updatedUser);
+        // Real API call to add member to organization
+        this.apiService.addOrganizationMember(this.data.orgId, userId, 'VIEWER').subscribe({
+            next: (response) => {
+                this.dialogRef.close(response);
             },
             error: () => {
                 this.submitting = false;

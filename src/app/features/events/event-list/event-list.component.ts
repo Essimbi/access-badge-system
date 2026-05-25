@@ -103,7 +103,7 @@ export class EventListComponent implements OnInit {
         }
 
         if (this.orgFilter !== 'all') {
-            filtered = filtered.filter(e => e.organization_id === Number(this.orgFilter));
+            filtered = filtered.filter(e => e.organization_id === this.orgFilter);
         }
 
         if (this.statusFilter !== 'all') {
@@ -131,7 +131,7 @@ export class EventListComponent implements OnInit {
         this.updateDataSource();
     }
 
-    getOrganizationName(orgId: number): string {
+    getOrganizationName(orgId: string | number): string {
         const org = this.organizations.find(o => o.id === orgId);
         return org ? org.name : 'Inconnue';
     }

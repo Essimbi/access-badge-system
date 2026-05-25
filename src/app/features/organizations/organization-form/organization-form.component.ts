@@ -41,12 +41,14 @@ import { Organization } from '../../../core/models/organization.model';
 export class OrganizationFormComponent implements OnInit {
   orgForm: FormGroup;
   isEditMode = false;
-  orgId?: number;
+  orgId?: string | number;
   loading = false;
   submitting = false;
   potentialAdmins: User[] = [];
   filteredAdmins: User[] = [];
   adminSearchControl = new FormControl('');
+  selectedFile: File | null = null;
+  logoPreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -64,7 +66,7 @@ export class OrganizationFormComponent implements OnInit {
       description: ['', Validators.required],
       phone: [''],
       address: [''],
-      adminUserId: [null],
+      adminUserId: [null, Validators.required],
       logoUrl: [''],
       primaryColor: ['#3b82f6']
     });
@@ -152,10 +154,40 @@ export class OrganizationFormComponent implements OnInit {
     this.orgForm.get('adminUserId')?.setValue(user.id);
   }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.logoPreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   onSubmit(): void {
     if (this.orgForm.invalid) return;
 
     this.submitting = true;
+
+    if (this.selectedFile) {
+      this.apiService.uploadLogo(this.selectedFile).subscribe({
+        next: (response) => {
+          this.orgForm.get('logoUrl')?.setValue(response.url);
+          this.saveOrganization();
+        },
+        error: (err) => {
+          this.notificationService.error('Erreur lors du chargement de l\'image');
+          this.submitting = false;
+        }
+      });
+    } else {
+      this.saveOrganization();
+    }
+  }
+
+  private saveOrganization(): void {
     const request = this.isEditMode
       ? this.apiService.updateOrganization(this.orgId!, this.orgForm.value)
       : this.apiService.createOrganization(this.orgForm.value);

@@ -20,6 +20,10 @@ export class ApiService {
         private mockStore: MockStoreService
     ) { }
 
+    hasRole(role: string): boolean {
+        return this.authService.hasRole(role);
+    }
+
     // Generic CRUD methods
     get<T>(endpoint: string, params?: any): Observable<T> {
         return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params });
@@ -41,30 +45,39 @@ export class ApiService {
     getOrganizations(params?: any): Observable<any[]> {
         if (this.authService.hasRole('super_admin')) {
             return this.get<any[]>('/admin/organizations', params).pipe(
-                map(orgs => orgs.map(org => ({
-                    ...org,
-                    adminUser: org.owner ? {
-                        id: org.owner.id,
-                        firstName: org.owner.first_name,
-                        lastName: org.owner.last_name,
-                        email: org.owner.email
-                    } : null,
-                    adminUserId: org.owner_id
-                })))
+                map(orgs => orgs.map(org => this.mapOrganization(org)))
             );
         }
-        return this.get<any[]>('/organizations/my-organizations', params);
+        return this.get<any[]>('/organizations/my-organizations', params).pipe(
+            map(orgs => orgs.map(org => this.mapOrganization(org)))
+        );
     }
 
     getOrganization(id: string | number): Observable<any> {
-        return this.get<any>(`/organizations/${id}`);
+        return this.get<any>(`/organizations/${id}`).pipe(
+            map(org => this.mapOrganization(org))
+        );
     }
 
     createOrganization(data: any): Observable<any> {
+        const payload = {
+            name: data.name,
+            email: data.email,
+            description: data.description,
+            phone: data.phone,
+            address: data.address,
+            logo_url: data.logoUrl,
+            owner_id: data.adminUserId,
+            max_events_limit: 100 // Default value
+        };
         if (this.authService.hasRole('super_admin')) {
-            return this.post('/admin/organizations', data);
+            return this.post('/admin/organizations', payload).pipe(
+                map(org => this.mapOrganization(org))
+            );
         }
-        return this.post('/organizations', data);
+        return this.post('/organizations', payload).pipe(
+            map(org => this.mapOrganization(org))
+        );
     }
 
     updateOrganization(id: string | number, data: any): Observable<any> {
@@ -77,38 +90,62 @@ export class ApiService {
         if (data.logoUrl !== undefined) payload.logo_url = data.logoUrl;
         if (data.adminUserId !== undefined) payload.owner_id = data.adminUserId;
         if (data.status !== undefined) payload.status = data.status;
-        return this.put(`/organizations/${id}`, payload);
+        
+        return this.put<any>(`/organizations/${id}`, payload).pipe(
+            map(org => this.mapOrganization(org))
+        );
     }
 
     updateOrganizationStatus(id: string | number, status: string): Observable<any> {
-        return this.http.patch<any>(`${this.baseUrl}/admin/organizations/${id}/status`, { status });
+        return this.http.patch<any>(`${this.baseUrl}/admin/organizations/${id}/status`, { status }).pipe(
+            map(org => this.mapOrganization(org))
+        );
+    }
+
+    uploadLogo(file: File): Observable<{ url: string, filename: string }> {
+        const formData = new FormData();
+        formData.append('logo', file);
+        return this.http.post<{ url: string, filename: string }>(`${this.baseUrl}/upload/logo`, formData);
+    }
+
+    private mapOrganization(org: any): any {
+        if (!org) return null;
+        return {
+            ...org,
+            logoUrl: org.logo_url,
+            adminUserId: org.owner_id,
+            is_active: org.status === 'active',
+            eventCount: org.event_count || 0,
+            adminUser: org.owner ? {
+                id: org.owner.id,
+                firstName: org.owner.first_name,
+                lastName: org.owner.last_name,
+                email: org.owner.email
+            } : (org.adminUser || null)
+        };
     }
 
     deleteOrganization(id: string | number): Observable<any> {
+        if (this.authService.hasRole('super_admin')) {
+            return this.delete(`/admin/organizations/${id}`);
+        }
         return this.delete(`/organizations/${id}`);
     }
 
-    getOrganizationMembers(orgId: number): Observable<any[]> {
-        const members = MOCK_USERS.filter(u => u.organization_id === orgId);
-        return of(members).pipe(delay(500));
+    getOrganizationMembers(orgId: string | number): Observable<any[]> {
+        return this.get<any[]>(`/organizations/${orgId}/members`);
     }
 
-    getOrganizationActivities(orgId: number): Observable<any[]> {
-        // In a real app, we would filter by orgId on the backend
-        // For mock, we can just return a filtered list if we had one, but here we'll simulate
-        const user = this.authService.hasRole('admin') ? this.authService.currentUserValue : null;
+    addOrganizationMember(orgId: string | number, userId: string | number, role: string): Observable<any> {
+        return this.post('/organizations/add-user', { org_id: orgId, user_id: userId, role });
+    }
 
-        // Ensure admin can only see their own org activities
-        if (user && user.organization_id && user.organization_id !== orgId) {
-            return throwError(() => new Error('Accès non autorisé'));
-        }
+    removeOrganizationMember(orgId: string | number, userId: string | number): Observable<any> {
+        return this.post('/organizations/remove-user', { org_id: orgId, user_id: userId });
+    }
 
-        const activities = [
-            { id: 1, type: 'create', message: 'Organisation créée', user: 'System', date: new Date() },
-            { id: 2, type: 'update', message: 'Paramètres mis à jour', user: 'Admin', date: new Date(Date.now() - 3600000) },
-            { id: 3, type: 'member_add', message: 'Nouveau membre ajouté', user: 'Admin', date: new Date(Date.now() - 86400000) }
-        ];
-        return of(activities).pipe(delay(500));
+    getOrganizationActivities(orgId: string | number): Observable<any[]> {
+        return this.get<any[]>(`/organizations/${orgId}/activities`);
     }
 
     getRecentActivities(): Observable<any[]> {
@@ -127,64 +164,66 @@ export class ApiService {
 
     // Events
     getEvents(params?: any): Observable<any[]> {
-        return this.mockStore.getEvents$().pipe(
-            take(1),
-            map((events: EventRecord[]) => {
-                const authUser = this.authService.hasRole('admin') ? this.authService.currentUserValue : null;
-                let filtered = [...events];
-
-                if (authUser && authUser.organization_id) {
-                    filtered = filtered.filter(e => e.organization_id === authUser.organization_id);
-                }
-
-                if (params?.organizationId) {
-                    filtered = filtered.filter(e => e.organization_id === Number(params.organizationId));
-                }
-
-                if (params?.status) {
-                    filtered = filtered.filter(e => e.status === params.status);
-                }
-
-                return filtered;
-            }),
-            delay(300)
+        return this.http.get<any[]>(`${this.baseUrl}/events`, { params }).pipe(
+            map(events => {
+                const now = new Date();
+                return events.map(event => {
+                    // Force dynamic status based on dates
+                    const startDate = new Date(event.date);
+                    // Use a 2-hour default duration if end_date is missing, otherwise use end_date
+                    const endDate = event.end_date ? new Date(event.end_date) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+                    
+                    let dynamicStatus = event.status;
+                    if (now < startDate) {
+                        dynamicStatus = 'upcoming';
+                    } else if (now >= startDate && now <= endDate) {
+                        dynamicStatus = 'ongoing';
+                    } else {
+                        dynamicStatus = 'completed';
+                    }
+                    
+                    return { ...event, status: dynamicStatus };
+                });
+            })
         );
     }
 
-    getEvent(id: number): Observable<any> {
-        return this.mockStore.getEventById$(id).pipe(take(1), delay(200));
+    getEvent(id: number | string): Observable<any> {
+        return this.get<any>(`/events/${id}`);
     }
 
     createEvent(data: any): Observable<any> {
-        const authUser = this.authService.currentUserValue;
-        const payload: Omit<EventRecord, 'id'> = {
+        const payload = {
             title: data.title,
             description: data.description,
-            date: data.date ? new Date(data.date) : new Date(),
-            location: data.location,
-            status: data.status || 'upcoming',
-            type: data.type || 'Conference',
-            organization_id: data.organization_id || authUser?.organization_id || 1
-        };
-
-        return this.mockStore.createEvent(payload).pipe(delay(200));
-    }
-
-    updateEvent(id: number, data: any): Observable<any> {
-        const patch: Partial<EventRecord> = {
-            title: data.title,
-            description: data.description,
-            date: data.date ? new Date(data.date) : undefined,
+            start_date: data.date,
+            end_date: data.endDate,
             location: data.location,
             status: data.status,
             type: data.type,
-            organization_id: data.organization_id
+            org_id: data.organization_id,
+            max_participants: data.maxParticipants || data.max_participants
         };
-        return this.mockStore.updateEvent(id, patch).pipe(delay(200));
+        return this.post<any>('/events', payload);
     }
 
-    deleteEvent(id: number): Observable<any> {
-        return this.mockStore.deleteEvent(id).pipe(delay(200));
+    updateEvent(id: number | string, data: any): Observable<any> {
+        const payload = {
+            title: data.title,
+            description: data.description,
+            start_date: data.date,
+            end_date: data.endDate,
+            location: data.location,
+            status: data.status,
+            type: data.type,
+            org_id: data.organization_id,
+            max_participants: data.maxParticipants || data.max_participants
+        };
+        return this.put<any>(`/events/${id}`, payload);
+    }
+
+    deleteEvent(id: number | string): Observable<any> {
+        return this.delete<any>(`/events/${id}`);
     }
 
     publishEvent(id: number): Observable<any> {
@@ -226,28 +265,49 @@ export class ApiService {
     }
 
     getMyEnrollments(): Observable<any> {
-        return of(MOCK_ENROLLMENTS.slice(0, 2)).pipe(delay(500));
+        return this.get<any>('/badges/my-badges');
     }
 
-    getEventEnrollments(eventId: number): Observable<any[]> {
-        return this.mockStore.getEnrollments$().pipe(
-            take(1),
-            map((items: EnrollmentRecord[]) => items.filter(e => e.eventId === eventId)),
-            delay(300)
+    getEventEnrollments(eventId: string | number): Observable<any[]> {
+        return this.get<any[]>(`/badges/event/${eventId}`);
+    }
+
+    printBadges(eventId: string | number): Observable<any> {
+        return this.http.get(`${this.baseUrl}/badges/event/${eventId}/bulk-pdf`, { responseType: 'blob' }).pipe(
+            map(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `badges-event-${eventId}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                return { success: true };
+            })
         );
     }
 
-    printBadges(eventId: number, enrollmentIds?: number[]): Observable<any> {
-        // Simulate PDF generation delay
-        return of({ success: true, message: 'Génération du PDF en cours...' }).pipe(delay(2000));
+    sendBadgeEmail(badgeId: string | number): Observable<any> {
+        return this.get<any>(`/badges/${badgeId}/email`);
     }
 
-    downloadParticipantBadge(enrollmentId: number): Observable<any> {
-        return of({ success: true }).pipe(delay(1000));
+    downloadParticipantBadge(badgeId: string | number): Observable<any> {
+        return this.http.get(`${this.baseUrl}/badges/${badgeId}/pdf`, { responseType: 'blob' }).pipe(
+            map(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `badge-${badgeId}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                return { success: true };
+            })
+        );
     }
 
     createEnrollment(data: any): Observable<any> {
-        return this.post('/enrollments', data);
+        // In the backend, enrolling is creating a badge
+        // data usually contains eventId
+        return this.post(`/badges/enroll/${data.eventId}`, data);
     }
 
     approveEnrollment(id: number): Observable<any> {
@@ -289,6 +349,18 @@ export class ApiService {
         return this.get('/badges', params);
     }
 
+    getMyBadges(): Observable<any> {
+        return this.get('/badges/my-badges');
+    }
+
+    enrollEventBadge(eventId: number, category: string = 'Participant'): Observable<any> {
+        return this.post(`/badges/enroll/${eventId}`, { event_id: eventId, category });
+    }
+
+    unenrollEventBadge(eventId: number): Observable<any> {
+        return this.delete(`/badges/enroll/${eventId}`);
+    }
+
     downloadBadgePDF(id: number): Observable<Blob> {
         return this.http.get(`${this.baseUrl}/badges/${id}/pdf`, {
             responseType: 'blob'
@@ -296,46 +368,45 @@ export class ApiService {
     }
 
     getBadgeCategories(): Observable<any[]> {
-        const user = this.authService.hasRole('admin') ? this.authService.currentUserValue : null;
-        let categories = MOCK_BADGE_CATEGORIES;
-        if (user && user.organization_id) {
-            categories = categories.filter(c => c.organizationId === user.organization_id);
-        }
-        return of(categories).pipe(delay(300));
+        return this.get<any[]>('/badge-designer/categories');
     }
 
     createBadgeCategory(data: any): Observable<any> {
-        return of({ ...data, id: Date.now() }).pipe(delay(500));
+        return this.post('/badge-designer/categories', data);
     }
 
     updateBadgeCategory(id: number, data: any): Observable<any> {
-        return of({ ...data, id }).pipe(delay(500));
+        return this.put(`/badge-designer/categories/${id}`, data);
     }
 
-    getBadgeTemplates(): Observable<any[]> {
-        const user = this.authService.hasRole('admin') ? this.authService.currentUserValue : null;
-        let templates = MOCK_BADGE_TEMPLATES;
-        if (user && user.organization_id) {
-            templates = templates.filter(t => t.organizationId === user.organization_id);
+    getBadgeTemplates(organizationId?: string | number): Observable<any[]> {
+        let params = new HttpParams();
+        if (organizationId) {
+            params = params.set('orgId', organizationId.toString());
         }
-        return of(templates).pipe(delay(500));
+        return this.get<any[]>('/badge-designer/templates', params);
     }
 
-    getBadgeTemplateById(id: number): Observable<any> {
-        const template = MOCK_BADGE_TEMPLATES.find(t => t.id === id);
-        return of(template).pipe(delay(400));
+    getBadgeTemplateById(id: string | number): Observable<any> {
+        return this.get<any>(`/badge-designer/templates/${id}`);
     }
 
     createBadgeTemplate(data: any): Observable<any> {
-        return of({ ...data, id: Date.now() }).pipe(delay(500));
+        return this.post('/badge-designer/templates', data);
     }
 
-    updateBadgeTemplate(id: number, data: any): Observable<any> {
-        return of({ ...data, id }).pipe(delay(500));
+    updateBadgeTemplate(id: string | number, data: any): Observable<any> {
+        return this.put(`/badge-designer/templates/${id}`, data);
     }
 
-    deleteBadgeTemplate(id: number): Observable<any> {
-        return of({ success: true }).pipe(delay(500));
+    deleteBadgeTemplate(id: string | number): Observable<any> {
+        return this.delete(`/badge-designer/templates/${id}`);
+    }
+
+    generateBadgePDF(data: any): Observable<Blob> {
+        return this.http.post(`${this.baseUrl}/badge-designer/generate-preview`, data, {
+            responseType: 'blob'
+        });
     }
 
     // Access Logs
@@ -413,8 +484,8 @@ export class ApiService {
         return this.get<any>('/stats/dashboard');
     }
 
-    getOrganizationStats(id: number): Observable<any> {
-        return of(MOCK_STATS.organization).pipe(delay(500));
+    getOrganizationStats(id: string | number): Observable<any> {
+        return this.get<any>(`/stats/org/${id}`);
     }
 
     getEventStats(id: number): Observable<any> {

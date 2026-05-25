@@ -42,7 +42,7 @@
                         <mat-option *ngFor="let user of filteredAdmins" [value]="user">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
-                                    {{user.firstName?.[0]}}{{user.lastName?.[0]}}
+                                    {{user.firstName[0]}}{{user.lastName[0]}}
                                 </div>
                                 <div>
                                     <div class="font-medium">{{user.firstName}} {{user.lastName}}</div>
@@ -71,11 +71,25 @@
                         requise</mat-error>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>URL du Logo</mat-label>
-                    <input matInput formControlName="logoUrl" placeholder="https://exemple.com/logo.png">
-                    <mat-icon matPrefix>image</mat-icon>
-                </mat-form-field>
+                <div class="logo-upload-container col-span-2">
+                    <label class="text-sm text-gray-500 mb-2 block">Logo de l'organisation</label>
+                    <div class="flex items-center gap-6 p-4 border-2 border-dashed border-gray-200 rounded-lg">
+                        <div class="logo-preview w-20 h-20 bg-gray-50 rounded flex items-center justify-center border overflow-hidden">
+                            <img *ngIf="logoPreview || orgForm.get('logoUrl')?.value" 
+                                 [src]="logoPreview || orgForm.get('logoUrl')?.value" 
+                                 class="w-full h-full object-contain">
+                            <mat-icon *ngIf="!logoPreview && !orgForm.get('logoUrl')?.value" class="text-gray-300 scale-150">business</mat-icon>
+                        </div>
+                        <div class="upload-actions">
+                            <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+                            <button mat-stroked-button type="button" (click)="fileInput.click()">
+                                <mat-icon>upload</mat-icon>
+                                {{ (logoPreview || orgForm.get('logoUrl')?.value) ? 'Changer le logo' : 'Sélectionner un logo' }}
+                            </button>
+                            <p class="text-xs text-gray-400 mt-2">Format PNG, JPG ou WebP. Max 2Mo.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div
                     class="color-picker-container flex items-center gap-4 px-3 border rounded-md h-[56px] border-gray-300">
