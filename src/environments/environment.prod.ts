@@ -1,6 +1,6 @@
 export const environment = {
-    production: false,
-    apiUrl: 'http://localhost:3000/api',
+    production: true,
+    apiUrl: 'https://api.abs.3cm.com/api', // URL de production à adapter
     
     // Branding 3CM
     branding: {

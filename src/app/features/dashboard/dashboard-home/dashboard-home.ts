@@ -85,4 +85,13 @@ export class DashboardHomeComponent implements OnInit {
       newRequests: 2
     };
   }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'upcoming': return 'À venir';
+      case 'ongoing': return 'En cours';
+      case 'completed': return 'Terminé';
+      default: return status;
+    }
+  }
 }

@@ -1,212 +1,332 @@
-<div class="browse-events-page p-6">
-  <div class="mb-8">
-    <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Parcourir les Événements</h1>
-    <p class="text-slate-500">Découvrez et inscrivez-vous à des événements</p>
+<div class="browse-events-container">
+  <!-- Header Section -->
+  <div class="events-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Découvrir les Événements</h1>
+        <p class="subtitle">Explorez et inscrivez-vous aux événements qui vous intéressent</p>
+      </div>
+      <div class="stats-badges">
+        <div class="stat-badge">
+          <span class="number">{{ filteredEvents.length }}</span>
+          <span class="label">Événements</span>
+        </div>
+        <div class="stat-badge accent">
+          <span class="number">{{ getEnrolledEventsCount() }}</span>
+          <span class="label">Inscriptions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Filters Section -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <div class="filters-title">
+          <mat-icon class="filters-icon">tune</mat-icon>
+          <h3>Filtres de recherche</h3>
+        </div>
+        <div class="filters-actions-header">
+          <button class="filter-toggle-btn" (click)="toggleFiltersExpanded()">
+            <mat-icon>{{ filtersExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+            {{ filtersExpanded ? 'Réduire' : 'Étendre' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filters-content" [class.expanded]="filtersExpanded">
+        <!-- Search Field -->
+        <div class="filter-row primary-filter">
+          <div class="search-field-enhanced">
+            <mat-form-field appearance="fill" class="search-input-3cm">
+              <mat-label>
+                <mat-icon class="label-icon">search</mat-icon>
+                Rechercher un événement
+              </mat-label>
+              <input matInput 
+                [(ngModel)]="searchQuery" 
+                (input)="onFilterChange()"
+                placeholder="Titre, lieu, organisation, description..."
+                class="search-input">
+              <button matSuffix mat-icon-button *ngIf="searchQuery" (click)="clearSearch()">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Filter Selects Row -->
+        <div class="filter-row secondary-filters">
+          <div class="filter-group">
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">category</mat-icon>
+                  Type d'événement
+                </mat-label>
+                <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterChange()">
+                  <mat-option value="" class="default-option">
+                    <mat-icon>all_inclusive</mat-icon>
+                    <span>Tous les types</span>
+                  </mat-option>
+                  <mat-option *ngFor="let type of eventTypes" [value]="type" class="type-option">
+                    <mat-icon>{{ getTypeIcon(type) }}</mat-icon>
+                    <span>{{ type }}</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">schedule</mat-icon>
+                  Statut
+                </mat-label>
+                <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()">
+                  <mat-option *ngFor="let status of statuses" [value]="status.value" class="status-option">
+                    <mat-icon [class]="'status-icon-' + status.value">{{ getStatusIcon(status.value) }}</mat-icon>
+                    <span>{{ status.label }}</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">business</mat-icon>
+                  Organisation
+                </mat-label>
+                <mat-select [(ngModel)]="selectedOrganization" (selectionChange)="onFilterChange()">
+                  <mat-option value="" class="default-option">
+                    <mat-icon>domain</mat-icon>
+                    <span>Toutes les organisations</span>
+                  </mat-option>
+                  <mat-option *ngFor="let org of organizations" [value]="org" class="org-option">
+                    <mat-icon>business_center</mat-icon>
+                    <span>{{ org }}</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Filters Row (when expanded) -->
+        <div class="filter-row advanced-filters" *ngIf="filtersExpanded">
+          <div class="filter-group">
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">date_range</mat-icon>
+                  Période
+                </mat-label>
+                <mat-select [(ngModel)]="selectedPeriod" (selectionChange)="onFilterChange()">
+                  <mat-option value="">Toutes les périodes</mat-option>
+                  <mat-option value="today">Aujourd'hui</mat-option>
+                  <mat-option value="week">Cette semaine</mat-option>
+                  <mat-option value="month">Ce mois</mat-option>
+                  <mat-option value="quarter">Ce trimestre</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">people</mat-icon>
+                  Disponibilité
+                </mat-label>
+                <mat-select [(ngModel)]="selectedAvailability" (selectionChange)="onFilterChange()">
+                  <mat-option value="">Toutes</mat-option>
+                  <mat-option value="available">Places disponibles</mat-option>
+                  <mat-option value="limited">Places limitées</mat-option>
+                  <mat-option value="full">Complet</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="filter-select-enhanced">
+              <mat-form-field appearance="fill" class="select-3cm">
+                <mat-label>
+                  <mat-icon class="label-icon">how_to_reg</mat-icon>
+                  Inscription
+                </mat-label>
+                <mat-select [(ngModel)]="selectedEnrollment" (selectionChange)="onFilterChange()">
+                  <mat-option value="">Tous</mat-option>
+                  <mat-option value="enrolled">Inscrit</mat-option>
+                  <mat-option value="not-enrolled">Non inscrit</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="filter-row filter-actions">
+          <div class="actions-group">
+            <button class="filter-btn primary" (click)="applyFilters()">
+              <mat-icon>filter_list</mat-icon>
+              <span>Appliquer les filtres</span>
+            </button>
+            <button class="filter-btn secondary" (click)="clearFilters()">
+              <mat-icon>refresh</mat-icon>
+              <span>Réinitialiser</span>
+            </button>
+            <div class="filter-summary" *ngIf="hasActiveFilters()">
+              <mat-icon>info</mat-icon>
+              <span>{{ getActiveFiltersCount() }} filtre(s) actif(s)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Filters Card -->
-  <mat-card class="mb-6 shadow-lg">
-    <mat-card-header class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-t-lg">
-      <div class="flex items-center gap-3">
-        <mat-icon>filter_list</mat-icon>
-        <mat-card-title class="text-white m-0">Filtres</mat-card-title>
-      </div>
-    </mat-card-header>
-    <mat-card-content class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <!-- Search -->
-        <mat-form-field class="w-full">
-          <mat-label>Rechercher</mat-label>
-          <input matInput 
-            [(ngModel)]="searchQuery" 
-            (input)="onFilterChange()"
-            placeholder="Titre, lieu, organisation...">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-
-        <!-- Type Filter -->
-        <mat-form-field class="w-full">
-          <mat-label>Type d'événement</mat-label>
-          <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterChange()">
-            <mat-option value="">Tous</mat-option>
-            <mat-option *ngFor="let type of eventTypes" [value]="type">
-              {{ type }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Status Filter -->
-        <mat-form-field class="w-full">
-          <mat-label>Statut</mat-label>
-          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()">
-            <mat-option *ngFor="let status of statuses" [value]="status.value">
-              {{ status.label }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Organization Filter -->
-        <mat-form-field class="w-full">
-          <mat-label>Organisation</mat-label>
-          <mat-select [(ngModel)]="selectedOrganization" (selectionChange)="onFilterChange()">
-            <mat-option value="">Toutes</mat-option>
-            <mat-option *ngFor="let org of organizations" [value]="org">
-              {{ org }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <!-- Filter Actions -->
-      <div class="flex gap-2">
-        <button mat-raised-button color="primary" (click)="clearFilters()">
-          <mat-icon>clear</mat-icon>
-          Réinitialiser
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
   <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center py-12">
-    <mat-spinner diameter="40"></mat-spinner>
+  <div *ngIf="loading" class="empty-state">
+    <mat-spinner diameter="60"></mat-spinner>
+    <div class="empty-title">Chargement des événements...</div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredEvents.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">event_busy</mat-icon>
+    <h3 class="empty-title">Aucun événement trouvé</h3>
+    <p class="empty-message">
+      Essayez de modifier vos critères de recherche ou consultez les événements à venir
+    </p>
+    <button class="empty-action" (click)="clearFilters()">
+      Réinitialiser les filtres
+    </button>
   </div>
 
   <!-- Events Grid -->
-  <div *ngIf="!loading && filteredEvents.length === 0" class="text-center py-12 bg-slate-50 rounded-lg border border-slate-200">
-    <mat-icon class="text-6xl text-slate-300 mb-4">event_busy</mat-icon>
-    <p class="text-slate-500 text-lg">Aucun événement trouvé</p>
-  </div>
+  <div *ngIf="!loading && filteredEvents.length > 0" class="events-grid">
+    <div *ngFor="let event of filteredEvents" class="event-card" [class.new-event]="isNewEvent(event)">
+      <!-- Event Image -->
+      <div class="event-image">
+        <mat-icon>event</mat-icon>
+        <div class="event-type-badge">{{ event.type }}</div>
+      </div>
 
-  <div *ngIf="!loading && filteredEvents.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <mat-card *ngFor="let event of filteredEvents" class="event-card shadow-lg">
-      <mat-card-header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg">
-        <div class="flex items-start justify-between w-full">
-          <div>
-            <mat-card-title class="text-white m-0">{{ event.title }}</mat-card-title>
-            <mat-card-subtitle class="text-blue-100 text-sm">{{ event.date | date:'dd MMM yyyy' }}</mat-card-subtitle>
-          </div>
-          <mat-chip class="text-xs" [ngClass]="event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' : event.status === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'">
-            {{ event.status === 'upcoming' ? 'À venir' : event.status === 'ongoing' ? 'En cours' : 'Terminé' }}
-          </mat-chip>
-        </div>
-      </mat-card-header>
-
-      <mat-card-content class="p-6">
-        <!-- Description -->
-        <p class="text-sm text-slate-600 mb-4">{{ event.description }}</p>
-
-        <!-- Event Details -->
-        <div class="space-y-2 mb-4">
-          <div class="flex items-center gap-2">
-            <mat-icon class="text-slate-400 text-sm">location_on</mat-icon>
-            <span class="text-sm text-slate-600">{{ event.location }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <mat-icon class="text-slate-400 text-sm">business</mat-icon>
-            <span class="text-sm text-slate-600">{{ event.organization }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <mat-icon class="text-slate-400 text-sm">category</mat-icon>
-            <mat-chip class="text-xs">{{ event.type }}</mat-chip>
-          </div>
+      <!-- Event Content -->
+      <div class="event-content">
+        <div class="event-header">
+          <h3 class="event-title">{{ event.title }}</h3>
+          <span class="event-status" [ngClass]="'status-' + event.status">
+            {{ getStatusLabel(event.status) }}
+          </span>
         </div>
 
-        <!-- Taux de remplissage -->
-        <div class="mb-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-semibold text-slate-700">Taux de remplissage</span>
-            <span class="text-sm font-bold" 
-              [ngClass]="{
-                'text-green-600': getOccupancyPercentage(event) < 50,
-                'text-orange-600': getOccupancyPercentage(event) >= 50 && getOccupancyPercentage(event) < 80,
-                'text-red-600': getOccupancyPercentage(event) >= 80
-              }">
-              {{ getOccupancyPercentage(event) }}%
-            </span>
+        <p class="event-description">{{ event.description }}</p>
+        
+        <div class="event-details">
+          <div class="detail-item">
+            <mat-icon>location_on</mat-icon>
+            <span class="detail-value">{{ event.location }}</span>
           </div>
-          <mat-progress-bar 
-            mode="determinate" 
-            [value]="getOccupancyPercentage(event)"
-            [color]="getOccupancyPercentage(event) >= 80 ? 'warn' : 'primary'"
-            class="rounded-full">
-          </mat-progress-bar>
-          <p class="text-xs text-slate-500 mt-2">
-            {{ event.participants }} / {{ event.maxParticipants }} participants
-          </p>
-        </div>
-
-        <!-- Places disponibles -->
-        <div class="border rounded-lg p-3 mb-4"
-          [ngClass]="{
-            'bg-blue-50 border-blue-200': getAvailableSpots(event) > 0,
-            'bg-red-50 border-red-200': getAvailableSpots(event) <= 0
-          }">
-          <div class="flex items-center gap-2">
-            <mat-icon class="text-sm"
-              [ngClass]="{
-                'text-blue-600': getAvailableSpots(event) > 0,
-                'text-red-600': getAvailableSpots(event) <= 0
-              }">
-              {{ getAvailableSpots(event) > 0 ? 'info' : 'block' }}
-            </mat-icon>
-            <span class="text-sm font-semibold"
-              [ngClass]="{
-                'text-blue-700': getAvailableSpots(event) > 0,
-                'text-red-700': getAvailableSpots(event) <= 0
-              }">
-              {{ getAvailableSpots(event) > 0 ? getAvailableSpots(event) + ' places disponibles' : 'COMPLET' }}
-            </span>
+          <div class="detail-item">
+            <mat-icon>business</mat-icon>
+            <span class="detail-value">{{ event.organization }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>schedule</mat-icon>
+            <span class="detail-value">{{ event.date | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>people</mat-icon>
+            <span class="detail-value">{{ event.participants }}/{{ event.maxParticipants }}</span>
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex gap-2">
-          <button 
-            *ngIf="!event.enrolled && event.status !== 'completed'"
-            mat-raised-button 
-            color="primary" 
-            (click)="enrollEvent(event)"
-            [disabled]="event.participants >= event.maxParticipants"
-            class="flex-1">
-            <mat-icon>add</mat-icon>
+        <!-- Participation Gauge -->
+        <div class="participation-gauge">
+          <div class="gauge-header">
+            <span class="gauge-label">Participation</span>
+            <span class="gauge-value">{{ getOccupancyPercentage(event) }}%</span>
+          </div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" [style.width.%]="getOccupancyPercentage(event)"></div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <!-- Not enrolled - Upcoming event -->
+          <button *ngIf="!event.enrolled && event.status === 'upcoming'"
+                  class="action-btn primary" 
+                  (click)="enrollEvent(event)"
+                  [disabled]="event.participants >= event.maxParticipants">
+            <mat-icon>add_circle</mat-icon>
             S'inscrire
           </button>
-          <button 
-            *ngIf="event.enrolled && event.status !== 'completed'"
-            mat-raised-button 
-            color="warn" 
-            (click)="cancelEnrollment(event)"
-            class="flex-1">
-            <mat-icon>close</mat-icon>
+
+          <!-- Enrolled - Upcoming event -->
+          <button *ngIf="event.enrolled && event.status === 'upcoming'"
+                  class="action-btn danger" 
+                  (click)="cancelEnrollment(event)">
+            <mat-icon>cancel</mat-icon>
             Annuler
           </button>
-          <button 
-            *ngIf="event.enrolled && event.status === 'completed'"
-            mat-raised-button 
-            color="primary"
-            class="flex-1">
+
+          <!-- Enrolled - Ongoing event -->
+          <button *ngIf="event.enrolled && event.status === 'ongoing'"
+                  class="action-btn primary">
+            <mat-icon>play_circle</mat-icon>
+            Rejoindre
+          </button>
+
+          <!-- Enrolled - Completed event -->
+          <button *ngIf="event.enrolled && event.status === 'completed'"
+                  class="action-btn primary">
             <mat-icon>download</mat-icon>
             Badge
           </button>
-          <button 
-            *ngIf="!event.enrolled && event.status === 'completed'"
-            mat-stroked-button 
-            disabled
-            class="flex-1">
+
+          <!-- Not enrolled - Completed event -->
+          <button *ngIf="!event.enrolled && event.status === 'completed'"
+                  class="action-btn secondary" 
+                  disabled>
             <mat-icon>lock</mat-icon>
             Terminé
           </button>
+
+          <!-- Info button -->
+          <button class="action-btn secondary" 
+                  [matMenuTriggerFor]="eventMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+
+          <!-- Context Menu -->
+          <mat-menu #eventMenu="matMenu">
+            <button mat-menu-item>
+              <mat-icon>info</mat-icon>
+              <span>Détails</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>share</mat-icon>
+              <span>Partager</span>
+            </button>
+            <button mat-menu-item *ngIf="event.enrolled">
+              <mat-icon>calendar_today</mat-icon>
+              <span>Calendrier</span>
+            </button>
+          </mat-menu>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
   </div>
 
   <!-- Pagination -->
-  <mat-paginator
-    *ngIf="!loading && filteredEvents.length > 0"
-    [pageSizeOptions]="[9, 18, 27]"
-    showFirstLastButtons
-    class="bg-slate-50 mt-6">
-  </mat-paginator>
+  <div *ngIf="!loading && filteredEvents.length > 0" class="pagination-container">
+    <div class="pagination-info">
+      Affichage de <span class="highlight">{{ filteredEvents.length }}</span> événements
+    </div>
+    <mat-paginator
+      [pageSizeOptions]="[9, 18, 27]"
+      [pageSize]="9"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
 </div>

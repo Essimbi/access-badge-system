@@ -1,0 +1,304 @@
+@use '../../../../styles/variables-3cm' as vars;
+
+.footer-3cm {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-top: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    box-shadow: 0 -2px 10px rgba(59, 130, 246, 0.05);
+
+    &__container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 0 1rem;
+        }
+    }
+
+    // ============================================================================
+    // SECTION GAUCHE - BRANDING
+    // ============================================================================
+
+    &__left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    &__logo {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+        border-radius: vars.$border-radius-md;
+        box-shadow: vars.$shadow-3cm;
+    }
+
+    &__brand-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+    &__brand-name {
+        font-size: 1rem;
+        font-weight: 700;
+        background: vars.$gradient-3cm-primary;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    &__brand-tagline {
+        font-size: 0.75rem;
+        color: vars.$tcm-neutral-500;
+        font-weight: 500;
+    }
+
+    &__copyright {
+        font-size: 0.75rem;
+        color: vars.$tcm-neutral-500;
+        
+        @media (max-width: 768px) {
+            text-align: center;
+        }
+    }
+
+    // ============================================================================
+    // SECTION CENTRE - LIENS
+    // ============================================================================
+
+    &__center {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
+    }
+
+    &__links {
+        display: flex;
+        gap: 0.5rem;
+
+        @media (max-width: 768px) {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+
+    &__link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: vars.$border-radius-md;
+        color: vars.$tcm-neutral-600;
+        font-size: 0.875rem;
+        transition: vars.$transition-fast;
+
+        &:hover {
+            background: vars.$tcm-primary-50;
+            color: vars.$tcm-primary-700;
+            transform: translateY(-1px);
+        }
+
+        mat-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            
+            span {
+                display: none;
+            }
+        }
+    }
+
+    // ============================================================================
+    // SECTION DROITE - INFORMATIONS TECHNIQUES
+    // ============================================================================
+
+    &__right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.75rem;
+
+        @media (max-width: 768px) {
+            align-items: center;
+        }
+    }
+
+    &__tech-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+
+    &__version-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: vars.$border-radius-md;
+        background: rgba(59, 130, 246, 0.05);
+        color: vars.$tcm-primary-600;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: vars.$transition-fast;
+
+        &:hover {
+            background: vars.$tcm-primary-100;
+            color: vars.$tcm-primary-700;
+            transform: translateY(-1px);
+        }
+
+        mat-icon {
+            font-size: 0.875rem;
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+    }
+
+    &__version-text {
+        font-family: monospace;
+        font-weight: 600;
+    }
+
+    &__build-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        @media (max-width: 768px) {
+            align-items: center;
+        }
+    }
+
+    &__build-date {
+        font-size: 0.625rem;
+        color: vars.$tcm-neutral-400;
+        font-family: monospace;
+    }
+
+    // ============================================================================
+    // INDICATEUR DE STATUT
+    // ============================================================================
+
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__status-indicator {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: vars.$tcm-neutral-400;
+        transition: vars.$transition-fast;
+
+        &--online {
+            background: vars.$tcm-success-500;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        &--offline {
+            background: vars.$tcm-accent-500;
+        }
+
+        &--maintenance {
+            background: vars.$tcm-warning-500;
+        }
+    }
+
+    &__status-text {
+        font-size: 0.75rem;
+        color: vars.$tcm-neutral-500;
+        font-weight: 500;
+    }
+}
+
+// ============================================================================
+// ANIMATIONS
+// ============================================================================
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+// ============================================================================
+// MODE SOMBRE
+// ============================================================================
+
+.dark-theme {
+    .footer-3cm {
+        background: linear-gradient(135deg, vars.$tcm-neutral-800 0%, vars.$tcm-neutral-900 100%);
+        border-top-color: rgba(59, 130, 246, 0.2);
+
+        &__brand-tagline {
+            color: vars.$tcm-neutral-400;
+        }
+
+        &__copyright {
+            color: vars.$tcm-neutral-400;
+        }
+
+        &__link {
+            color: vars.$tcm-neutral-300;
+
+            &:hover {
+                background: vars.$tcm-neutral-700;
+                color: vars.$tcm-primary-400;
+            }
+        }
+
+        &__version-btn {
+            background: rgba(59, 130, 246, 0.1);
+            color: vars.$tcm-primary-400;
+
+            &:hover {
+                background: rgba(59, 130, 246, 0.2);
+                color: vars.$tcm-primary-300;
+            }
+        }
+
+        &__build-date {
+            color: vars.$tcm-neutral-500;
+        }
+
+        &__status-text {
+            color: vars.$tcm-neutral-400;
+        }
+    }
+}

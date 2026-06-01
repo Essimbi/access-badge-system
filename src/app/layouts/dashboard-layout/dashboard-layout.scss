@@ -1,29 +1,60 @@
-@use '../../../styles' as *;
+@use '../../../styles/variables-3cm' as vars;
 
 .dashboard-layout {
     height: 100vh;
     display: flex;
     overflow: hidden;
-    background-color: #f9fafb; // gray-50
+    background-color: vars.$tcm-neutral-50;
+    transition: vars.$transition-normal;
 
     &__content {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
         min-width: 0;
+        transition: vars.$transition-normal;
+        height: 100vh;
     }
 
     &__main {
         flex-grow: 1;
         overflow: auto;
-        padding: 1rem;
+        padding: 0;
+        background: vars.$tcm-neutral-50;
+        transition: vars.$transition-normal;
 
-        @media (min-width: 768px) {
-            padding: 1.5rem;
+        // Scrollbar personnalisée
+        &::-webkit-scrollbar {
+            width: 6px;
         }
 
-        @media (min-width: 1024px) {
-            padding: 2rem;
+        &::-webkit-scrollbar-track {
+            background: vars.$tcm-neutral-100;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: vars.$tcm-primary-300;
+            border-radius: vars.$border-radius-md;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: vars.$tcm-primary-500;
+        }
+    }
+
+    // État sidebar réduite
+    &--sidebar-collapsed {
+        .dashboard-layout__content {
+            margin-left: 0;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .dashboard-layout {
+        &__main {
+            padding: 0;
         }
     }
 }

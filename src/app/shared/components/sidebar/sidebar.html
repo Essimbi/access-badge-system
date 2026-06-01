@@ -1,28 +1,103 @@
-<div class="sidebar">
-  <div class="sidebar__logo">
-    <mat-icon class="sidebar__logo-icon">badge</mat-icon>
-    <span class="sidebar__logo-text">EventBadge</span>
+<aside class="sidebar-3cm" 
+       [@sidebarAnimation]="isCollapsed ? 'collapsed' : 'expanded'"
+       [class.sidebar-3cm--collapsed]="isCollapsed">
+  
+  <!-- En-tête de la sidebar -->
+  <div class="sidebar-3cm__header">
+    <!-- Logo et branding -->
+    <div class="sidebar-3cm__brand" *ngIf="!isCollapsed" [@fadeInOut]>
+      <div class="sidebar-3cm__logo-container">
+        <img src="/assets/images/3cm-logo.jpg" alt="3CM Logo" class="sidebar-3cm__logo" />
+      </div>
+      <div class="sidebar-3cm__brand-text">
+        <h2 class="sidebar-3cm__brand-name">ABS</h2>
+        <span class="sidebar-3cm__brand-subtitle">by 3CM</span>
+      </div>
+    </div>
+
+    <!-- Logo réduit -->
+    <div class="sidebar-3cm__brand-collapsed" *ngIf="isCollapsed">
+      <img src="/assets/images/3cm-logo.jpg" alt="3CM Logo" class="sidebar-3cm__logo-small" />
+    </div>
+
+    <!-- Bouton de réduction -->
+    <button mat-icon-button 
+            class="sidebar-3cm__toggle-btn"
+            (click)="onToggleSidebar()"
+            [matTooltip]="isCollapsed ? 'Étendre la sidebar' : 'Réduire la sidebar'"
+            matTooltipPosition="right">
+      <mat-icon>{{ isCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
   </div>
 
-  <mat-nav-list class="sidebar__nav">
-    <ng-container *ngFor="let item of navItems">
-      <a mat-list-item *ngIf="canShow(item)" [routerLink]="item.route" routerLinkActive="sidebar__nav-item--active"
-        class="sidebar__nav-item">
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.label }}</span>
-      </a>
-    </ng-container>
-  </mat-nav-list>
+  <!-- Navigation principale -->
+  <nav class="sidebar-3cm__nav">
+    <div class="sidebar-3cm__nav-section">
+      <h3 class="sidebar-3cm__nav-title" *ngIf="!isCollapsed" [@fadeInOut]>Navigation</h3>
+      
+      <div class="sidebar-3cm__nav-items">
+        <a *ngFor="let item of visibleNavItems; trackBy: trackByRoute"
+           [routerLink]="item.route"
+           [class.sidebar-3cm__nav-item--active]="isNavItemActive(item)"
+           class="sidebar-3cm__nav-item"
+           [matTooltip]="isCollapsed ? item.label : ''"
+           [matTooltipDisabled]="!isCollapsed"
+           matTooltipPosition="right">
+          
+          <div class="sidebar-3cm__nav-item-content">
+            <mat-icon class="sidebar-3cm__nav-item-icon">{{ item.icon }}</mat-icon>
+            
+            <span class="sidebar-3cm__nav-item-label" *ngIf="!isCollapsed" [@fadeInOut]>
+              {{ item.label }}
+            </span>
+            
+            <!-- Badge de notification -->
+            <span class="sidebar-3cm__nav-item-badge" 
+                  *ngIf="item.badge && item.badge > 0 && !isCollapsed" 
+                  [@fadeInOut]>
+              {{ item.badge > 99 ? '99+' : item.badge }}
+            </span>
 
-  <div class="sidebar__user">
-    <div class="sidebar__user-container" *ngIf="currentUser">
-      <div class="sidebar__user-avatar">
-        {{ currentUser.firstName[0] }}{{ currentUser.lastName[0] }}
+            <!-- Badge réduit -->
+            <span class="sidebar-3cm__nav-item-badge-dot" 
+                  *ngIf="item.badge && item.badge > 0 && isCollapsed">
+            </span>
+          </div>
+
+          <!-- Indicateur d'élément actif -->
+          <div class="sidebar-3cm__nav-item-indicator"></div>
+        </a>
       </div>
-      <div class="sidebar__user-info">
-        <span class="sidebar__user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
-        <span class="sidebar__user-role">{{ currentUser.role }}</span>
+    </div>
+  </nav>
+
+  <!-- Section utilisateur -->
+  <div class="sidebar-3cm__user" *ngIf="currentUser">
+    <mat-divider class="sidebar-3cm__divider"></mat-divider>
+    
+    <div class="sidebar-3cm__user-container">
+      <!-- Avatar utilisateur -->
+      <div class="sidebar-3cm__user-avatar">
+        <span class="sidebar-3cm__user-initials">{{ getUserInitials() }}</span>
+        <div class="sidebar-3cm__user-status"></div>
+      </div>
+
+      <!-- Informations utilisateur (mode étendu) -->
+      <div class="sidebar-3cm__user-info" *ngIf="!isCollapsed" [@fadeInOut]>
+        <div class="sidebar-3cm__user-name">
+          {{ currentUser.firstName }} {{ currentUser.lastName }}
+        </div>
+        <div class="sidebar-3cm__user-role">
+          {{ getRoleLabel(currentUser.role) }}
+        </div>
+      </div>
+
+      <!-- Tooltip pour mode réduit -->
+      <div class="sidebar-3cm__user-tooltip" 
+           *ngIf="isCollapsed"
+           [matTooltip]="currentUser.firstName + ' ' + currentUser.lastName + ' - ' + getRoleLabel(currentUser.role)"
+           matTooltipPosition="right">
       </div>
     </div>
   </div>
-</div>
+</aside>

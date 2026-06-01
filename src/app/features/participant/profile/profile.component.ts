@@ -139,13 +139,11 @@ export class ProfileComponent implements OnInit {
   }
 
   savePreferences(): void {
-    this.loading = true;
-    // Simulation de la sauvegarde des préférences
+    // Simulation de la sauvegarde des préférences en arrière-plan
     setTimeout(() => {
       this.notificationService.success('Préférences mises à jour');
       this.editingPreferences = false;
-      this.loading = false;
-    }, 1000);
+    }, 500);
   }
 
   cancelEdit(form: string): void {

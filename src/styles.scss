@@ -1,54 +1,317 @@
+// ============================================================================
+// STYLES PRINCIPAUX - SYSTÈME ABS 3CM
+// ============================================================================
+
+// Variables et thème 3CM (MUST be first)
+@use "styles/variables-3cm" as vars;
+@use "styles/utilities-3cm";
+
+// Tailwind CSS
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+// Material Icons
 @import "material-icons/iconfont/material-icons.css";
 @import "material-symbols/index.css";
 
-/* Base styles */
+// ============================================================================
+// STYLES DE BASE
+// ============================================================================
+
 html,
 body {
     height: 100%;
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: vars.$font-family-3cm;
+    background-color: vars.$tcm-neutral-50;
+    color: vars.$tcm-neutral-800;
 }
 
-/* Custom Snackbar Styles */
-.snackbar-success {
-    @apply bg-success text-white !important;
+* {
+    box-sizing: border-box;
 }
 
-.snackbar-error {
-    @apply bg-danger text-white !important;
+// ============================================================================
+// STYLES GLOBAUX 3CM
+// ============================================================================
+
+// Scrollbar personnalisée
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-.snackbar-info {
-    @apply bg-info text-white !important;
+::-webkit-scrollbar-track {
+    background: vars.$tcm-neutral-100;
 }
 
-.snackbar-warning {
-    @apply bg-warning text-white !important;
+::-webkit-scrollbar-thumb {
+    background: vars.$tcm-primary-300;
+    border-radius: vars.$border-radius-md;
 }
 
-/* Custom Card Styles */
-.stat-card {
-    @apply transition-transform duration-200;
+::-webkit-scrollbar-thumb:hover {
+    background: vars.$tcm-primary-500;
 }
 
-.stat-card:hover {
-    @apply -translate-y-1 shadow-lg;
+// Sélection de texte
+::selection {
+    background-color: vars.$tcm-primary-200;
+    color: vars.$tcm-primary-800;
 }
 
-/* Status Chips */
-.status-pending {
-    @apply bg-warning text-white;
+// Focus outline personnalisé
+*:focus {
+    outline: 2px solid vars.$tcm-primary-500;
+    outline-offset: 2px;
 }
 
-.status-approved {
-    @apply bg-success text-white;
+// ============================================================================
+// COMPOSANTS MATERIAL PERSONNALISÉS
+// ============================================================================
+
+// Tables Material
+.mat-mdc-table {
+    background: white;
+    border-radius: vars.$border-radius-lg;
+    box-shadow: vars.$shadow-3cm;
+    overflow: hidden;
+    
+    .mat-mdc-header-row {
+        background: vars.$gradient-3cm-light;
+        
+        .mat-mdc-header-cell {
+            color: vars.$tcm-primary-800;
+            font-weight: 600;
+        }
+    }
+    
+    .mat-mdc-row {
+        &:hover {
+            background-color: vars.$tcm-primary-50;
+        }
+    }
 }
 
-.status-rejected {
-    @apply bg-danger text-white;
+// Formulaires Material
+.mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+        border-radius: vars.$border-radius-md;
+    }
+    
+    &.mat-focused {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+            border-color: vars.$tcm-primary-500;
+        }
+    }
+}
+
+// Dialogs Material
+.mat-mdc-dialog-container {
+    border-radius: vars.$border-radius-xl;
+    box-shadow: vars.$shadow-3cm-xl;
+}
+
+// Menus Material
+.mat-mdc-menu-panel {
+    border-radius: vars.$border-radius-lg;
+    box-shadow: vars.$shadow-3cm-lg;
+}
+
+// Tabs Material
+.mat-mdc-tab-group {
+    .mat-mdc-tab-header {
+        border-bottom: 2px solid vars.$tcm-primary-100;
+    }
+    
+    .mat-mdc-tab {
+        &.mdc-tab--active {
+            .mdc-tab__text-label {
+                color: vars.$tcm-primary-600;
+            }
+        }
+    }
+    
+    .mat-mdc-tab-ink-bar {
+        background-color: vars.$tcm-primary-600;
+    }
+}
+
+// Progress bars
+.mat-mdc-progress-bar {
+    .mdc-linear-progress__bar-inner {
+        border-color: vars.$tcm-primary-500;
+    }
+}
+
+// Sliders
+.mat-mdc-slider {
+    .mdc-slider__track--active_fill {
+        border-color: vars.$tcm-primary-500;
+    }
+    
+    .mdc-slider__thumb-knob {
+        background-color: vars.$tcm-primary-500;
+        border-color: vars.$tcm-primary-500;
+    }
+}
+
+// ============================================================================
+// CLASSES UTILITAIRES SPÉCIFIQUES
+// ============================================================================
+
+// Layout principal
+.main-layout {
+    min-height: 100vh;
+    background: vars.$tcm-neutral-50;
+}
+
+.sidebar-3cm {
+    background: white;
+    box-shadow: vars.$shadow-3cm;
+    border-right: 1px solid vars.$tcm-neutral-200;
+    
+    .nav-item {
+        padding: vars.$spacing-sm vars.$spacing-lg;
+        margin: vars.$spacing-xs;
+        border-radius: vars.$border-radius-md;
+        transition: vars.$transition-normal;
+        
+        &:hover {
+            background: vars.$tcm-primary-50;
+            color: vars.$tcm-primary-600;
+        }
+        
+        &.active {
+            background: vars.$gradient-3cm-primary;
+            color: white;
+        }
+    }
+}
+
+.header-3cm {
+    background: white;
+    box-shadow: vars.$shadow-3cm;
+    border-bottom: 1px solid vars.$tcm-neutral-200;
+    
+    .logo {
+        height: 40px;
+        width: auto;
+    }
+    
+    .user-menu {
+        .user-avatar {
+            background: vars.$gradient-3cm-primary;
+            color: white;
+        }
+    }
+}
+
+// Dashboard cards
+.dashboard-card {
+    @extend .card-3cm;
+    
+    .card-header {
+        border-bottom: 1px solid vars.$tcm-neutral-200;
+        padding-bottom: vars.$spacing-md;
+        margin-bottom: vars.$spacing-md;
+        
+        .card-title {
+            color: vars.$tcm-neutral-800;
+            font-weight: 600;
+            margin: 0;
+        }
+    }
+}
+
+// Loading states
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    
+    .loading-spinner {
+        color: vars.$tcm-primary-500;
+    }
+}
+
+// Empty states
+.empty-state {
+    text-align: center;
+    padding: vars.$spacing-2xl;
+    color: vars.$tcm-neutral-500;
+    
+    .empty-icon {
+        font-size: 4rem;
+        color: vars.$tcm-neutral-300;
+        margin-bottom: vars.$spacing-lg;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: vars.$spacing-sm;
+        color: vars.$tcm-neutral-600;
+    }
+    
+    .empty-description {
+        margin-bottom: vars.$spacing-lg;
+    }
+}
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+    
+    .container-3cm {
+        padding: 0 vars.$spacing-md;
+    }
+    
+    .card-3cm {
+        padding: vars.$spacing-md;
+    }
+}
+
+@media (min-width: 769px) {
+    .hide-desktop {
+        display: none !important;
+    }
+}
+
+// ============================================================================
+// PRINT STYLES
+// ============================================================================
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .print-only {
+        display: block !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .card-3cm {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
 }

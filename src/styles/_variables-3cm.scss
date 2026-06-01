@@ -1,0 +1,94 @@
+// ============================================================================
+// VARIABLES 3CM - CHARTE GRAPHIQUE
+// ============================================================================
+
+// Couleurs principales 3CM
+$tcm-primary-50: #EFF6FF;
+$tcm-primary-100: #DBEAFE;
+$tcm-primary-200: #BFDBFE;
+$tcm-primary-300: #93C5FD;
+$tcm-primary-400: #60A5FA;
+$tcm-primary-500: #3B82F6;  // Bleu principal 3CM
+$tcm-primary-600: #2563EB;  // Bleu moyen 3CM
+$tcm-primary-700: #1D4ED8;
+$tcm-primary-800: #1E40AF;  // Bleu foncé 3CM
+$tcm-primary-900: #1E3A8A;
+
+// Couleurs d'accent 3CM
+$tcm-accent-50: #FEF2F2;
+$tcm-accent-100: #FEE2E2;
+$tcm-accent-200: #FECACA;
+$tcm-accent-300: #FCA5A5;
+$tcm-accent-400: #F87171;  // Corail 3CM
+$tcm-accent-500: #EF4444;
+$tcm-accent-600: #DC2626;  // Rouge 3CM
+$tcm-accent-700: #B91C1C;
+$tcm-accent-800: #991B1B;
+$tcm-accent-900: #7F1D1D;
+
+// Couleurs neutres 3CM
+$tcm-neutral-50: #F9FAFB;
+$tcm-neutral-100: #F3F4F6;
+$tcm-neutral-200: #E5E7EB;
+$tcm-neutral-300: #D1D5DB;
+$tcm-neutral-400: #9CA3AF;
+$tcm-neutral-500: #6B7280;  // Gris métallique 3CM
+$tcm-neutral-600: #4B5563;
+$tcm-neutral-700: #374151;
+$tcm-neutral-800: #1F2937;  // Texte foncé 3CM
+$tcm-neutral-900: #111827;
+
+// Couleurs fonctionnelles
+$tcm-success-50: #ECFDF5;
+$tcm-success-100: #D1FAE5;
+$tcm-success-200: #A7F3D0;
+$tcm-success-300: #6EE7B7;
+$tcm-success-400: #34D399;
+$tcm-success-500: #10B981;
+$tcm-success-600: #059669;
+$tcm-success-700: #047857;
+$tcm-success-800: #065F46;
+$tcm-success-900: #064E3B;
+
+$tcm-warning-50: #FFFBEB;
+$tcm-warning-100: #FEF3C7;
+$tcm-warning-200: #FDE68A;
+$tcm-warning-300: #FCD34D;
+$tcm-warning-400: #FBBF24;
+$tcm-warning-500: #F59E0B;
+$tcm-warning-600: #D97706;
+$tcm-warning-700: #B45309;
+$tcm-warning-800: #92400E;
+$tcm-warning-900: #78350F;
+
+// Dégradés 3CM
+$gradient-3cm-primary: linear-gradient(135deg, #{$tcm-primary-500} 0%, #{$tcm-primary-800} 100%);
+$gradient-3cm-accent: linear-gradient(135deg, #{$tcm-accent-400} 0%, #{$tcm-accent-600} 100%);
+$gradient-3cm-light: linear-gradient(135deg, #{$tcm-primary-100} 0%, #{$tcm-primary-300} 100%);
+
+// Ombres 3CM
+$shadow-3cm: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+$shadow-3cm-lg: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05);
+$shadow-3cm-xl: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
+
+// Typographie
+$font-family-3cm: 'Inter', 'Roboto', 'Arial', sans-serif;
+
+// Espacements
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-2xl: 3rem;     // 48px
+
+// Rayons de bordure
+$border-radius-sm: 0.25rem;  // 4px
+$border-radius-md: 0.375rem; // 6px
+$border-radius-lg: 0.5rem;   // 8px
+$border-radius-xl: 0.75rem;  // 12px
+
+// Transitions
+$transition-fast: 150ms ease-in-out;
+$transition-normal: 200ms ease-in-out;
+$transition-slow: 300ms ease-in-out;

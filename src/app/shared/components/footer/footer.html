@@ -1,1 +1,69 @@
-<p>footer works!</p>
+<footer class="footer-3cm">
+  <div class="footer-3cm__container">
+    <!-- Section gauche - Informations de l'entreprise -->
+    <div class="footer-3cm__left">
+      <div class="footer-3cm__brand">
+        <img src="/assets/images/3cm-logo.jpg" alt="3CM Logo" class="footer-3cm__logo" />
+        <div class="footer-3cm__brand-info">
+          <span class="footer-3cm__brand-name">3CM</span>
+          <span class="footer-3cm__brand-tagline">Automated Badge System</span>
+        </div>
+      </div>
+      <div class="footer-3cm__copyright">
+        © {{ currentYear }} 3CM. Tous droits réservés.
+      </div>
+    </div>
+
+    <!-- Section centre - Liens rapides -->
+    <div class="footer-3cm__center">
+      <div class="footer-3cm__links">
+        <button mat-button 
+                class="footer-3cm__link"
+                (click)="openLegalInfo()"
+                matTooltip="Mentions légales">
+          <mat-icon>gavel</mat-icon>
+          <span>Mentions légales</span>
+        </button>
+        
+        <button mat-button 
+                class="footer-3cm__link"
+                matTooltip="Politique de confidentialité">
+          <mat-icon>privacy_tip</mat-icon>
+          <span>Confidentialité</span>
+        </button>
+        
+        <button mat-button 
+                class="footer-3cm__link"
+                matTooltip="Centre d'aide">
+          <mat-icon>help_center</mat-icon>
+          <span>Aide</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section droite - Informations techniques -->
+    <div class="footer-3cm__right">
+      <div class="footer-3cm__tech-info">
+        <button mat-button 
+                class="footer-3cm__version-btn"
+                (click)="openVersionInfo()"
+                matTooltip="Informations de version">
+          <mat-icon>info_outline</mat-icon>
+          <span class="footer-3cm__version-text">
+            v{{ appVersion }}
+          </span>
+        </button>
+        
+        <!-- <div class="footer-3cm__build-info">
+          <span class="footer-3cm__build-date">Build: {{ buildDate }}</span>
+        </div> -->
+      </div>
+      
+      <!-- Indicateur de statut -->
+      <!-- <div class="footer-3cm__status">
+        <div class="footer-3cm__status-indicator footer-3cm__status-indicator--online"></div>
+        <span class="footer-3cm__status-text">Système opérationnel</span>
+      </div> -->
+    </div>
+  </div>
+</footer>

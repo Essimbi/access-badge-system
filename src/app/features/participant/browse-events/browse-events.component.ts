@@ -67,6 +67,10 @@ export class BrowseEventsComponent implements OnInit {
   selectedType = '';
   selectedStatus = 'upcoming';
   selectedOrganization = '';
+  selectedPeriod = '';
+  selectedAvailability = '';
+  selectedEnrollment = '';
+  filtersExpanded = false;
 
   eventTypes = ['Conference', 'Workshop', 'Summit', 'Hackathon', 'Meetup'];
   organizations: string[] = [];
@@ -133,7 +137,8 @@ export class BrowseEventsComponent implements OnInit {
       filtered = filtered.filter(e =>
         e.title.toLowerCase().includes(query) ||
         e.location.toLowerCase().includes(query) ||
-        e.organization.toLowerCase().includes(query)
+        e.organization.toLowerCase().includes(query) ||
+        e.description.toLowerCase().includes(query)
       );
     }
 
@@ -152,6 +157,63 @@ export class BrowseEventsComponent implements OnInit {
       filtered = filtered.filter(e => e.organization === this.selectedOrganization);
     }
 
+    // Period filter
+    if (this.selectedPeriod) {
+      const now = new Date();
+      filtered = filtered.filter(e => {
+        const eventDate = new Date(e.date);
+        switch (this.selectedPeriod) {
+          case 'today':
+            return eventDate.toDateString() === now.toDateString();
+          case 'week':
+            const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+            const weekEnd = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+            return eventDate >= weekStart && eventDate <= weekEnd;
+          case 'month':
+            return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
+          case 'quarter':
+            const quarter = Math.floor(now.getMonth() / 3);
+            const eventQuarter = Math.floor(eventDate.getMonth() / 3);
+            return eventQuarter === quarter && eventDate.getFullYear() === now.getFullYear();
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Availability filter
+    if (this.selectedAvailability) {
+      filtered = filtered.filter(e => {
+        const availableSpots = this.getAvailableSpots(e);
+        const occupancyPercentage = this.getOccupancyPercentage(e);
+        
+        switch (this.selectedAvailability) {
+          case 'available':
+            return availableSpots > 0 && occupancyPercentage < 80;
+          case 'limited':
+            return availableSpots > 0 && occupancyPercentage >= 80;
+          case 'full':
+            return availableSpots <= 0;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Enrollment filter
+    if (this.selectedEnrollment) {
+      filtered = filtered.filter(e => {
+        switch (this.selectedEnrollment) {
+          case 'enrolled':
+            return e.enrolled;
+          case 'not-enrolled':
+            return !e.enrolled;
+          default:
+            return true;
+        }
+      });
+    }
+
     this.filteredEvents = filtered;
   }
 
@@ -164,7 +226,61 @@ export class BrowseEventsComponent implements OnInit {
     this.selectedType = '';
     this.selectedStatus = 'upcoming';
     this.selectedOrganization = '';
+    this.selectedPeriod = '';
+    this.selectedAvailability = '';
+    this.selectedEnrollment = '';
     this.applyFilters();
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.onFilterChange();
+  }
+
+  toggleFiltersExpanded(): void {
+    this.filtersExpanded = !this.filtersExpanded;
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchQuery || 
+             this.selectedType || 
+             this.selectedStatus !== 'upcoming' || 
+             this.selectedOrganization ||
+             this.selectedPeriod ||
+             this.selectedAvailability ||
+             this.selectedEnrollment);
+  }
+
+  getActiveFiltersCount(): number {
+    let count = 0;
+    if (this.searchQuery) count++;
+    if (this.selectedType) count++;
+    if (this.selectedStatus !== 'upcoming') count++;
+    if (this.selectedOrganization) count++;
+    if (this.selectedPeriod) count++;
+    if (this.selectedAvailability) count++;
+    if (this.selectedEnrollment) count++;
+    return count;
+  }
+
+  getTypeIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      'Conference': 'mic',
+      'Workshop': 'build',
+      'Summit': 'trending_up',
+      'Hackathon': 'code',
+      'Meetup': 'groups'
+    };
+    return icons[type] || 'event';
+  }
+
+  getStatusIcon(status: string): string {
+    const icons: { [key: string]: string } = {
+      'upcoming': 'schedule',
+      'ongoing': 'play_circle',
+      'completed': 'check_circle'
+    };
+    return icons[status] || 'help';
   }
 
   enrollEvent(event: Event): void {
@@ -206,6 +322,26 @@ export class BrowseEventsComponent implements OnInit {
 
   getOccupancyPercentage(event: Event): number {
     return Math.round((event.participants / event.maxParticipants) * 100);
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'upcoming': return 'À venir';
+      case 'ongoing': return 'En cours';
+      case 'completed': return 'Terminé';
+      default: return status;
+    }
+  }
+
+  getEnrolledEventsCount(): number {
+    return this.events.filter(e => e.enrolled).length;
+  }
+
+  isNewEvent(event: Event): boolean {
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    const daysDiff = Math.floor((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return daysDiff <= 7 && daysDiff >= 0; // Nouveau si dans les 7 prochains jours
   }
 
   generateMockEvents(): Event[] {

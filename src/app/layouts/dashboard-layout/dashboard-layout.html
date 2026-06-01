@@ -1,5 +1,8 @@
-<div class="dashboard-layout">
-    <app-sidebar></app-sidebar>
+<div class="dashboard-layout" [class.dashboard-layout--sidebar-collapsed]="isSidebarCollapsed">
+    <app-sidebar 
+        [isCollapsed]="isSidebarCollapsed"
+        (toggleSidebar)="onSidebarToggle($event)">
+    </app-sidebar>
 
     <div class="dashboard-layout__content">
         <app-header></app-header>
@@ -7,5 +10,7 @@
         <main class="dashboard-layout__main">
             <router-outlet></router-outlet>
         </main>
+
+        <app-footer></app-footer>
     </div>
 </div>

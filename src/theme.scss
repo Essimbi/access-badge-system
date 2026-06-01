@@ -1,0 +1,213 @@
+// ============================================================================
+// THÈME ANGULAR MATERIAL 3CM - COULEURS PERSONNALISÉES
+// ============================================================================
+
+// Variables CSS globales pour les couleurs 3CM
+:root {
+  // Couleurs primaires 3CM
+  --mdc-theme-primary: #3B82F6;
+  --mdc-theme-on-primary: #FFFFFF;
+  --mdc-theme-primary-container: #DBEAFE;
+  --mdc-theme-on-primary-container: #1E40AF;
+  
+  // Couleurs secondaires 3CM  
+  --mdc-theme-secondary: #DC2626;
+  --mdc-theme-on-secondary: #FFFFFF;
+  --mdc-theme-secondary-container: #FEE2E2;
+  --mdc-theme-on-secondary-container: #991B1B;
+  
+  // Couleurs de surface
+  --mdc-theme-surface: #FFFFFF;
+  --mdc-theme-on-surface: #1F2937;
+  --mdc-theme-surface-variant: #F3F4F6;
+  --mdc-theme-on-surface-variant: #6B7280;
+  
+  // Couleurs de fond
+  --mdc-theme-background: #F9FAFB;
+  --mdc-theme-on-background: #1F2937;
+  
+  // Couleurs d'erreur
+  --mdc-theme-error: #DC2626;
+  --mdc-theme-on-error: #FFFFFF;
+  --mdc-theme-error-container: #FEE2E2;
+  --mdc-theme-on-error-container: #991B1B;
+  
+  // Couleurs d'outline
+  --mdc-theme-outline: #D1D5DB;
+  --mdc-theme-outline-variant: #E5E7EB;
+}
+
+// Surcharge complète des composants Material avec les couleurs 3CM
+.mat-mdc-button.mat-primary {
+  --mdc-text-button-label-text-color: #3B82F6 !important;
+  
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.04) !important;
+  }
+}
+
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: #3B82F6 !important;
+  --mdc-filled-button-label-text-color: #FFFFFF !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
+  
+  &:hover {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05) !important;
+    transform: translateY(-1px);
+  }
+}
+
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-outline-color: #3B82F6 !important;
+  --mdc-outlined-button-label-text-color: #3B82F6 !important;
+  
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.04) !important;
+  }
+}
+
+.mat-mdc-fab.mat-primary {
+  --mdc-fab-container-color: #3B82F6 !important;
+  --mdc-fab-icon-color: #FFFFFF !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+}
+
+// Cartes Material avec style 3CM
+.mat-mdc-card {
+  --mdc-card-container-color: #FFFFFF !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
+  
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05) !important;
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+  }
+}
+
+// Formulaires Material avec couleurs 3CM
+.mat-mdc-form-field.mat-primary {
+  --mdc-filled-text-field-active-indicator-color: #3B82F6 !important;
+  --mdc-filled-text-field-focus-active-indicator-color: #3B82F6 !important;
+  --mdc-outlined-text-field-focus-outline-color: #3B82F6 !important;
+  --mdc-outlined-text-field-outline-color: #D1D5DB !important;
+}
+
+.mat-mdc-form-field.mat-focused {
+  --mdc-outlined-text-field-focus-outline-color: #3B82F6 !important;
+  
+  .mat-mdc-floating-label {
+    color: #3B82F6 !important;
+  }
+}
+
+// Tabs Material avec couleurs 3CM
+.mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #3B82F6 !important;
+  
+  .mat-mdc-tab.mdc-tab--active {
+    --mdc-tab-text-label-color-default: #3B82F6 !important;
+  }
+}
+
+// Sliders avec couleurs 3CM
+.mat-mdc-slider {
+  --mdc-slider-active-track-color: #3B82F6 !important;
+  --mdc-slider-handle-color: #3B82F6 !important;
+  --mdc-slider-focus-handle-color: #3B82F6 !important;
+  --mdc-slider-hover-handle-color: #2563EB !important;
+}
+
+// Progress bars avec couleurs 3CM
+.mat-mdc-progress-bar {
+  --mdc-linear-progress-active-indicator-color: #3B82F6 !important;
+}
+
+.mat-mdc-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: #3B82F6 !important;
+}
+
+// Checkboxes et radios avec couleurs 3CM
+.mat-mdc-checkbox.mat-primary {
+  --mdc-checkbox-selected-checkmark-color: #FFFFFF !important;
+  --mdc-checkbox-selected-focus-icon-color: #3B82F6 !important;
+  --mdc-checkbox-selected-hover-icon-color: #3B82F6 !important;
+  --mdc-checkbox-selected-icon-color: #3B82F6 !important;
+  --mdc-checkbox-selected-pressed-icon-color: #3B82F6 !important;
+}
+
+.mat-mdc-radio-button.mat-primary {
+  --mdc-radio-selected-focus-icon-color: #3B82F6 !important;
+  --mdc-radio-selected-hover-icon-color: #3B82F6 !important;
+  --mdc-radio-selected-icon-color: #3B82F6 !important;
+  --mdc-radio-selected-pressed-icon-color: #3B82F6 !important;
+}
+
+// Switches avec couleurs 3CM
+.mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-focus-track-color: #DBEAFE !important;
+  --mdc-switch-selected-hover-track-color: #DBEAFE !important;
+  --mdc-switch-selected-pressed-track-color: #DBEAFE !important;
+  --mdc-switch-selected-track-color: #3B82F6 !important;
+  --mdc-switch-selected-focus-handle-color: #FFFFFF !important;
+  --mdc-switch-selected-hover-handle-color: #FFFFFF !important;
+  --mdc-switch-selected-handle-color: #FFFFFF !important;
+  --mdc-switch-selected-pressed-handle-color: #FFFFFF !important;
+}
+
+// Snackbars personnalisés
+.snackbar-success {
+  background-color: #10B981 !important;
+  color: white !important;
+}
+
+.snackbar-error {
+  background-color: #DC2626 !important;
+  color: white !important;
+}
+
+.snackbar-info {
+  background-color: #3B82F6 !important;
+  color: white !important;
+}
+
+.snackbar-warning {
+  background-color: #F59E0B !important;
+  color: white !important;
+}
+
+// Menus et dialogs
+.mat-mdc-menu-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05) !important;
+}
+
+.mat-mdc-dialog-container {
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04) !important;
+}
+
+// Tables Material
+.mat-mdc-table {
+  background: #FFFFFF !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
+  
+  .mat-mdc-header-row {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%) !important;
+    
+    .mat-mdc-header-cell {
+      color: #1E40AF !important;
+      font-weight: 600;
+    }
+  }
+  
+  .mat-mdc-row {
+    &:hover {
+      background-color: rgba(59, 130, 246, 0.04) !important;
+    }
+  }
+}

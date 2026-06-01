@@ -1,114 +1,128 @@
-<div class="profile-page p-6">
-  <div class="mb-8">
-    <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Mon Profil</h1>
-    <p class="text-slate-500">Gérez vos informations personnelles et vos préférences</p>
+<div class="profile-container">
+  <!-- Header Section -->
+  <div class="profile-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Mon Profil</h1>
+        <p class="subtitle">Gérez vos informations personnelles et vos préférences</p>
+      </div>
+      <div class="profile-avatar-wrapper">
+        <div class="avatar-circle">
+          <span class="initials">{{ currentUser?.firstName?.[0] || 'A' }}{{ currentUser?.lastName?.[0] || 'P' }}</span>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ currentUser?.firstName || 'Participant' }} {{ currentUser?.lastName || '' }}</span>
+          <span class="user-role">{{ currentUser?.organization || 'Indépendant' }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <mat-tab-group class="custom-tabs">
+  <mat-tab-group class="custom-tabs-3cm">
     <!-- Profile Tab -->
-    <mat-tab label="Informations Personnelles">
-      <div class="pt-6">
-        <mat-card class="shadow-lg">
-          <mat-card-header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
-            <div class="flex items-center justify-between w-full">
-              <div class="flex items-center gap-3">
-                <mat-icon class="text-2xl">person</mat-icon>
-                <div>
-                  <mat-card-title class="text-white m-0">Profil Personnel</mat-card-title>
-                  <mat-card-subtitle class="text-blue-100">Vos informations de base</mat-card-subtitle>
-                </div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">person</mat-icon>
+        Informations Personnelles
+      </ng-template>
+      <div class="tab-content">
+        <div class="premium-card">
+          <div class="card-header primary">
+            <div class="header-title">
+              <mat-icon>badge</mat-icon>
+              <div>
+                <h2>Profil Personnel</h2>
+                <p>Vos informations de base</p>
               </div>
-              <button 
-                mat-icon-button 
-                (click)="editingProfile ? cancelEdit('profile') : (editingProfile = true)"
-                [color]="editingProfile ? 'warn' : ''">
-                <mat-icon>{{ editingProfile ? 'close' : 'edit' }}</mat-icon>
-              </button>
             </div>
-          </mat-card-header>
+            <button class="action-btn-icon" (click)="editingProfile ? cancelEdit('profile') : (editingProfile = true)"
+                    [class.warn]="editingProfile">
+              <mat-icon>{{ editingProfile ? 'close' : 'edit' }}</mat-icon>
+            </button>
+          </div>
 
-          <mat-card-content class="p-6">
+          <div class="card-body">
             <form [formGroup]="profileForm" *ngIf="!loading">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <mat-form-field class="w-full">
+              <div class="form-grid">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Prénom</mat-label>
                   <input matInput formControlName="firstName" [readonly]="!editingProfile">
                 </mat-form-field>
 
-                <mat-form-field class="w-full">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Nom</mat-label>
                   <input matInput formControlName="lastName" [readonly]="!editingProfile">
                 </mat-form-field>
 
-                <mat-form-field class="w-full">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Email</mat-label>
                   <input matInput formControlName="email" [readonly]="!editingProfile">
                 </mat-form-field>
 
-                <mat-form-field class="w-full">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Téléphone</mat-label>
                   <input matInput formControlName="phone" [readonly]="!editingProfile">
                 </mat-form-field>
 
-                <mat-form-field class="w-full md:col-span-2">
+                <mat-form-field appearance="fill" class="input-3cm full-width">
                   <mat-label>Organisation</mat-label>
                   <input matInput formControlName="organization" [readonly]="!editingProfile">
                 </mat-form-field>
               </div>
 
-              <div *ngIf="editingProfile" class="flex gap-2">
-                <button mat-raised-button color="primary" (click)="saveProfile()" [disabled]="profileForm.invalid">
+              <div class="form-actions" *ngIf="editingProfile">
+                <button class="btn-3cm primary" (click)="saveProfile()" [disabled]="profileForm.invalid">
                   <mat-icon>save</mat-icon>
                   Enregistrer
                 </button>
-                <button mat-stroked-button (click)="cancelEdit('profile')">
+                <button class="btn-3cm secondary" (click)="cancelEdit('profile')">
                   <mat-icon>cancel</mat-icon>
                   Annuler
                 </button>
               </div>
             </form>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </mat-tab>
 
     <!-- Password Tab -->
-    <mat-tab label="Sécurité">
-      <div class="pt-6">
-        <mat-card class="shadow-lg">
-          <mat-card-header class="bg-gradient-to-r from-red-600 to-red-700 text-white p-6 rounded-t-lg">
-            <div class="flex items-center justify-between w-full">
-              <div class="flex items-center gap-3">
-                <mat-icon class="text-2xl">lock</mat-icon>
-                <div>
-                  <mat-card-title class="text-white m-0">Changer le Mot de Passe</mat-card-title>
-                  <mat-card-subtitle class="text-red-100">Sécurisez votre compte</mat-card-subtitle>
-                </div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">lock</mat-icon>
+        Sécurité
+      </ng-template>
+      <div class="tab-content">
+        <div class="premium-card">
+          <div class="card-header danger">
+            <div class="header-title">
+              <mat-icon>shield</mat-icon>
+              <div>
+                <h2>Changer le Mot de Passe</h2>
+                <p>Sécurisez votre compte</p>
               </div>
-              <button 
-                mat-icon-button 
-                (click)="editingPassword ? cancelEdit('password') : (editingPassword = true)"
-                [color]="editingPassword ? 'warn' : ''">
-                <mat-icon>{{ editingPassword ? 'close' : 'edit' }}</mat-icon>
-              </button>
             </div>
-          </mat-card-header>
+            <button class="action-btn-icon" (click)="editingPassword ? cancelEdit('password') : (editingPassword = true)"
+                    [class.warn]="editingPassword">
+              <mat-icon>{{ editingPassword ? 'close' : 'edit' }}</mat-icon>
+            </button>
+          </div>
 
-          <mat-card-content class="p-6">
+          <div class="card-body">
             <form [formGroup]="passwordForm" *ngIf="!loading">
-              <div class="space-y-4 mb-4">
-                <mat-form-field class="w-full">
+              <div class="form-stack">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Mot de passe actuel</mat-label>
                   <input matInput type="password" formControlName="currentPassword" [readonly]="!editingPassword">
                 </mat-form-field>
 
-                <mat-form-field class="w-full">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Nouveau mot de passe</mat-label>
                   <input matInput type="password" formControlName="newPassword" [readonly]="!editingPassword">
                   <mat-hint>Minimum 8 caractères</mat-hint>
                 </mat-form-field>
 
-                <mat-form-field class="w-full">
+                <mat-form-field appearance="fill" class="input-3cm">
                   <mat-label>Confirmer le mot de passe</mat-label>
                   <input matInput type="password" formControlName="confirmPassword" [readonly]="!editingPassword">
                   <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
@@ -117,145 +131,146 @@
                 </mat-form-field>
               </div>
 
-              <div *ngIf="editingPassword" class="flex gap-2">
-                <button mat-raised-button color="primary" (click)="changePassword()" [disabled]="passwordForm.invalid">
+              <div class="form-actions" *ngIf="editingPassword">
+                <button class="btn-3cm danger" (click)="changePassword()" [disabled]="passwordForm.invalid">
                   <mat-icon>save</mat-icon>
-                  Changer le mot de passe
+                  Mettre à jour
                 </button>
-                <button mat-stroked-button (click)="cancelEdit('password')">
+                <button class="btn-3cm secondary" (click)="cancelEdit('password')">
                   <mat-icon>cancel</mat-icon>
                   Annuler
                 </button>
               </div>
             </form>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </mat-tab>
 
     <!-- Preferences Tab -->
-    <mat-tab label="Préférences">
-      <div class="pt-6">
-        <mat-card class="shadow-lg">
-          <mat-card-header class="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6 rounded-t-lg">
-            <div class="flex items-center justify-between w-full">
-              <div class="flex items-center gap-3">
-                <mat-icon class="text-2xl">settings</mat-icon>
-                <div>
-                  <mat-card-title class="text-white m-0">Préférences</mat-card-title>
-                  <mat-card-subtitle class="text-purple-100">Personnalisez votre expérience</mat-card-subtitle>
-                </div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">settings</mat-icon>
+        Préférences
+      </ng-template>
+      <div class="tab-content">
+        <div class="premium-card">
+          <div class="card-header accent">
+            <div class="header-title">
+              <mat-icon>tune</mat-icon>
+              <div>
+                <h2>Préférences</h2>
+                <p>Personnalisez votre expérience utilisateur</p>
               </div>
-              <button 
-                mat-icon-button 
-                (click)="editingPreferences ? cancelEdit('preferences') : (editingPreferences = true)"
-                [color]="editingPreferences ? 'warn' : ''">
-                <mat-icon>{{ editingPreferences ? 'close' : 'edit' }}</mat-icon>
-              </button>
             </div>
-          </mat-card-header>
+          </div>
 
-          <mat-card-content class="p-6">
+          <div class="card-body">
             <form [formGroup]="preferencesForm" *ngIf="!loading">
-              <div class="space-y-4 mb-4">
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div>
-                    <p class="font-semibold text-slate-900">Notifications par Email</p>
-                    <p class="text-sm text-slate-600">Recevez les mises à jour par email</p>
+              <div class="preferences-list">
+                <div class="preference-item">
+                  <div class="pref-info">
+                    <mat-icon>mail</mat-icon>
+                    <div>
+                      <h3>Notifications par Email</h3>
+                      <p>Recevez les mises à jour et alertes importantes</p>
+                    </div>
                   </div>
-                  <mat-slide-toggle formControlName="emailNotifications" [disabled]="!editingPreferences"></mat-slide-toggle>
+                  <mat-slide-toggle formControlName="emailNotifications" (change)="savePreferences()"></mat-slide-toggle>
                 </div>
 
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div>
-                    <p class="font-semibold text-slate-900">Notifications Push</p>
-                    <p class="text-sm text-slate-600">Recevez les notifications push</p>
+                <div class="preference-item">
+                  <div class="pref-info">
+                    <mat-icon>notifications_active</mat-icon>
+                    <div>
+                      <h3>Notifications Push</h3>
+                      <p>Alertes instantanées sur votre appareil</p>
+                    </div>
                   </div>
-                  <mat-slide-toggle formControlName="pushNotifications" [disabled]="!editingPreferences"></mat-slide-toggle>
+                  <mat-slide-toggle formControlName="pushNotifications" (change)="savePreferences()"></mat-slide-toggle>
                 </div>
 
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div>
-                    <p class="font-semibold text-slate-900">Rappels d'Événements</p>
-                    <p class="text-sm text-slate-600">Recevez des rappels avant les événements</p>
+                <div class="preference-item">
+                  <div class="pref-info">
+                    <mat-icon>event_available</mat-icon>
+                    <div>
+                      <h3>Rappels d'Événements</h3>
+                      <p>Soyez notifié avant le début de vos événements</p>
+                    </div>
                   </div>
-                  <mat-slide-toggle formControlName="eventReminders" [disabled]="!editingPreferences"></mat-slide-toggle>
+                  <mat-slide-toggle formControlName="eventReminders" (change)="savePreferences()"></mat-slide-toggle>
                 </div>
 
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div>
-                    <p class="font-semibold text-slate-900">Infolettre</p>
-                    <p class="text-sm text-slate-600">Recevez notre infolettre mensuelle</p>
+                <div class="preference-item">
+                  <div class="pref-info">
+                    <mat-icon>newspaper</mat-icon>
+                    <div>
+                      <h3>Infolettre</h3>
+                      <p>Actualités et nouveautés de la plateforme</p>
+                    </div>
                   </div>
-                  <mat-slide-toggle formControlName="newsletter" [disabled]="!editingPreferences"></mat-slide-toggle>
+                  <mat-slide-toggle formControlName="newsletter" (change)="savePreferences()"></mat-slide-toggle>
                 </div>
-              </div>
-
-              <div *ngIf="editingPreferences" class="flex gap-2">
-                <button mat-raised-button color="primary" (click)="savePreferences()">
-                  <mat-icon>save</mat-icon>
-                  Enregistrer
-                </button>
-                <button mat-stroked-button (click)="cancelEdit('preferences')">
-                  <mat-icon>cancel</mat-icon>
-                  Annuler
-                </button>
               </div>
             </form>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </mat-tab>
 
     <!-- Data Tab -->
-    <mat-tab label="Données">
-      <div class="pt-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">data_usage</mat-icon>
+        Données
+      </ng-template>
+      <div class="tab-content">
+        <div class="grid-2-cols">
           <!-- Download Data -->
-          <mat-card class="shadow-lg">
-            <mat-card-header class="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-t-lg">
-              <div class="flex items-center gap-3">
-                <mat-icon class="text-2xl">download</mat-icon>
+          <div class="premium-card">
+            <div class="card-header success">
+              <div class="header-title">
+                <mat-icon>download</mat-icon>
                 <div>
-                  <mat-card-title class="text-white m-0">Télécharger Mes Données</mat-card-title>
-                  <mat-card-subtitle class="text-green-100">Exportez vos données personnelles</mat-card-subtitle>
+                  <h2>Exporter</h2>
+                  <p>Vos données personnelles</p>
                 </div>
               </div>
-            </mat-card-header>
-
-            <mat-card-content class="p-6">
-              <p class="text-sm text-slate-600 mb-4">
-                Téléchargez une copie de vos données personnelles au format JSON.
+            </div>
+            <div class="card-body align-center text-center">
+              <mat-icon class="large-illustration success-text">cloud_download</mat-icon>
+              <p class="description-text">
+                Obtenez une copie complète de vos données personnelles et historiques au format JSON standard.
               </p>
-              <button mat-raised-button color="primary" (click)="downloadProfileData()">
+              <button class="btn-3cm success" (click)="downloadProfileData()">
                 <mat-icon>download</mat-icon>
-                Télécharger
+                Télécharger mes données
               </button>
-            </mat-card-content>
-          </mat-card>
+            </div>
+          </div>
 
           <!-- Delete Account -->
-          <mat-card class="shadow-lg">
-            <mat-card-header class="bg-gradient-to-r from-red-600 to-red-700 text-white p-6 rounded-t-lg">
-              <div class="flex items-center gap-3">
-                <mat-icon class="text-2xl">delete</mat-icon>
+          <div class="premium-card border-danger">
+            <div class="card-header danger">
+              <div class="header-title">
+                <mat-icon>delete_forever</mat-icon>
                 <div>
-                  <mat-card-title class="text-white m-0">Supprimer le Compte</mat-card-title>
-                  <mat-card-subtitle class="text-red-100">Action irréversible</mat-card-subtitle>
+                  <h2>Zone de Danger</h2>
+                  <p>Action irréversible</p>
                 </div>
               </div>
-            </mat-card-header>
-
-            <mat-card-content class="p-6">
-              <p class="text-sm text-slate-600 mb-4">
-                Supprimez définitivement votre compte et toutes vos données.
+            </div>
+            <div class="card-body align-center text-center">
+              <mat-icon class="large-illustration danger-text">warning</mat-icon>
+              <p class="description-text">
+                La suppression de votre compte effacera de manière permanente toutes vos données, inscriptions et historiques sur la plateforme.
               </p>
-              <button mat-raised-button color="warn" (click)="deleteAccount()">
+              <button class="btn-3cm danger" (click)="deleteAccount()">
                 <mat-icon>delete</mat-icon>
-                Supprimer le Compte
+                Supprimer mon compte
               </button>
-            </mat-card-content>
-          </mat-card>
+            </div>
+          </div>
         </div>
       </div>
     </mat-tab>

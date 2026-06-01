@@ -26,12 +26,29 @@ interface ParticipantStats {
 interface Event {
   id: number;
   title: string;
+  description?: string;
   date: Date;
+  start_date?: Date;
+  end_date?: Date;
   location: string;
   status: 'upcoming' | 'ongoing' | 'completed';
   badgeCategory: string;
   badgeId?: number;
   enrolled: boolean;
+  capacity?: number;
+  enrolled_count?: number;
+  organizer?: string;
+  duration?: string;
+  event_type?: string;
+}
+
+interface CalendarDay {
+  day: number;
+  isPrevMonth: boolean;
+  isNextMonth: boolean;
+  isToday: boolean;
+  hasEvent: boolean;
+  date: Date;
 }
 
 @Component({
@@ -65,6 +82,11 @@ export class ParticipantDashboardComponent implements OnInit {
   upcomingEvents: Event[] = [];
   pastEvents: Event[] = [];
   loading = false;
+  
+  // Calendrier
+  currentDate = new Date();
+  calendarDays: CalendarDay[] = [];
+  monthEvents: Event[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -74,6 +96,7 @@ export class ParticipantDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadParticipantData();
+    this.generateCalendar();
   }
 
   loadParticipantData(): void {
@@ -95,12 +118,20 @@ export class ParticipantDashboardComponent implements OnInit {
           return {
             id: b.event.id,
             title: b.event.title,
+            description: b.event.description || 'Aucune description disponible',
             date: startDate,
-            location: b.event.location || 'N/A',
+            start_date: startDate,
+            end_date: endDate,
+            location: b.event.location || 'Lieu à définir',
             status: dynamicStatus,
             badgeCategory: b.category,
             badgeId: b.id,
-            enrolled: true
+            enrolled: true,
+            capacity: b.event.capacity || 0,
+            enrolled_count: b.event.enrolled_count || 0,
+            organizer: b.event.organizer || '3CM',
+            duration: this.calculateDuration(startDate, endDate),
+            event_type: b.event.event_type || 'Conférence'
           };
         });
 
@@ -108,12 +139,16 @@ export class ParticipantDashboardComponent implements OnInit {
         this.pastEvents = mappedEvents.filter((e: any) => e.status === 'completed');
 
         this.loadParticipantStats();
+        this.updateMonthEvents();
+        this.generateCalendar();
         this.loading = false;
       },
       error: () => {
         this.upcomingEvents = this.generateMockUpcomingEvents();
         this.pastEvents = this.generateMockPastEvents();
         this.loadParticipantStats();
+        this.updateMonthEvents();
+        this.generateCalendar();
         this.loading = false;
       }
     });
@@ -214,22 +249,38 @@ export class ParticipantDashboardComponent implements OnInit {
       {
         id: 1,
         title: 'Conférence Innovation 2026',
+        description: 'Une conférence sur les dernières innovations technologiques et les tendances du futur',
         date: new Date('2026-03-15'),
-        location: 'Palais de la Culture',
+        start_date: new Date('2026-03-15T09:00:00'),
+        end_date: new Date('2026-03-15T17:00:00'),
+        location: 'Palais de la Culture, Abidjan',
         status: 'upcoming',
         badgeCategory: 'VIP',
         badgeId: 101,
-        enrolled: true
+        enrolled: true,
+        capacity: 500,
+        enrolled_count: 342,
+        organizer: '3CM Events',
+        duration: '8 heures',
+        event_type: 'Conférence'
       },
       {
         id: 2,
         title: 'Workshop Angular 18',
+        description: 'Atelier pratique sur les nouvelles fonctionnalités d\'Angular 18 et les meilleures pratiques',
         date: new Date('2026-02-20'),
-        location: 'Hôtel Ivoire',
+        start_date: new Date('2026-02-20T14:00:00'),
+        end_date: new Date('2026-02-20T18:00:00'),
+        location: 'Hôtel Ivoire, Cocody',
         status: 'upcoming',
-        badgeCategory: 'Exposant',
+        badgeCategory: 'Participant',
         badgeId: 102,
-        enrolled: true
+        enrolled: true,
+        capacity: 50,
+        enrolled_count: 35,
+        organizer: '3CM Tech',
+        duration: '4 heures',
+        event_type: 'Workshop'
       }
     ];
   }
@@ -239,23 +290,148 @@ export class ParticipantDashboardComponent implements OnInit {
       {
         id: 3,
         title: 'Sommet Tech Africa',
+        description: 'Le plus grand sommet technologique d\'Afrique de l\'Ouest avec des experts internationaux',
         date: new Date('2026-01-10'),
-        location: 'Abidjan, CIV',
+        start_date: new Date('2026-01-10T08:00:00'),
+        end_date: new Date('2026-01-12T18:00:00'),
+        location: 'Abidjan, Côte d\'Ivoire',
         status: 'completed',
         badgeCategory: 'Visiteur',
         badgeId: 103,
-        enrolled: true
+        enrolled: true,
+        capacity: 1000,
+        enrolled_count: 856,
+        organizer: 'Tech Africa',
+        duration: '3 jours',
+        event_type: 'Sommet'
       },
       {
         id: 4,
         title: 'Hackathon 2025',
+        description: 'Compétition de développement de 48h pour créer des solutions innovantes',
         date: new Date('2025-12-01'),
-        location: 'Centre Tech',
+        start_date: new Date('2025-12-01T18:00:00'),
+        end_date: new Date('2025-12-03T18:00:00'),
+        location: 'Centre Tech, Plateau',
         status: 'completed',
-        badgeCategory: 'Conférencier',
+        badgeCategory: 'Participant',
         badgeId: 104,
-        enrolled: true
+        enrolled: true,
+        capacity: 100,
+        enrolled_count: 87,
+        organizer: '3CM Innovation',
+        duration: '48 heures',
+        event_type: 'Hackathon'
       }
     ];
+  }
+
+  // ============================================================================
+  // MÉTHODES DU CALENDRIER
+  // ============================================================================
+
+  generateCalendar(): void {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    
+    // Premier jour du mois
+    const firstDay = new Date(year, month, 1);
+    // Dernier jour du mois
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Premier jour de la semaine (lundi = 1, dimanche = 0)
+    const startDate = new Date(firstDay);
+    const dayOfWeek = firstDay.getDay();
+    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    startDate.setDate(firstDay.getDate() - daysToSubtract);
+    
+    // Générer 42 jours (6 semaines)
+    this.calendarDays = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 42; i++) {
+      const currentDay = new Date(startDate);
+      currentDay.setDate(startDate.getDate() + i);
+      
+      const isToday = this.isSameDay(currentDay, today);
+      const hasEvent = this.hasEventOnDate(currentDay);
+      
+      this.calendarDays.push({
+        day: currentDay.getDate(),
+        isPrevMonth: currentDay.getMonth() < month,
+        isNextMonth: currentDay.getMonth() > month,
+        isToday: isToday,
+        hasEvent: hasEvent,
+        date: new Date(currentDay)
+      });
+    }
+  }
+
+  previousMonth(): void {
+    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+    this.generateCalendar();
+    this.updateMonthEvents();
+  }
+
+  nextMonth(): void {
+    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+    this.generateCalendar();
+    this.updateMonthEvents();
+  }
+
+  updateMonthEvents(): void {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    
+    const allEvents = [...this.upcomingEvents, ...this.pastEvents];
+    
+    this.monthEvents = allEvents.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+    });
+  }
+
+  hasEventOnDate(date: Date): boolean {
+    const allEvents = [...this.upcomingEvents, ...this.pastEvents];
+    return allEvents.some(event => this.isSameDay(new Date(event.date), date));
+  }
+
+  isSameDay(date1: Date, date2: Date): boolean {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  }
+
+  calculateDuration(startDate: Date, endDate: Date): string {
+    const diffMs = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (diffDays > 0) {
+      return diffDays === 1 ? '1 jour' : `${diffDays} jours`;
+    } else if (diffHours > 0) {
+      return diffHours === 1 ? '1 heure' : `${diffHours} heures`;
+    } else {
+      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      return diffMinutes === 1 ? '1 minute' : `${diffMinutes} minutes`;
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'upcoming': return 'À venir';
+      case 'ongoing': return 'En cours';
+      case 'completed': return 'Terminé';
+      default: return status;
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'upcoming': return 'status-upcoming';
+      case 'ongoing': return 'status-ongoing';
+      case 'completed': return 'status-completed';
+      default: return '';
+    }
   }
 }

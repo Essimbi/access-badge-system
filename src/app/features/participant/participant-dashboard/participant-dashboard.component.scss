@@ -1,90 +1,843 @@
+@use '../../../../styles/variables-3cm' as vars;
+
 .participant-dashboard {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
+  background: vars.$tcm-neutral-50;
 
-  .stat-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
+  // ============================================================================
+  // EN-TÊTE AVEC MESSAGE DE BIENVENUE
+  // ============================================================================
 
-    &:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    }
+  &__header {
+    padding: 2rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.98) 100%);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.12);
 
-    mat-icon {
-      opacity: 0.3;
+    @media (max-width: 768px) {
+      padding: 1.5rem 1rem;
     }
   }
 
-  .event-card {
-    border-radius: 12px;
+  &__welcome-section {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  &__user-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__user-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
     overflow: hidden;
-    transition: all 0.3s ease;
+    box-shadow: vars.$shadow-3cm;
+    background: vars.$gradient-3cm-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    }
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    mat-card-header {
-      margin: 0;
-      padding: 0;
-    }
+  &__user-info {
+    flex: 1;
+  }
 
-    mat-card-content {
-      padding: 24px;
+  &__welcome-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: vars.$tcm-neutral-800;
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__welcome-subtitle {
+    font-size: 0.875rem;
+    color: vars.$tcm-neutral-500;
+    margin: 0;
+  }
+
+  // ============================================================================
+  // CONTENU PRINCIPAL
+  // ============================================================================
+
+  &__main-content {
+    padding: 2rem;
+
+    @media (max-width: 768px) {
+      padding: 1rem;
     }
   }
 
-  mat-tab-group {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+  &__content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
 
-  mat-chip {
-    font-size: 0.75rem;
-    height: 24px;
-    padding: 0 8px;
-    font-weight: 600;
-  }
-
-  button {
-    border-radius: 8px;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
     }
   }
 
-  mat-progress-bar {
-    border-radius: 4px;
-    height: 8px;
+  &__main-column {
+    min-width: 0;
+  }
+
+  &__sidebar-column {
+    @media (max-width: 1024px) {
+      order: -1;
+    }
   }
 }
 
-// Responsive
-@media (max-width: 768px) {
-  .participant-dashboard {
-    padding: 12px !important;
+// ============================================================================
+// BANNIÈRE PRINCIPALE
+// ============================================================================
 
-    .stat-card {
-      mat-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
-      }
+.main-banner {
+  background: linear-gradient(135deg, 
+    vars.$tcm-primary-500 0%, 
+    vars.$tcm-primary-700 100%);
+  border-radius: vars.$border-radius-xl;
+  padding: 2rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  box-shadow: vars.$shadow-3cm-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+    background-size: 30px 30px;
+    opacity: 0.3;
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 1.5rem;
+      color: white;
+    }
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  &__btn {
+    background: white;
+    color: vars.$tcm-primary-600;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+
+    &__content {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+}
+
+// ============================================================================
+// SECTION ÉVÉNEMENTS
+// ============================================================================
+
+.events-section {
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: vars.$tcm-neutral-800;
+    margin: 0 0 1.5rem 0;
+  }
+}
+
+// ============================================================================
+// TIMELINE DES ÉVÉNEMENTS
+// ============================================================================
+
+.events-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  &__date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+
+    @media (max-width: 768px) {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+  }
+
+  &__day {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: vars.$tcm-neutral-600;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  &__status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: relative;
+
+    &--active {
+      background: vars.$tcm-success-500;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
     }
 
-    .event-card {
-      mat-card-content {
-        padding: 16px;
+    &--upcoming {
+      background: vars.$tcm-primary-500;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+
+    &--empty {
+      background: vars.$tcm-neutral-300;
+    }
+
+    &--completed {
+      background: vars.$tcm-neutral-400;
+    }
+  }
+
+  &--active {
+    .timeline-item__day {
+      color: vars.$tcm-success-600;
+      font-weight: 700;
+    }
+  }
+
+  &--past {
+    opacity: 0.7;
+
+    .timeline-item__day {
+      color: vars.$tcm-neutral-500;
+    }
+  }
+}
+
+// ============================================================================
+// CARTES D'ÉVÉNEMENTS MINI
+// ============================================================================
+
+.event-card-mini {
+  background: white;
+  border-radius: vars.$border-radius-lg;
+  padding: 1.5rem;
+  box-shadow: vars.$shadow-3cm;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: vars.$transition-normal;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: vars.$shadow-3cm-lg;
+  }
+
+  &__header {
+    margin-bottom: 1rem;
+  }
+
+  &__title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: vars.$tcm-neutral-800;
+    margin: 0;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  &__status {
+    padding: 0.25rem 0.75rem;
+    border-radius: vars.$border-radius-xl;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &.status-upcoming {
+      background: rgba(59, 130, 246, 0.1);
+      color: vars.$tcm-primary-700;
+    }
+
+    &.status-ongoing {
+      background: rgba(16, 185, 129, 0.1);
+      color: vars.$tcm-success-700;
+    }
+
+    &.status-completed {
+      background: rgba(107, 114, 128, 0.1);
+      color: vars.$tcm-neutral-600;
+    }
+  }
+
+  &__description {
+    font-size: 0.875rem;
+    color: vars.$tcm-neutral-600;
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+
+  &__participants {
+    margin-bottom: 1rem;
+  }
+
+  &__btn {
+    width: 100%;
+    font-weight: 500;
+  }
+
+  // État vide
+  &--empty {
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+
+  &__empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__empty-icon {
+    font-size: 2rem;
+    color: vars.$tcm-neutral-400;
+  }
+
+  &__empty-text {
+    font-size: 0.875rem;
+    color: vars.$tcm-neutral-500;
+    margin: 0;
+  }
+
+  // État passé
+  &--past {
+    background: vars.$tcm-neutral-50;
+    border-color: vars.$tcm-neutral-200;
+
+    .event-card-mini__title {
+      color: vars.$tcm-neutral-600;
+    }
+  }
+
+  &__btn--past {
+    color: vars.$tcm-neutral-600;
+    border-color: vars.$tcm-neutral-300;
+  }
+}
+
+// ============================================================================
+// AVATARS DES PARTICIPANTS
+// ============================================================================
+
+.participants-avatars {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.participant-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: vars.$shadow-3cm;
+
+  &--1 {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  }
+
+  &--2 {
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+  }
+
+  &--3 {
+    background: linear-gradient(135deg, #45B7D1, #96C93D);
+  }
+}
+
+.participants-count {
+  font-size: 0.75rem;
+  color: vars.$tcm-neutral-500;
+  font-weight: 500;
+}
+
+// ============================================================================
+// DÉTAILS DES ÉVÉNEMENTS
+// ============================================================================
+
+.event-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: vars.$tcm-neutral-600;
+  line-height: 1.3;
+
+  mat-icon {
+    font-size: 1rem;
+    color: vars.$tcm-primary-500;
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .badge-category {
+    background: vars.$tcm-primary-100;
+    color: vars.$tcm-primary-800;
+    padding: 0.125rem 0.5rem;
+    border-radius: vars.$border-radius-md;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+}
+
+// ============================================================================
+// ÉTAT DE CHARGEMENT
+// ============================================================================
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: vars.$tcm-neutral-500;
+
+  .loading-icon {
+    font-size: 3rem;
+    color: vars.$tcm-primary-400;
+    margin-bottom: 1rem;
+    animation: spin 2s linear infinite;
+  }
+
+  p {
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================================
+// WIDGET CALENDRIER
+// ============================================================================
+
+.calendar-widget {
+  background: white;
+  border-radius: vars.$border-radius-xl;
+  box-shadow: vars.$shadow-3cm;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  overflow: hidden;
+
+  &__header {
+    background: vars.$gradient-3cm-primary;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+  }
+
+  &__title-text {
+    font-weight: 600;
+  }
+
+  &__date {
+    font-size: 0.875rem;
+    opacity: 0.9;
+  }
+
+  &__nav {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid vars.$tcm-neutral-200;
+  }
+
+  &__month {
+    font-weight: 600;
+    color: vars.$tcm-neutral-700;
+  }
+
+  &__events {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid vars.$tcm-neutral-200;
+  }
+
+  &__stats {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-bottom: 1px solid vars.$tcm-neutral-200;
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: vars.$tcm-neutral-600;
+
+      mat-icon {
+        font-size: 1rem;
+        color: vars.$tcm-primary-500;
       }
+    }
+  }
+
+  &__create-btn {
+    width: 100%;
+    margin: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.calendar-nav-btn {
+  color: vars.$tcm-neutral-600;
+
+  &:hover {
+    background: vars.$tcm-neutral-100;
+  }
+}
+
+// ============================================================================
+// GRILLE DU CALENDRIER
+// ============================================================================
+
+.calendar-grid {
+  padding: 1rem 1.5rem;
+
+  &__header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+  }
+}
+
+.calendar-day-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: vars.$tcm-neutral-500;
+  text-align: center;
+  padding: 0.5rem 0;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: vars.$border-radius-sm;
+  cursor: pointer;
+  transition: vars.$transition-fast;
+  position: relative;
+
+  &:hover {
+    background: vars.$tcm-neutral-100;
+  }
+
+  &--prev-month {
+    color: vars.$tcm-neutral-400;
+  }
+
+  &--today {
+    background: vars.$tcm-primary-600;
+    color: white;
+    font-weight: 700;
+
+    &:hover {
+      background: vars.$tcm-primary-700;
+    }
+  }
+
+  &--has-event {
+    background: vars.$tcm-primary-50;
+    color: vars.$tcm-primary-700;
+    font-weight: 600;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: vars.$tcm-primary-500;
+      border-radius: 50%;
+    }
+  }
+}
+
+// ============================================================================
+// ÉVÉNEMENTS DU CALENDRIER
+// ============================================================================
+
+.calendar-event {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &__time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: vars.$tcm-primary-600;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: vars.$tcm-neutral-700;
+  }
+
+  &__subtitle {
+    font-size: 0.75rem;
+    color: vars.$tcm-neutral-500;
+  }
+}
+
+// ============================================================================
+// ANIMATIONS ULTRA-SOPHISTIQUÉES
+// ============================================================================
+
+// ============================================================================
+// ANIMATIONS SOPHISTIQUÉES
+// ============================================================================
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Application des animations
+.participant-dashboard {
+  animation: dashboardFadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+// ============================================================================
+// MODE SOMBRE SOPHISTIQUÉ
+// ============================================================================
+
+.dark-theme {
+  .participant-dashboard {
+    background: vars.$tcm-neutral-900;
+
+    &__header {
+      background: linear-gradient(135deg, vars.$tcm-neutral-800 0%, vars.$tcm-neutral-900 100%);
+      border-bottom-color: rgba(59, 130, 246, 0.2);
+    }
+
+    &__welcome-title {
+      color: vars.$tcm-neutral-100;
+    }
+
+    &__welcome-subtitle {
+      color: vars.$tcm-neutral-400;
+    }
+  }
+
+  .main-banner {
+    background: linear-gradient(135deg, vars.$tcm-primary-600 0%, vars.$tcm-primary-800 100%);
+  }
+
+  .events-section__title {
+    color: vars.$tcm-neutral-100;
+  }
+
+  .timeline-item__day {
+    color: vars.$tcm-neutral-300;
+  }
+
+  .event-card-mini {
+    background: vars.$tcm-neutral-800;
+    border-color: rgba(59, 130, 246, 0.2);
+
+    &__title {
+      color: vars.$tcm-neutral-100;
+    }
+
+    &--past {
+      background: vars.$tcm-neutral-900;
+    }
+  }
+
+  .calendar-widget {
+    background: vars.$tcm-neutral-800;
+    border-color: rgba(59, 130, 246, 0.2);
+
+    &__month {
+      color: vars.$tcm-neutral-200;
+    }
+  }
+
+  .calendar-day {
+    color: vars.$tcm-neutral-300;
+
+    &:hover {
+      background: vars.$tcm-neutral-700;
+    }
+
+    &--prev-month {
+      color: vars.$tcm-neutral-500;
+    }
+  }
+
+  .calendar-event {
+    &__title {
+      color: vars.$tcm-neutral-200;
+    }
+
+    &__subtitle {
+      color: vars.$tcm-neutral-400;
     }
   }
 }
