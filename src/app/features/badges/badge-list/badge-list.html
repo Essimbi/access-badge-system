@@ -1,0 +1,161 @@
+<div class="badge-list-page">
+    <div class="page-header">
+        <div>
+            <nav class="flex text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">
+                <span class="hover:text-primary cursor-pointer transition-colors">Dashboard</span>
+                <span class="mx-2">/</span>
+                <span class="text-slate-900">Modèles de Badges</span>
+            </nav>
+            <h1 class="page-header__title">Gestion des <span class="text-gradient">Badges</span></h1>
+            <p class="text-slate-500 text-sm max-w-md leading-relaxed font-medium">
+                Gérez et personnalisez vos designs de badges par organisation.
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Org Filter for SuperAdmin -->
+            <mat-form-field *ngIf="isSuperAdmin" appearance="outline" class="min-w-[240px] hide-hint">
+                <mat-label>Filtrer par Organisation</mat-label>
+                <mat-select [(ngModel)]="selectedOrgId" (selectionChange)="loadTemplates()">
+                    <mat-option value="">Toutes les organisations</mat-option>
+                    <mat-option value="global">Modèles Globaux (3CM)</mat-option>
+                    <mat-divider></mat-divider>
+                    <mat-option *ngFor="let org of organizations" [value]="org.id">
+                        {{org.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-button-toggle-group [(ngModel)]="viewMode" class="modern-toggle-group">
+                <mat-button-toggle value="table" matTooltip="Vue Tableau">
+                    <mat-icon>table_chart</mat-icon>
+                </mat-button-toggle>
+                <mat-button-toggle value="grid" matTooltip="Vue Galerie">
+                    <mat-icon>grid_view</mat-icon>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <div class="flex gap-3 border-l pl-4 border-slate-300">
+                <button mat-stroked-button (click)="loadTemplates()" style="border-radius: 12px; height: 48px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.5);">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+                <button mat-flat-button color="primary" routerLink="new" style="border-radius: 12px; height: 48px; padding: 0 24px; font-weight: 700;">
+                    <mat-icon>add</mat-icon>
+                    Nouveau Design
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="glass-card flex flex-col items-center justify-center p-24 text-center">
+        <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+        <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Chargement en cours...</p>
+    </div>
+
+    <div *ngIf="!loading && dataSource.data.length === 0" class="glass-card flex flex-col items-center justify-center p-24 text-center">
+        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6 shadow-inner border border-slate-200">
+            <mat-icon class="text-slate-400 text-4xl w-10 h-10">style</mat-icon>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Aucun modèle trouvé</h3>
+        <p class="text-slate-500 max-w-xs mb-8">Commencez par créer votre premier design de badge.</p>
+        <button mat-flat-button color="primary" routerLink="new" style="border-radius: 12px; font-weight: 700;">Créer un badge</button>
+    </div>
+
+    <div *ngIf="!loading && dataSource.data.length > 0">
+        
+        <!-- TABLE VIEW (DEFAULT) -->
+        <div *ngIf="viewMode === 'table'" class="table-glass-container">
+            <table mat-table [dataSource]="dataSource">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> Nom du Modèle </th>
+                    <td mat-cell *matCellDef="let template"> 
+                        <div class="flex items-center gap-4 py-2">
+                            <div class="w-12 h-16 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
+                                <div class="mini-badge-table" [innerHTML]="getSafePreview(template)"></div>
+                            </div>
+                            <span class="font-bold text-slate-900 text-base">{{template.templateName}}</span>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="organization">
+                    <th mat-header-cell *matHeaderCellDef> Organisation </th>
+                    <td mat-cell *matCellDef="let template">
+                        <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                            {{template.organizationName}}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                    <td mat-cell *matCellDef="let template">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full shadow-sm" [style.backgroundColor]="getCategory(template.categoryId)?.color || '#94a3b8'"></div>
+                            <span class="text-slate-700 font-medium">{{getCategory(template.categoryId)?.name || 'Standard'}}</span>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="updatedAt">
+                    <th mat-header-cell *matHeaderCellDef> Dernière Modif. </th>
+                    <td mat-cell *matCellDef="let template">
+                        <span class="text-slate-500 text-sm font-medium">{{template.updatedAt | date:'dd/MM/yyyy HH:mm'}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let template" class="text-right">
+                        <button mat-icon-button (click)="openPreview(template)" matTooltip="Visualiser">
+                            <mat-icon class="text-slate-500 hover:text-primary transition-colors">visibility</mat-icon>
+                        </button>
+                        <button mat-icon-button [routerLink]="['edit', template.id]" matTooltip="Modifier">
+                            <mat-icon class="text-slate-500 hover:text-primary transition-colors">edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteTemplate(template)" matTooltip="Supprimer">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+        </div>
+
+        <!-- GRID VIEW (GALLERY) -->
+        <div *ngIf="viewMode === 'grid'" class="badge-gallery">
+            <div *ngFor="let template of dataSource.data" class="badge-card group">
+                <div class="badge-card__preview-container">
+                    <div class="preview-scale">
+                        <div class="mini-badge bg-white rounded overflow-hidden shadow-2xl" 
+                            [innerHTML]="getSafePreview(template)"
+                            [ngClass]="template.layout === 'landscape' ? 'mini-landscape' : 'mini-portrait'">
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card__overlay">
+                        <button mat-fab color="primary" class="badge-card__action" (click)="openPreview(template)">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                        <button mat-fab class="badge-card__action" style="background: white; color: #0f172a;" [routerLink]="['edit', template.id]">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </div>
+
+                    <div class="org-tag" *ngIf="template.organizationName">
+                        {{template.organizationName}}
+                    </div>
+                </div>
+                <div class="mt-4 px-2">
+                    <h3 class="text-lg font-bold text-slate-800 truncate mb-1">{{template.templateName}}</h3>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full" [style.backgroundColor]="getCategory(template.categoryId)?.color || '#94a3b8'"></div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{getCategory(template.categoryId)?.name || 'Standard'}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, delay, throwError, map, switchMap, take } from 'rxjs';
+import { Observable, of, delay, throwError, map, switchMap, take, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MOCK_ORGANIZATIONS, MOCK_EVENTS, MOCK_STATS, MOCK_USERS, MOCK_ENROLLMENTS, MOCK_GATES, MOCK_BADGE_CATEGORIES, MOCK_BADGE_TEMPLATES } from '../mocks/mock-data';
 import { User } from '../models/user.model';
@@ -232,36 +232,15 @@ export class ApiService {
 
     // Enrollments
     getEnrollments(params?: any): Observable<any[]> {
-        return this.mockStore.getEnrollments$().pipe(
-            take(1),
-            switchMap((enrollments: EnrollmentRecord[]) =>
-                this.mockStore.getEvents$().pipe(
-                    take(1),
-                    map((events: EventRecord[]) => {
-                        const authUser = this.authService.hasRole('admin') ? this.authService.currentUserValue : null;
-                        let filtered = [...enrollments];
-
-                        if (authUser && authUser.organization_id) {
-                            const orgEventIds = events
-                                .filter(e => e.organization_id === authUser.organization_id)
-                                .map(e => e.id);
-                            filtered = filtered.filter(e => orgEventIds.includes(e.eventId));
-                        }
-
-                        if (params?.eventId) {
-                            filtered = filtered.filter(e => e.eventId === Number(params.eventId));
-                        }
-
-                        if (params?.status) {
-                            filtered = filtered.filter(e => e.status === params.status);
-                        }
-
-                        return filtered;
-                    })
-                )
-            ),
-            delay(300)
-        );
+        let queryString = '';
+        if (params) {
+            const queryParams: string[] = [];
+            if (params.eventId) queryParams.push(`eventId=${params.eventId}`);
+            if (params.status) queryParams.push(`status=${params.status}`);
+            if (params.search) queryParams.push(`search=${encodeURIComponent(params.search)}`);
+            if (queryParams.length) queryString = '?' + queryParams.join('&');
+        }
+        return this.get<any[]>(`/enrollments${queryString}`);
     }
 
     getMyEnrollments(): Observable<any> {
@@ -310,24 +289,20 @@ export class ApiService {
         return this.post(`/badges/enroll/${data.eventId}`, data);
     }
 
-    approveEnrollment(id: number): Observable<any> {
-        return this.mockStore.approveEnrollment(id).pipe(delay(200));
+    approveEnrollment(id: number | string): Observable<any> {
+        return this.put<any>(`/enrollments/${id}/approve`, {});
     }
 
-    rejectEnrollment(id: number): Observable<any> {
-        return this.mockStore.rejectEnrollment(id).pipe(delay(200));
+    rejectEnrollment(id: number | string): Observable<any> {
+        return this.put<any>(`/enrollments/${id}/reject`, {});
     }
 
-    deleteEnrollment(id: number): Observable<any> {
-        return this.mockStore.deleteEnrollment(id).pipe(delay(200));
+    deleteEnrollment(id: number | string): Observable<any> {
+        return this.delete<any>(`/enrollments/${id}`);
     }
 
-    getEnrollmentById(id: number): Observable<any> {
-        return this.mockStore.getEnrollmentById$(id).pipe(
-            take(1),
-            map(enrollment => enrollment ? { ...enrollment, userEmail: 'user@example.com' } : null),
-            delay(200)
-        );
+    getEnrollmentById(id: number | string): Observable<any> {
+        return this.get<any>(`/enrollments/${id}`);
     }
 
     // Access Gates
@@ -555,7 +530,31 @@ export class ApiService {
     }
 
     updateProfile(data: any): Observable<any> {
-        return this.put('/users/me', data);
+        return this.put('/users/me', data).pipe(
+            tap((response: any) => {
+                if (response) {
+                    this.authService.updateCurrentUser(response);
+                }
+            })
+        );
+    }
+
+    changePassword(data: any): Observable<any> {
+        return this.put('/users/me/password', data);
+    }
+
+    updatePreferences(data: any): Observable<any> {
+        return this.put('/users/me/preferences', data).pipe(
+            tap((response: any) => {
+                if (response && response.preferences) {
+                    this.authService.updateCurrentUser({ preferences: response.preferences });
+                }
+            })
+        );
+    }
+
+    deleteAccount(): Observable<any> {
+        return this.delete('/users/me');
     }
 
     updateUser(id: string | number, data: any): Observable<any> {

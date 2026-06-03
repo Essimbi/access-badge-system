@@ -97,6 +97,10 @@ export class ProfileComponent implements OnInit {
           phone: user.phone || '',
           organization: user.organization || ''
         });
+
+        if (user.preferences) {
+          this.preferencesForm.patchValue(user.preferences);
+        }
       }
       this.loading = false;
     });
@@ -129,21 +133,36 @@ export class ProfileComponent implements OnInit {
     }
 
     this.loading = true;
-    // Simulation du changement de mot de passe
-    setTimeout(() => {
-      this.notificationService.success('Mot de passe changé avec succès');
-      this.passwordForm.reset();
-      this.editingPassword = false;
-      this.loading = false;
-    }, 1000);
+    this.apiService.changePassword({
+      currentPassword: this.passwordForm.value.currentPassword,
+      newPassword: this.passwordForm.value.newPassword
+    }).subscribe({
+      next: () => {
+        this.notificationService.success('Mot de passe changé avec succès');
+        this.passwordForm.reset();
+        this.editingPassword = false;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.notificationService.error(err.error?.error || 'Erreur lors du changement de mot de passe');
+        this.loading = false;
+      }
+    });
   }
 
   savePreferences(): void {
-    // Simulation de la sauvegarde des préférences en arrière-plan
-    setTimeout(() => {
-      this.notificationService.success('Préférences mises à jour');
-      this.editingPreferences = false;
-    }, 500);
+    this.loading = true;
+    this.apiService.updatePreferences(this.preferencesForm.value).subscribe({
+      next: () => {
+        this.notificationService.success('Préférences mises à jour');
+        this.editingPreferences = false;
+        this.loading = false;
+      },
+      error: () => {
+        this.notificationService.error('Erreur lors de la mise à jour des préférences');
+        this.loading = false;
+      }
+    });
   }
 
   cancelEdit(form: string): void {
@@ -187,11 +206,16 @@ export class ProfileComponent implements OnInit {
     if (!confirmed) return;
 
     this.loading = true;
-    // Simulation de la suppression du compte
-    setTimeout(() => {
-      this.notificationService.success('Compte supprimé');
-      this.authService.logout();
-      this.loading = false;
-    }, 1000);
+    this.apiService.deleteAccount().subscribe({
+      next: () => {
+        this.notificationService.success('Compte supprimé');
+        this.authService.logout();
+        this.loading = false;
+      },
+      error: () => {
+        this.notificationService.error('Erreur lors de la suppression du compte');
+        this.loading = false;
+      }
+    });
   }
 }

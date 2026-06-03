@@ -1,7 +1,7 @@
 <div class="org-list-page">
     <div class="page-header">
         <h1 class="page-header__title">Gestion des Organisations</h1>
-        <div class="page-header__actions flex gap-2">
+        <div class="page-header__actions">
             <button mat-stroked-button (click)="exportCSV()" [disabled]="dataSource.data.length === 0">
                 <mat-icon>download</mat-icon>
                 Exporter
@@ -13,19 +13,22 @@
         </div>
     </div>
 
-    <div class="filter-bar flex flex-wrap gap-4 mb-6 items-center p-4 bg-white rounded-lg border shadow-sm">
-        <mat-form-field appearance="outline" class="search-field flex-grow max-w-md">
+    <div class="filter-bar">
+        <mat-form-field appearance="outline" class="search-field">
             <mat-label>Rechercher une organisation</mat-label>
             <input matInput (keyup)="onSearchChange($any($event.target).value)" placeholder="Nom, email...">
             <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
 
-        <div class="filter-group flex gap-2">
+        <div class="filter-group">
             <button mat-stroked-button [color]="statusFilter === 'all' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'all'"
                 (click)="onStatusFilterChange('all')">Tout</button>
             <button mat-stroked-button [color]="statusFilter === 'active' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'active'"
                 (click)="onStatusFilterChange('active')">Actif</button>
             <button mat-stroked-button [color]="statusFilter === 'inactive' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'inactive'"
                 (click)="onStatusFilterChange('inactive')">Inactif</button>
         </div>
     </div>

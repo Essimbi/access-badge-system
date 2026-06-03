@@ -1,51 +1,263 @@
+@use '../../../../styles/variables-3cm' as vars;
+
 .event-list-page {
-    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: vars.$spacing-2xl;
+    padding: vars.$spacing-2xl;
+    min-height: calc(100vh - 80px);
+    background: radial-gradient(circle at top right, rgba(219, 234, 254, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at bottom left, rgba(238, 242, 255, 0.7) 0%, transparent 40%),
+                vars.$gradient-3cm-light;
+    font-family: vars.$font-family-3cm;
 }
 
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 600;
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: vars.$border-radius-xl;
+    box-shadow: 0 10px 40px -10px rgba(37, 99, 235, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: vars.$spacing-xl vars.$spacing-2xl;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 50px -10px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    &__title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, vars.$tcm-neutral-900 0%, vars.$tcm-primary-700 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    &__actions {
+        display: flex;
+        gap: vars.$spacing-md;
+
+        .mat-mdc-button, .mat-mdc-raised-button {
+            border-radius: vars.$border-radius-lg;
+            padding: 0 1.5rem;
+            height: 44px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            mat-icon {
+                margin-right: 8px;
+            }
+        }
+    }
+}
+
+.filter-bar {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: vars.$border-radius-lg;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: vars.$spacing-lg vars.$spacing-xl;
+    display: flex;
+    flex-wrap: wrap;
+    gap: vars.$spacing-xl;
+    align-items: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .search-field {
+        flex-grow: 1;
+        max-width: 400px;
+        margin-bottom: -1.25em;
+
+        ::ng-deep .mat-mdc-text-field-wrapper {
+            background-color: white !important;
+            border-radius: vars.$border-radius-md !important;
+            transition: all 0.3s ease;
+
+            &.mdc-text-field--focused {
+                box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+            }
+        }
+    }
+
+    .org-filter {
+        width: 250px;
+        margin-bottom: -1.25em;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: vars.$spacing-sm;
+
+        button {
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1px solid transparent !important;
+            color: vars.$tcm-neutral-600 !important;
+            background: transparent !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.5) !important;
+                color: vars.$tcm-neutral-900 !important;
+                border-color: rgba(0, 0, 0, 0.1) !important;
+            }
+
+            &.active-filter {
+                background: vars.$gradient-3cm-primary !important;
+                color: white !important;
+                border-color: transparent !important;
+                box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
+                transform: scale(1.05);
+
+                * {
+                    color: white !important;
+                }
+            }
+        }
+    }
+}
+
+.event-table-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: vars.$border-radius-xl;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.mat-mdc-table {
+    width: 100%;
+    background: transparent !important;
+}
+
+.mat-mdc-header-cell {
+    background: rgba(249, 250, 251, 0.5) !important;
+    color: vars.$tcm-neutral-600 !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    padding: vars.$spacing-lg vars.$spacing-xl !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
 
-    &--upcoming {
-        background-color: #eff6ff;
-        color: #1e40af;
-    }
+.mat-mdc-cell {
+    padding: vars.$spacing-md vars.$spacing-xl !important;
+    font-size: 0.95rem !important;
+    color: vars.$tcm-neutral-800 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+    transition: background-color 0.2s ease;
+}
 
-    &--ongoing {
-        background-color: #fefce8;
-        color: #854d0e;
-    }
+.mat-mdc-row {
+    transition: all 0.3s ease;
 
-    &--completed {
-        background-color: #f0fdf4;
-        color: #166534;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        transform: scale(1.002);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
 }
 
 .event-name-cell {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: vars.$spacing-sm 0;
+
+    .font-bold {
+        font-weight: 700;
+        color: vars.$tcm-neutral-900;
+        font-size: 1.05rem;
+        margin-bottom: 2px;
+    }
+
+    .text-xs {
+        color: vars.$tcm-neutral-500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.75rem;
+    }
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
+
+    &--upcoming {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    &--ongoing {
+        background: linear-gradient(135deg, #fefce8 0%, #fef08a 100%);
+        color: #a16207;
+        border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+
+    &--completed {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #15803d;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
 }
 
 .empty-state {
-    padding: 64px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
     text-align: center;
-    color: #94a3b8;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
 
     &__icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        margin-bottom: 16px;
-        opacity: 0.2;
+        color: vars.$tcm-neutral-300;
+        font-size: 6rem;
+        width: 6rem;
+        height: 6rem;
+        margin-bottom: vars.$spacing-xl;
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.05));
+        transition: transform 0.4s ease;
+
+        &:hover {
+            transform: scale(1.1) translateY(-5px);
+            color: vars.$tcm-primary-300;
+        }
     }
 
     &__title {
-        color: #1e293b;
-        font-weight: 600;
-        margin-bottom: 8px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: vars.$tcm-neutral-800;
+        margin-bottom: vars.$spacing-sm;
+    }
+
+    &__subtitle {
+        font-size: 1.1rem;
+        color: vars.$tcm-neutral-500;
     }
 }

@@ -3,25 +3,28 @@
         <h1 class="page-header__title">Gestion des Inscriptions</h1>
     </div>
 
-    <div class="filter-bar flex flex-wrap gap-4 mb-6 items-center p-4 bg-white rounded-lg border shadow-sm">
-        <mat-form-field appearance="outline" class="search-field flex-grow max-w-md">
+    <div class="filter-bar">
+        <mat-form-field appearance="outline" class="search-field">
             <mat-label>Rechercher un participant ou événement</mat-label>
             <input matInput (keyup)="onSearchChange($any($event.target).value)" placeholder="Nom, titre...">
             <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
 
-        <div class="filter-group flex gap-2">
+        <div class="filter-group">
             <button mat-stroked-button [color]="statusFilter === 'all' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'all'"
                 (click)="onStatusFilterChange('all')">Tout</button>
             <button mat-stroked-button [color]="statusFilter === 'confirmed' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'confirmed'"
                 (click)="onStatusFilterChange('confirmed')">Confirmées</button>
             <button mat-stroked-button [color]="statusFilter === 'pending' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'pending'"
                 (click)="onStatusFilterChange('pending')">En attente</button>
         </div>
     </div>
 
-    <div class="table-container">
-        <div *ngIf="loading" class="flex justify-center items-center p-8">
+    <div class="enrollment-table-container">
+        <div *ngIf="loading" class="loading-container">
             <mat-spinner diameter="40"></mat-spinner>
         </div>
 
@@ -49,8 +52,8 @@
             <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef> Statut </th>
                 <td mat-cell *matCellDef="let entry">
-                    <span class="px-2 py-1 rounded-full text-[10px] uppercase font-bold"
-                        [ngClass]="entry.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'">
+                    <span class="status-badge"
+                        [ngClass]="entry.status === 'confirmed' ? 'status-badge--confirmed' : 'status-badge--pending'">
                         {{entry.status === 'confirmed' ? 'Confirmée' : 'En attente'}}
                     </span>
                 </td>
@@ -77,9 +80,10 @@
         <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
 
         <ng-template #emptyState>
-            <div class="p-12 text-center text-gray-400">
-                <mat-icon class="text-5xl opacity-20">assignment_ind</mat-icon>
-                <p class="mt-2">Aucune inscription trouvée.</p>
+            <div class="empty-state" *ngIf="!loading">
+                <mat-icon class="empty-state__icon">assignment_ind</mat-icon>
+                <h2 class="empty-state__title">Aucune inscription trouvée</h2>
+                <p class="empty-state__subtitle">Essayez d'ajuster vos filtres de recherche.</p>
             </div>
         </ng-template>
     </div>

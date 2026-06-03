@@ -1,131 +1,129 @@
-<div class="enrollment-detail-page p-6 max-w-5xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-4">
-            <button mat-icon-button routerLink="/dashboard/enrollments">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-            <div>
-                <h1 class="page-header__title mb-0">Détails de l'Inscription #{{enrollment?.id}}</h1>
-                <p class="text-slate-500 text-sm">Gérer la participation et le statut de validation</p>
+<div class="enrollment-detail-page">
+    <div class="max-w-5xl mx-auto w-full">
+        <!-- Header -->
+        <div class="page-header mb-8">
+            <div class="flex items-center gap-4">
+                <button mat-icon-button routerLink="/dashboard/enrollments" class="back-button">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+                <div>
+                    <h1 class="page-header__title mb-0">Détails de l'Inscription <span class="text-sm font-normal text-slate-500 block sm:inline sm:ml-2">#{{enrollment?.id}}</span></h1>
+                    <p class="text-slate-500 text-sm mt-1">Gérer la participation et le statut de validation</p>
+                </div>
+            </div>
+            <div class="page-header__actions" *ngIf="enrollment">
+                <button mat-stroked-button color="warn" (click)="updateStatus('rejected')"
+                    *ngIf="enrollment.status !== 'rejected'">
+                    Annuler
+                </button>
+                <button mat-raised-button color="primary" (click)="updateStatus('confirmed')"
+                    *ngIf="enrollment.status === 'pending'">
+                    Confirmer
+                </button>
             </div>
         </div>
-        <div class="flex gap-2" *ngIf="enrollment">
-            <button mat-stroked-button color="warn" (click)="updateStatus('cancelled')"
-                *ngIf="enrollment.status !== 'cancelled'">
-                Annuler
-            </button>
-            <button mat-flat-button color="primary" (click)="updateStatus('confirmed')"
-                *ngIf="enrollment.status === 'pending'">
-                Confirmer
-            </button>
-        </div>
-    </div>
 
-    <div *ngIf="loading" class="flex justify-center p-20">
-        <mat-spinner diameter="40"></mat-spinner>
-    </div>
-
-    <div *ngIf="!loading && enrollment" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left: Participant & Event Info -->
-        <div class="lg:col-span-2 space-y-6">
-            <mat-card class="p-8">
-                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                    <mat-icon color="primary">person</mat-icon>
-                    Informations du Participant
-                </h3>
-                <div class="grid grid-cols-2 gap-8">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nom
-                            Complet</label>
-                        <div class="text-lg font-medium">{{enrollment.userName}}</div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</label>
-                        <div class="text-slate-600">{{enrollment.userEmail || 'non fourni'}}</div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID
-                            Participant</label>
-                        <div class="font-mono text-slate-600">ID-{{enrollment.userId}}</div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date
-                            d'inscription</label>
-                        <div class="text-slate-600">{{enrollment.registeredAt | date:'medium'}}</div>
-                    </div>
-                </div>
-            </mat-card>
-
-            <mat-card class="p-8">
-                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                    <mat-icon color="accent">event</mat-icon>
-                    Événement Associé
-                </h3>
-                <div class="flex gap-6 items-start">
-                    <div class="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <mat-icon class="text-slate-300 text-5xl">image</mat-icon>
-                    </div>
-                    <div class="flex-grow">
-                        <div class="text-xl font-bold text-slate-900 mb-1">{{enrollment.eventTitle}}</div>
-                        <div class="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                            <mat-icon class="text-sm w-4 h-4">location_on</mat-icon>
-                            <span>Palais de la Culture, Abidjan</span>
-                        </div>
-                        <button mat-stroked-button size="small">Voir l'événement</button>
-                    </div>
-                </div>
-            </mat-card>
+        <div *ngIf="loading" class="flex justify-center p-20">
+            <mat-spinner diameter="40"></mat-spinner>
         </div>
 
-        <!-- Right: Status & Actions -->
-        <div class="space-y-6">
-            <mat-card class="p-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-6 font-mono">Statut Actuel</h3>
-                <div class="flex flex-col items-center p-6 bg-slate-50 rounded-xl border border-slate-100 mb-6">
-                    <span class="px-4 py-2 rounded-full text-xs font-bold uppercase mb-2" [ngClass]="{
-                            'bg-green-100 text-green-700': enrollment.status === 'confirmed',
-                            'bg-orange-100 text-orange-700': enrollment.status === 'pending',
-                            'bg-red-100 text-red-700': enrollment.status === 'cancelled'
-                        }">
-                        {{ enrollment.status === 'confirmed' ? 'Confirmé' : enrollment.status === 'pending' ? 'En
-                        attente' : 'Annulé' }}
-                    </span>
-                    <div class="text-[10px] text-slate-400">Validé le {{enrollment.registeredAt | date}}</div>
-                </div>
-
-                <mat-divider class="mb-6"></mat-divider>
-
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Actions de badge</h3>
-                <div class="space-y-2">
-                    <button mat-stroked-button class="w-full text-left justify-start" color="primary">
-                        <mat-icon>print</mat-icon>
-                        Imprimer le Badge
-                    </button>
-                    <button mat-stroked-button class="w-full text-left justify-start">
-                        <mat-icon>email</mat-icon>
-                        Renvoyer l'Email
-                    </button>
-                </div>
-            </mat-card>
-
-            <mat-card class="p-6 bg-slate-900 text-white border-0">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Historique d'accès</h3>
-                <div class="space-y-4">
-                    <div class="flex gap-3 border-l-2 border-green-500 pl-4 py-1">
-                        <div>
-                            <p class="text-[10px] text-slate-400 leading-none mb-1">AUJOURD'HUI 14:20</p>
-                            <p class="text-xs font-medium">Entrée: GATE-001</p>
+        <div *ngIf="!loading && enrollment" class="detail-grid">
+            <!-- Left: Participant & Event Info -->
+            <div class="detail-column-main">
+                <div class="glass-card">
+                    <h3 class="glass-card__title">
+                        <div class="icon-wrapper icon-wrapper--primary">
+                            <mat-icon>person</mat-icon>
                         </div>
-                    </div>
-                    <div class="flex gap-3 border-l-2 border-slate-700 pl-4 py-1 opacity-50">
-                        <div>
-                            <p class="text-[10px] text-slate-400 leading-none mb-1">04 FÉV 09:15</p>
-                            <p class="text-xs">Tentative échouée (Zone VIP)</p>
+                        Informations du Participant
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Nom Complet</label>
+                            <div class="value">{{enrollment.userName}}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <div class="value">{{enrollment.userEmail || 'non fourni'}}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>ID Participant</label>
+                            <div class="value value--mono">ID-{{enrollment.userId | slice:0:8}}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Date d'inscription</label>
+                            <div class="value">{{enrollment.registeredAt | date:'medium'}}</div>
                         </div>
                     </div>
                 </div>
-            </mat-card>
+
+                <div class="glass-card">
+                    <h3 class="glass-card__title">
+                        <div class="icon-wrapper icon-wrapper--accent">
+                            <mat-icon>event</mat-icon>
+                        </div>
+                        Événement Associé
+                    </h3>
+                    <div class="event-info-flex">
+                        <div class="event-image-placeholder">
+                            <mat-icon>image</mat-icon>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-name">{{enrollment.eventTitle}}</div>
+                            <div class="event-location">
+                                <mat-icon>location_on</mat-icon>
+                                <span>{{enrollment.eventLocation || 'Lieu non défini'}}</span>
+                            </div>
+                            <button mat-stroked-button class="mt-2" [routerLink]="['/dashboard/events', enrollment.eventId]">Voir l'événement</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Status & Actions -->
+            <div class="detail-column-side">
+                <div class="glass-card">
+                    <h3 class="glass-card__subtitle">Statut Actuel</h3>
+                    <div class="status-container">
+                        <span class="status-badge" [ngClass]="{
+                                'status-badge--confirmed': enrollment.status === 'confirmed',
+                                'status-badge--pending': enrollment.status === 'pending',
+                                'status-badge--rejected': enrollment.status === 'rejected'
+                            }">
+                            {{ enrollment.status === 'confirmed' ? 'Confirmé' : enrollment.status === 'pending' ? 'En attente' : 'Annulé' }}
+                        </span>
+                        <div class="status-date">Validé le {{enrollment.registeredAt | date:'mediumDate'}}</div>
+                    </div>
+
+                    <div class="glass-divider"></div>
+
+                    <h3 class="glass-card__subtitle mb-4">Actions de badge</h3>
+                    <div class="action-buttons">
+                        <button mat-stroked-button color="primary">
+                            <mat-icon>print</mat-icon>
+                            Imprimer le Badge
+                        </button>
+                        <button mat-stroked-button>
+                            <mat-icon>email</mat-icon>
+                            Renvoyer l'Email
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-card glass-card--dark">
+                    <h3 class="glass-card__subtitle text-slate-400">Historique d'accès</h3>
+                    <div class="access-history">
+                        <div class="history-item success">
+                            <p class="time">AUJOURD'HUI 14:20</p>
+                            <p class="desc">Entrée: GATE-001</p>
+                        </div>
+                        <div class="history-item failed">
+                            <p class="time">04 FÉV 09:15</p>
+                            <p class="desc">Tentative échouée (Zone VIP)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

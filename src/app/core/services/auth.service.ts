@@ -14,6 +14,7 @@ export interface User {
     organization_id?: number;
     phone?: string;
     organization?: string;
+    preferences?: any;
 }
 
 export interface LoginResponse {
@@ -76,6 +77,15 @@ export class AuthService {
             } catch (e) {
                 localStorage.removeItem('current_user');
             }
+        }
+    }
+
+    updateCurrentUser(userData: Partial<User>): void {
+        const currentUser = this.currentUserValue;
+        if (currentUser) {
+            const updatedUser = { ...currentUser, ...userData };
+            localStorage.setItem('current_user', JSON.stringify(updatedUser));
+            this.currentUserSubject.next(updatedUser);
         }
     }
 

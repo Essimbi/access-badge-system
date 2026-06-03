@@ -1,7 +1,7 @@
 <div class="event-list-page">
     <div class="page-header">
         <h1 class="page-header__title">Tableau de bord des Événements</h1>
-        <div class="page-header__actions flex gap-2">
+        <div class="page-header__actions">
             <button mat-stroked-button (click)="exportCSV()" [disabled]="dataSource.data.length === 0">
                 <mat-icon>download</mat-icon>
                 Exporter
@@ -13,14 +13,14 @@
         </div>
     </div>
 
-    <div class="filter-bar flex flex-wrap gap-4 mb-6 items-center p-4 bg-white rounded-lg border shadow-sm">
-        <mat-form-field appearance="outline" class="search-field flex-grow max-w-md">
+    <div class="filter-bar">
+        <mat-form-field appearance="outline" class="search-field">
             <mat-label>Rechercher un événement</mat-label>
             <input matInput (keyup)="onSearchChange($any($event.target).value)" placeholder="Titre, lieu...">
             <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-64">
+        <mat-form-field appearance="outline" class="org-filter">
             <mat-label>Organisation</mat-label>
             <mat-select [value]="orgFilter" (selectionChange)="onOrgFilterChange($event.value)">
                 <mat-option value="all">Toutes les organisations</mat-option>
@@ -28,14 +28,18 @@
             </mat-select>
         </mat-form-field>
 
-        <div class="filter-group flex gap-2">
+        <div class="filter-group">
             <button mat-stroked-button [color]="statusFilter === 'all' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'all'"
                 (click)="onStatusFilterChange('all')">Tout</button>
             <button mat-stroked-button [color]="statusFilter === 'upcoming' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'upcoming'"
                 (click)="onStatusFilterChange('upcoming')">À venir</button>
             <button mat-stroked-button [color]="statusFilter === 'ongoing' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'ongoing'"
                 (click)="onStatusFilterChange('ongoing')">En cours</button>
             <button mat-stroked-button [color]="statusFilter === 'completed' ? 'primary' : ''"
+                [class.active-filter]="statusFilter === 'completed'"
                 (click)="onStatusFilterChange('completed')">Terminés</button>
         </div>
     </div>

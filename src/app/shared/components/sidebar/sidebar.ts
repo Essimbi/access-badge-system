@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
@@ -7,8 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService, User } from '../../../core/services/auth.service';
+import { ApiService } from '../../../core/services/api.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 interface NavItem {
   label: string;
@@ -57,12 +59,13 @@ interface NavItem {
     ])
   ]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<boolean>();
   
   currentUser: User | null = null;
   currentRoute = '';
+  private subscriptions: Subscription[] = [];
 
   navItems: NavItem[] = [
     { 
@@ -82,7 +85,7 @@ export class SidebarComponent implements OnInit {
       icon: 'event', 
       route: '/dashboard/participant/browse-events', 
       roles: ['participant'],
-      badge: 3
+      badge: 0
     },
     { 
       label: 'Mon Profil', 
@@ -113,7 +116,7 @@ export class SidebarComponent implements OnInit {
       icon: 'assignment', 
       route: '/dashboard/enrollments', 
       roles: ['super_admin', 'admin'],
-      badge: 12
+      badge: 0
     },
     { 
       label: 'Badges', 
@@ -173,12 +176,16 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private apiService: ApiService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      if (user) {
+        this.loadDynamicBadges();
+      }
     });
 
     // Écouter les changements de route
@@ -190,6 +197,49 @@ export class SidebarComponent implements OnInit {
 
     // Initialiser la route actuelle
     this.currentRoute = this.router.url;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Charge les badges dynamiques depuis l'API
+   */
+  private loadDynamicBadges(): void {
+    const sub = this.apiService.getEvents().subscribe({
+      next: (events: any[]) => {
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        // Compter les événements créés dans les 7 derniers jours
+        const newEventsCount = events.filter((event: any) => {
+          const createdAt = new Date(event.createdAt || event.created_at);
+          return createdAt >= sevenDaysAgo;
+        }).length;
+
+        // Mettre à jour le badge "Événements" (participant)
+        const participantEventsItem = this.navItems.find(
+          item => item.route === '/dashboard/participant/browse-events'
+        );
+        if (participantEventsItem) {
+          participantEventsItem.badge = newEventsCount;
+        }
+
+        // Compter les événements à venir (upcoming) pour les admins
+        const upcomingCount = events.filter((e: any) => e.status === 'upcoming').length;
+        const gestionEventsItem = this.navItems.find(
+          item => item.route === '/dashboard/events'
+        );
+        if (gestionEventsItem) {
+          gestionEventsItem.badge = upcomingCount;
+        }
+      },
+      error: () => {
+        // En cas d'erreur, on laisse les badges à 0
+      }
+    });
+    this.subscriptions.push(sub);
   }
 
   /**

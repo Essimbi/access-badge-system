@@ -40,31 +40,84 @@
 // Surcharge complète des composants Material avec les couleurs 3CM
 .mat-mdc-button.mat-primary {
   --mdc-text-button-label-text-color: #3B82F6 !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   
   &:hover {
-    background-color: rgba(59, 130, 246, 0.04) !important;
+    background-color: rgba(59, 130, 246, 0.08) !important;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 }
 
 .mat-mdc-raised-button.mat-primary {
-  --mdc-filled-button-container-color: #3B82F6 !important;
+  --mdc-filled-button-container-color: transparent !important;
   --mdc-filled-button-label-text-color: #FFFFFF !important;
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
+  --mdc-protected-button-label-text-color: #FFFFFF !important;
+  --mdc-elevated-button-label-text-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+  border-radius: 50px !important;
+  padding: 0 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  position: relative;
+  overflow: hidden;
+
+  * {
+    color: #FFFFFF !important;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%) !important;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+  }
   
   &:hover {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
-    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05) !important;
-    transform: translateY(-1px);
+    box-shadow: 0 12px 25px -8px rgba(37, 99, 235, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(1px) scale(0.98) !important;
+    box-shadow: 0 4px 10px -4px rgba(37, 99, 235, 0.5) !important;
   }
 }
 
 .mat-mdc-outlined-button.mat-primary {
   --mdc-outlined-button-outline-color: #3B82F6 !important;
   --mdc-outlined-button-label-text-color: #3B82F6 !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   
   &:hover {
-    background-color: rgba(59, 130, 246, 0.04) !important;
+    background-color: rgba(59, 130, 246, 0.08) !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1) !important;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 }
 

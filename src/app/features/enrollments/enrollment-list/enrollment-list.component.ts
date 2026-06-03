@@ -104,7 +104,7 @@ export class EnrollmentListComponent implements OnInit {
         this.updateDataSource();
     }
 
-    deleteEnrollment(id: number): void {
+    deleteEnrollment(id: string): void {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             width: '400px',
             data: {

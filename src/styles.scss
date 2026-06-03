@@ -11,6 +11,9 @@
 @tailwind components;
 @tailwind utilities;
 
+// Angular Material Core Structural Styles (Required for proper rendering of toggles, inputs, etc.)
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+
 // Material Icons
 @import "material-icons/iconfont/material-icons.css";
 @import "material-symbols/index.css";

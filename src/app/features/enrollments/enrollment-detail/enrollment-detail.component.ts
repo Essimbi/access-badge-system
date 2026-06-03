@@ -39,11 +39,11 @@ export class EnrollmentDetailComponent implements OnInit {
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            this.loadEnrollment(+id);
+            this.loadEnrollment(id);
         }
     }
 
-    loadEnrollment(id: number): void {
+    loadEnrollment(id: string): void {
         this.loading = true;
         this.apiService.getEnrollmentById(id).subscribe({
             next: (data) => {
@@ -57,8 +57,19 @@ export class EnrollmentDetailComponent implements OnInit {
         });
     }
 
-    updateStatus(status: string): void {
-        this.enrollment.status = status;
-        this.notificationService.success(`Statut mis à jour : ${status}`);
+    updateStatus(status: 'confirmed' | 'rejected'): void {
+        const action$ = status === 'confirmed' 
+            ? this.apiService.approveEnrollment(this.enrollment.id)
+            : this.apiService.rejectEnrollment(this.enrollment.id);
+
+        action$.subscribe({
+            next: (res) => {
+                this.enrollment.status = status;
+                this.notificationService.success(res.message || `Statut mis à jour : ${status}`);
+            },
+            error: () => {
+                this.notificationService.error('Erreur lors de la mise à jour du statut');
+            }
+        });
     }
 }

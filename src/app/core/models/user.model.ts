@@ -5,6 +5,9 @@ export interface User {
     lastName: string;
     role: 'super_admin' | 'admin' | 'controller' | 'participant';
     organization_id?: number;
+    organization?: any;
+    phone?: string;
+    preferences?: any;
     is_active: boolean;
     createdAt: Date;
     updatedAt: Date;
